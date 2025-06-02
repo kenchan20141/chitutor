@@ -1,44 +1,4 @@
-
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
@@ -53,7 +13,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
 
     <!-- Android 圖示 -->
@@ -85,6 +45,9 @@
             --gold: #FFD700;
             --silver: #C0C0C0;
             --active-orange: #FF8C00;
+            --hunger-red: #FF4444;
+            --hunger-yellow: #FFB84D;
+            --hunger-green: #4CAF50;
         }
 
         * {
@@ -129,6 +92,7 @@
             right: 0;
             padding: 5px 10px;
             background-color: #f1f1f1;
+            z-index: 1;
         }
 
         .copyright-footer p {
@@ -287,16 +251,18 @@
 
         #input-container {
             display: flex;
-            padding: 25px;
+            padding: 20px 25px;
             background: white;
             border-top: 1px solid #edf2f7;
             gap: 15px;
             align-items: center;
             position: relative;
+            flex-wrap: wrap;
         }
 
         #user-input {
             flex: 1;
+            min-width: 250px;
             padding: 18px 25px;
             border: 2px solid #e2e8f0;
             border-radius: 25px;
@@ -323,6 +289,7 @@
             align-items: center;
             gap: 10px;
             transition: background 0.3s, transform 0.2s;
+            min-width: 60px;
         }
 
         #send-btn {
@@ -338,6 +305,7 @@
             align-items: center;
             gap: 10px;
             transition: background 0.3s, transform 0.2s;
+            min-width: 60px;
         }
 
         #voice-btn:hover {
@@ -379,6 +347,9 @@
             gap: 10px;
             font-size: 1.1rem;
             color: var(--text-dark);
+            width: 100%;
+            justify-content: center;
+            margin-top: 10px;
         }
 
         .typing-indicator {
@@ -474,7 +445,12 @@
             z-index: 100;
             border: 3px solid var(--primary);
             transition: all 0.3s ease;
-            cursor: pointer;
+            cursor: grab;
+            user-select: none;
+        }
+
+        .vtuber-container:active {
+            cursor: grabbing;
         }
 
         .vtuber-avatar {
@@ -484,6 +460,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            pointer-events: none;
         }
 
         .vtuber-face {
@@ -493,6 +470,17 @@
             background: #fde2e4;
             position: relative;
             overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .vtuber-face.hungry {
+            background: #e8d5d6;
+            transform: scale(0.9);
+        }
+
+        .vtuber-face.very-hungry {
+            background: #dcc5c6;
+            transform: scale(0.85);
         }
 
         .vtuber-hair {
@@ -516,6 +504,14 @@
             z-index: 3;
         }
 
+        .vtuber-face.hungry .vtuber-eyes {
+            opacity: 0.7;
+        }
+
+        .vtuber-face.very-hungry .vtuber-eyes {
+            opacity: 0.5;
+        }
+
         .vtuber-eye {
             width: 30px;
             height: 20px;
@@ -525,6 +521,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        .vtuber-face.hungry .vtuber-eye {
+            transform: scaleY(0.7);
+        }
+
+        .vtuber-face.very-hungry .vtuber-eye {
+            transform: scaleY(0.5);
         }
 
         .vtuber-pupil {
@@ -555,6 +559,11 @@
             animation: talking 0.3s infinite alternate;
         }
 
+        .vtuber-mouth.eating {
+            animation: eating 0.5s ease-in-out 3;
+            background: #ffb347;
+        }
+
         .vtuber-mouth-inner {
             width: 100%;
             height: 10px;
@@ -569,16 +578,81 @@
             to { height: 20px; }
         }
 
+        @keyframes eating {
+            0% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.2); }
+            100% { transform: translateX(-50%) scale(1); }
+        }
+
         @keyframes blink {
             0%, 5%, 15%, 100% { transform: scaleY(1); }
             10% { transform: scaleY(0.1); }
         }
 
+        /* 飽腹值顯示 */
+        .hunger-bar-container {
+            position: fixed;
+            top: 20px;
+            right: 200px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 25px;
+            padding: 10px 15px;
+            box-shadow: var(--shadow);
+            z-index: 101;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 180px;
+        }
+
+        .hunger-icon {
+            font-size: 1.2rem;
+            color: var(--hunger-green);
+        }
+
+        .hunger-icon.hungry {
+            color: var(--hunger-yellow);
+        }
+
+        .hunger-icon.very-hungry {
+            color: var(--hunger-red);
+        }
+
+        .hunger-bar {
+            flex: 1;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .hunger-fill {
+            height: 100%;
+            background: var(--hunger-green);
+            transition: all 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .hunger-fill.hungry {
+            background: var(--hunger-yellow);
+        }
+
+        .hunger-fill.very-hungry {
+            background: var(--hunger-red);
+        }
+
+        .hunger-percentage {
+            font-size: 0.9rem;
+            font-weight: bold;
+            min-width: 40px;
+            text-align: right;
+        }
+
         /* 商店系統樣式 */
         .shop-button {
             position: fixed;
-            top: 30px;
-            right: 180px; /* 調整位置避免重疊 */
+            top: 20px;
+            left: 20px;
             background: linear-gradient(135deg, var(--gold), var(--silver));
             color: white;
             padding: 12px 18px;
@@ -615,12 +689,13 @@
             z-index: 200;
             justify-content: center;
             align-items: center;
+            padding: 20px;
         }
 
         .shop-content {
             background: white;
             border-radius: var(--radius);
-            width: 90%;
+            width: 100%;
             max-width: 800px;
             max-height: 90vh;
             overflow-y: auto;
@@ -659,32 +734,45 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            margin-bottom: 20px;
         }
 
         .points-display i {
             color: var(--gold);
         }
 
-        .shop-category {
-            margin: 20px 0;
+        .shop-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
 
-        .shop-category h3 {
-            font-size: 1.5rem;
-            color: var(--primary-dark);
-            margin-bottom: 15px;
+        .shop-tab {
+            padding: 10px 20px;
+            background: #e2e8f0;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .shop-tab.active {
+            background: var(--primary);
+            color: white;
         }
 
         .shop-items {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
         }
 
         .shop-item {
             background: #f9f9f9;
             border-radius: var(--radius-sm);
-            padding: 20px;
+            padding: 15px;
             text-align: center;
             transition: all 0.3s ease;
             border: 2px solid #e2e8f0;
@@ -700,9 +788,9 @@
             border-color: var(--secondary);
         }
 
-        .expression-preview, .hair-preview {
-            width: 100px;
-            height: 100px;
+        .item-preview {
+            width: 80px;
+            height: 80px;
             margin: 0 auto 15px;
             position: relative;
             overflow: hidden;
@@ -713,8 +801,13 @@
             border-radius: 50%;
         }
 
-        .hair-preview {
-            background: transparent;
+        .food-preview {
+            background: #fff3cd;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
         }
 
         .expression-eyes {
@@ -722,38 +815,38 @@
             top: 40%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 70px;
-            height: 20px;
+            width: 60px;
+            height: 15px;
             display: flex;
             justify-content: space-between;
             z-index: 2;
         }
 
         .expression-eye {
-            width: 25px;
-            height: 16px;
+            width: 20px;
+            height: 12px;
             background: #fff;
             border-radius: 50%;
             position: relative;
         }
 
         .expression-pupil {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             background: #333;
             border-radius: 50%;
             position: absolute;
-            top: 3px;
-            left: 7px;
+            top: 2px;
+            left: 6px;
         }
 
         .expression-mouth {
             position: absolute;
-            bottom: 20px;
+            bottom: 15px;
             left: 50%;
             transform: translateX(-50%);
-            width: 35px;
-            height: 12px;
+            width: 30px;
+            height: 10px;
             background: #ff9aa2;
             border-radius: 0 0 15px 15px;
             overflow: hidden;
@@ -762,7 +855,7 @@
 
         .expression-mouth-inner {
             width: 100%;
-            height: 7px;
+            height: 6px;
             background: #990000;
             border-radius: 50% / 100%;
             position: absolute;
@@ -773,60 +866,61 @@
         .hair-1 {
             background: #8B4513;
             clip-path: polygon(0 0, 100% 0, 80% 50%, 20% 50%);
-            height: 40px;
+            height: 35px;
         }
 
         .hair-2 {
             background: #FFD700;
             clip-path: polygon(0 0, 100% 0, 90% 40%, 60% 50%, 30% 40%);
-            height: 50px;
+            height: 40px;
         }
 
         .hair-3 {
             background: #FF4500;
             clip-path: polygon(0 0, 100% 0, 70% 60%, 30% 60%);
-            height: 45px;
+            height: 35px;
         }
 
         .hair-4 {
             background: #4682B4;
             clip-path: polygon(0 0, 100% 0, 85% 30%, 50% 50%, 15% 30%);
-            height: 35px;
+            height: 30px;
         }
 
         .hair-5 {
             background: #228B22;
             clip-path: polygon(0 0, 100% 0, 95% 45%, 70% 55%, 30% 55%, 5% 45%);
-            height: 50px;
+            height: 40px;
         }
 
         .hair-6 {
             background: #9932CC;
             clip-path: polygon(0 0, 100% 0, 80% 40%, 60% 60%, 40% 60%, 20% 40%);
-            height: 55px;
+            height: 45px;
         }
 
         .shop-item h3 {
             margin: 10px 0;
-            font-size: 1.2rem;
+            font-size: 1rem;
             color: var(--text-dark);
         }
 
         .shop-item .price {
-            font-size: 1.1rem;
+            font-size: 0.9rem;
             color: var(--gold);
             font-weight: bold;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .shop-btn {
-            padding: 8px 15px;
-            border-radius: 20px;
+            padding: 6px 12px;
+            border-radius: 15px;
             border: none;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
             width: 100%;
+            font-size: 0.9rem;
         }
 
         .buy-btn {
@@ -863,9 +957,9 @@
         /* 表情樣式 */
         .happy .expression-mouth {
             border-radius: 50%;
-            height: 25px;
-            width: 35px;
-            bottom: 25px;
+            height: 20px;
+            width: 30px;
+            bottom: 20px;
         }
         
         .vtuber-face.happy .vtuber-mouth {
@@ -884,7 +978,7 @@
             position: absolute;
             top: 0;
             right: 0;
-            font-size: 28px;
+            font-size: 20px;
         }
         
         .vtuber-face.angry::before {
@@ -897,8 +991,8 @@
 
         .angry .expression-mouth {
             border-radius: 50%;
-            height: 8px;
-            width: 40px;
+            height: 6px;
+            width: 35px;
             background: #d9534f;
         }
         
@@ -924,8 +1018,8 @@
 
         .surprised .expression-mouth {
             border-radius: 50%;
-            height: 25px;
-            width: 20px;
+            height: 20px;
+            width: 15px;
         }
         
         .vtuber-face.surprised .vtuber-eyes {
@@ -948,9 +1042,9 @@
 
         .sad .expression-mouth {
             border-radius: 50% 50% 0 0;
-            height: 10px;
-            width: 30px;
-            top: 60px;
+            height: 8px;
+            width: 25px;
+            top: 50px;
             background: #5bc0de;
         }
         
@@ -968,7 +1062,7 @@
         }
 
         .wink .expression-eye:first-child {
-            height: 5px;
+            height: 3px;
         }
 
         .wink .expression-eye:first-child .expression-pupil {
@@ -977,9 +1071,9 @@
 
         .wink .expression-mouth {
             transform: translateX(-50%) rotate(5deg);
-            border-radius: 20px;
-            height: 10px;
-            width: 35px;
+            border-radius: 15px;
+            height: 8px;
+            width: 30px;
         }
         
         .vtuber-face.wink .vtuber-eye:first-child {
@@ -999,6 +1093,10 @@
 
         /* 移動端適配 */
         @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+
             .vtuber-container {
                 width: 100px;
                 height: 100px;
@@ -1045,42 +1143,61 @@
             }
 
             #input-container {
-                padding: 20px;
-                flex-wrap: wrap;
+                padding: 15px;
                 gap: 10px;
             }
 
             #voice-btn, #send-btn {
                 padding: 0 15px;
                 font-size: 1rem;
-                width: 48%;
-            }
-
-            #tts-toggle {
-                order: 3;
-                width: 100%;
-                justify-content: center;
-                margin-top: 10px;
+                min-width: 50px;
             }
 
             .shop-button {
                 top: 15px;
-                right: 130px;
+                left: 15px;
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+
+            .hunger-bar-container {
+                top: 15px;
+                right: 15px;
+                min-width: 150px;
+                padding: 8px 12px;
             }
 
             .shop-items {
-                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 10px;
             }
 
-            .expression-preview, .hair-preview {
-                width: 80px;
-                height: 80px;
+            .item-preview {
+                width: 60px;
+                height: 60px;
+            }
+
+            .shop-item {
+                padding: 10px;
+            }
+
+            .shop-item h3 {
+                font-size: 0.9rem;
+            }
+
+            .shop-item .price {
+                font-size: 0.8rem;
+            }
+
+            .shop-btn {
+                font-size: 0.8rem;
+                padding: 5px 10px;
             }
         }
 
         /* 垂直滾動軸樣式 */
         ::-webkit-scrollbar {
-            width: 10px;
+            width: 8px;
         }
 
         ::-webkit-scrollbar-track {
@@ -1089,7 +1206,7 @@
 
         ::-webkit-scrollbar-thumb {
             background: #cbd5e0;
-            border-radius: 5px;
+            border-radius: 4px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
@@ -1101,15 +1218,24 @@
     <!-- 商店按鈕 -->
     <div class="shop-button" id="shop-button">
         <i class="fas fa-store"></i>
-        <span>表情商店</span>
+        <span>商店</span>
         <span class="points" id="points-display">0 點</span>
+    </div>
+
+    <!-- 飽腹值顯示 -->
+    <div class="hunger-bar-container" id="hunger-bar-container">
+        <i class="fas fa-drumstick-bite hunger-icon" id="hunger-icon"></i>
+        <div class="hunger-bar">
+            <div class="hunger-fill" id="hunger-fill"></div>
+        </div>
+        <span class="hunger-percentage" id="hunger-percentage">100%</span>
     </div>
 
     <!-- 商店彈窗 -->
     <div class="shop-modal" id="shop-modal">
         <div class="shop-content">
             <div class="shop-header">
-                <h2><i class="fas fa-gift"></i> 表情商店</h2>
+                <h2><i class="fas fa-gift"></i> 商店</h2>
                 <button class="close-shop" id="close-shop">×</button>
             </div>
             <div class="points-display">
@@ -1118,13 +1244,14 @@
             </div>
             <p>與陳SIR聊天可以獲得點數，每完成一輪對話獲得1點</p>
             
-            <div class="shop-category">
-                <h3>表情</h3>
-                <div class="shop-items" id="expression-items"></div>
+            <div class="shop-tabs">
+                <div class="shop-tab active" data-tab="expressions">表情</div>
+                <div class="shop-tab" data-tab="hairstyles">髮型</div>
+                <div class="shop-tab" data-tab="foods">食物</div>
             </div>
-            <div class="shop-category">
-                <h3>髮型</h3>
-                <div class="shop-items" id="hair-items"></div>
+            
+            <div class="shop-items" id="shop-items">
+                <!-- 商品將通過JS動態生成 -->
             </div>
         </div>
     </div>
@@ -1172,10 +1299,10 @@
         <div id="input-container">
             <input type="text" id="user-input" placeholder="輸入你的訊息，或者用語音輸入..." />
             <button id="voice-btn" title="點擊語音輸入">
-                <i class="fas fa-microphone" style="display: block; margin: 0 auto;"></i>
+                <i class="fas fa-microphone"></i>
             </button>
             <button id="send-btn">
-                <i class="fas fa-paper-plane" style="display: block; margin: 0 auto;"></i>
+                <i class="fas fa-paper-plane"></i>
             </button>
             <div id="tts-toggle">
                 <input type="checkbox" id="tts-auto-play" checked>
@@ -1221,8 +1348,11 @@
         const closeShop = document.getElementById('close-shop');
         const shopPoints = document.getElementById('shop-points');
         const pointsDisplay = document.getElementById('points-display');
-        const expressionItems = document.getElementById('expression-items');
-        const hairItems = document.getElementById('hair-items');
+        const shopItems = document.getElementById('shop-items');
+        const shopTabs = document.querySelectorAll('.shop-tab');
+        const hungerIcon = document.getElementById('hunger-icon');
+        const hungerFill = document.getElementById('hunger-fill');
+        const hungerPercentage = document.getElementById('hunger-percentage');
         
         let conversationHistory = [];
         let isRecording = false;
@@ -1232,8 +1362,10 @@
         let transcript = '';
         let silenceTimeout;
         let isTalking = false;
+        let isDragging = false;
+        let dragStartTime = 0;
         
-        // 表情和髮型商店數據
+        // 表情、髮型和食物商店數據
         const expressions = [
             { id: 'default', name: '默認表情', price: 0, className: '' },
             { id: 'happy', name: '無奈', price: 20, className: 'happy' },
@@ -1251,24 +1383,83 @@
             { id: 'hair-5', name: '綠色層次', price: 150, className: 'hair-5' },
             { id: 'hair-6', name: '紫色弧形', price: 180, className: 'hair-6' }
         ];
+
+        const foods = [
+            { id: 'apple', name: '蘋果', price: 10, nutrition: 15, emoji: '🍎' },
+            { id: 'sandwich', name: '三明治', price: 25, nutrition: 30, emoji: '🥪' },
+            { id: 'pizza', name: '披薩', price: 50, nutrition: 50, emoji: '🍕' },
+            { id: 'burger', name: '漢堡', price: 75, nutrition: 65, emoji: '🍔' },
+            { id: 'steak', name: '牛排', price: 100, nutrition: 80, emoji: '🥩' },
+            { id: 'cake', name: '蛋糕', price: 150, nutrition: 100, emoji: '🎂' }
+        ];
         
         // 用戶數據
         let userData = {
             points: 0,
             purchasedExpressions: ['default'],
             purchasedHairstyles: [],
+            purchasedFoods: [],
             currentExpression: 'default',
-            currentHairstyle: ''
+            currentHairstyle: '',
+            hungerLevel: 100,
+            lastFeedTime: Date.now()
         };
+
+        // 飽腹值衰減係數（可調整用於測試）
+        const HUNGER_DECAY_RATE = 0.5; // 每24小時減50%
+        const HUNGER_DECAY_INTERVAL = 24 * 60 * 60 * 1000; // 24小時毫秒數
 
         // 初始化用戶數據
         function initUserData() {
             const savedData = localStorage.getItem('vtuberUserData');
             if (savedData) {
                 userData = JSON.parse(savedData);
+                // 計算飽腹值衰減
+                updateHungerLevel();
             }
             updatePointsDisplay();
+            updateHungerDisplay();
             updateVtuberAppearance();
+            
+            // 開始飽腹值定時更新
+            setInterval(updateHungerLevel, 60000); // 每分鐘檢查一次
+        }
+
+        // 更新飽腹值
+        function updateHungerLevel() {
+            const currentTime = Date.now();
+            const timeDifference = currentTime - userData.lastFeedTime;
+            const decayIntervals = timeDifference / HUNGER_DECAY_INTERVAL;
+            
+            if (decayIntervals > 0) {
+                // 計算衰減後的飽腹值
+                const decayAmount = userData.hungerLevel * HUNGER_DECAY_RATE * decayIntervals;
+                userData.hungerLevel = Math.max(0, userData.hungerLevel - decayAmount);
+                userData.lastFeedTime = currentTime;
+                saveUserData();
+            }
+            
+            updateHungerDisplay();
+            updateVtuberAppearance();
+        }
+
+        // 更新飽腹值顯示
+        function updateHungerDisplay() {
+            const percentage = Math.round(userData.hungerLevel);
+            hungerPercentage.textContent = percentage + '%';
+            hungerFill.style.width = percentage + '%';
+            
+            // 重置所有狀態類
+            hungerIcon.className = 'fas fa-drumstick-bite hunger-icon';
+            hungerFill.className = 'hunger-fill';
+            
+            if (percentage <= 25) {
+                hungerIcon.classList.add('very-hungry');
+                hungerFill.classList.add('very-hungry');
+            } else if (percentage <= 50) {
+                hungerIcon.classList.add('hungry');
+                hungerFill.classList.add('hungry');
+            }
         }
 
         // 保存用戶數據到localStorage
@@ -1289,6 +1480,13 @@
             
             vtuberFace.className = 'vtuber-face';
             vtuberHair.className = 'vtuber-hair';
+            
+            // 添加飢餓狀態
+            if (userData.hungerLevel <= 25) {
+                vtuberFace.classList.add('very-hungry');
+            } else if (userData.hungerLevel <= 50) {
+                vtuberFace.classList.add('hungry');
+            }
             
             if (expression && expression.className) {
                 vtuberFace.classList.add(expression.className);
@@ -1311,15 +1509,26 @@
 
         // 購買商品
         function purchaseItem(itemId, type) {
-            const items = type === 'expression' ? expressions : hairstyles;
+            let items, purchasedArray;
+            
+            if (type === 'expression') {
+                items = expressions;
+                purchasedArray = userData.purchasedExpressions;
+            } else if (type === 'hairstyle') {
+                items = hairstyles;
+                purchasedArray = userData.purchasedHairstyles;
+            } else if (type === 'food') {
+                items = foods;
+                purchasedArray = userData.purchasedFoods;
+            }
+            
             const item = items.find(i => i.id === itemId);
             if (!item) return false;
             
             if (userData.points >= item.price) {
                 userData.points -= item.price;
-                const purchasedKey = type === 'expression' ? 'purchasedExpressions' : 'purchasedHairstyles';
-                if (!userData[purchasedKey].includes(itemId)) {
-                    userData[purchasedKey].push(itemId);
+                if (!purchasedArray.includes(itemId)) {
+                    purchasedArray.push(itemId);
                 }
                 updatePointsDisplay();
                 saveUserData();
@@ -1328,119 +1537,174 @@
             return false;
         }
 
-        // 切換外觀
-        function switchItem(itemId, type) {
-            const purchasedKey = type === 'expression' ? 'purchasedExpressions' : 'purchasedHairstyles';
-            const currentKey = type === 'expression' ? 'currentExpression' : 'currentHairstyle';
-            if (userData[purchasedKey].includes(itemId)) {
-                userData[currentKey] = itemId;
-                saveUserData();
-                updateVtuberAppearance();
-                return true;
+        // 切換外觀或使用食物
+        function useItem(itemId, type) {
+            if (type === 'expression') {
+                if (userData.purchasedExpressions.includes(itemId)) {
+                    userData.currentExpression = itemId;
+                    saveUserData();
+                    updateVtuberAppearance();
+                    return true;
+                }
+            } else if (type === 'hairstyle') {
+                if (userData.purchasedHairstyles.includes(itemId)) {
+                    userData.currentHairstyle = itemId;
+                    saveUserData();
+                    updateVtuberAppearance();
+                    return true;
+                }
+            } else if (type === 'food') {
+                if (userData.purchasedFoods.includes(itemId)) {
+                    const food = foods.find(f => f.id === itemId);
+                    if (food) {
+                        // 播放進食動畫
+                        playEatingAnimation();
+                        
+                        // 增加飽腹值
+                        userData.hungerLevel = Math.min(100, userData.hungerLevel + food.nutrition);
+                        userData.lastFeedTime = Date.now();
+                        
+                        // 消耗食物
+                        const index = userData.purchasedFoods.indexOf(itemId);
+                        userData.purchasedFoods.splice(index, 1);
+                        
+                        saveUserData();
+                        updateHungerDisplay();
+                        updateVtuberAppearance();
+                        return true;
+                    }
+                }
             }
             return false;
         }
 
-        // 渲染商店商品
-        function renderShopItems() {
-            expressionItems.innerHTML = '';
-            hairItems.innerHTML = '';
-            
-            // 渲染表情
-            expressions.forEach(expression => {
-                const isOwned = userData.purchasedExpressions.includes(expression.id);
-                const isActive = userData.currentExpression === expression.id;
-                
-                const item = createShopItem(expression, 'expression', isOwned, isActive);
-                expressionItems.appendChild(item);
-            });
-            
-            // 渲染髮型
-            hairstyles.forEach(hair => {
-                const isOwned = userData.purchasedHairstyles.includes(hair.id);
-                const isActive = userData.currentHairstyle === hair.id;
-                
-                const item = createShopItem(hair, 'hairstyle', isOwned, isActive);
-                hairItems.appendChild(item);
-            });
+        // 播放進食動畫
+        function playEatingAnimation() {
+            vtuberMouth.classList.add('eating');
+            setTimeout(() => {
+                vtuberMouth.classList.remove('eating');
+            }, 1500);
         }
 
-        // 創建商店項目
-        function createShopItem(item, type, isOwned, isActive) {
-            const itemDiv = document.createElement('div');
-            itemDiv.className = `shop-item ${isOwned ? 'owned' : ''}`;
+        // 渲染商店商品
+        function renderShopItems(tab = 'expressions') {
+            shopItems.innerHTML = '';
+            let items, purchasedArray, currentItem;
             
-            const previewDiv = document.createElement('div');
-            previewDiv.className = type === 'expression' ? `expression-preview ${item.className}` : `hair-preview ${item.className}`;
-            
-            if (type === 'expression') {
-                const eyesDiv = document.createElement('div');
-                eyesDiv.className = 'expression-eyes';
-                for (let i = 0; i < 2; i++) {
-                    const eyeDiv = document.createElement('div');
-                    eyeDiv.className = 'expression-eye';
-                    const pupilDiv = document.createElement('div');
-                    pupilDiv.className = 'expression-pupil';
-                    eyeDiv.appendChild(pupilDiv);
-                    eyesDiv.appendChild(eyeDiv);
+            if (tab === 'expressions') {
+                items = expressions;
+                purchasedArray = userData.purchasedExpressions;
+                currentItem = userData.currentExpression;
+            } else if (tab === 'hairstyles') {
+                items = hairstyles;
+                purchasedArray = userData.purchasedHairstyles;
+                currentItem = userData.currentHairstyle;
+            } else if (tab === 'foods') {
+                items = foods;
+                purchasedArray = userData.purchasedFoods;
+                currentItem = null;
+            }
+
+            items.forEach(item => {
+                const isOwned = purchasedArray.includes(item.id);
+                const isActive = currentItem === item.id;
+                const ownedCount = tab === 'foods' ? purchasedArray.filter(id => id === item.id).length : 0;
+                
+                const itemDiv = document.createElement('div');
+                itemDiv.className = `shop-item ${isOwned ? 'owned' : ''}`;
+                
+                const previewDiv = document.createElement('div');
+                previewDiv.className = `item-preview ${tab === 'expressions' ? 'expression-preview' : tab === 'foods' ? 'food-preview' : ''} ${item.className || ''}`;
+                
+                if (tab === 'expressions') {
+                    const eyesDiv = document.createElement('div');
+                    eyesDiv.className = 'expression-eyes';
+                    for (let i = 0; i < 2; i++) {
+                        const eyeDiv = document.createElement('div');
+                        eyeDiv.className = 'expression-eye';
+                        const pupilDiv = document.createElement('div');
+                        pupilDiv.className = 'expression-pupil';
+                        eyeDiv.appendChild(pupilDiv);
+                        eyesDiv.appendChild(eyeDiv);
+                    }
+                    const mouthDiv = document.createElement('div');
+                    mouthDiv.className = 'expression-mouth';
+                    const mouthInnerDiv = document.createElement('div');
+                    mouthInnerDiv.className = 'expression-mouth-inner';
+                    mouthDiv.appendChild(mouthInnerDiv);
+                    previewDiv.appendChild(eyesDiv);
+                    previewDiv.appendChild(mouthDiv);
+                } else if (tab === 'foods') {
+                    previewDiv.textContent = item.emoji;
                 }
-                const mouthDiv = document.createElement('div');
-                mouthDiv.className = 'expression-mouth';
-                const mouthInnerDiv = document.createElement('div');
-                mouthInnerDiv.className = 'expression-mouth-inner';
-                mouthDiv.appendChild(mouthInnerDiv);
-                previewDiv.appendChild(eyesDiv);
-                previewDiv.appendChild(mouthDiv);
-            }
-            
-            const nameElement = document.createElement('h3');
-            nameElement.textContent = item.name;
-            
-            const priceElement = document.createElement('div');
-            priceElement.className = 'price';
-            priceElement.textContent = `${item.price} 點`;
-            
-            const buttonElement = document.createElement('button');
-            if (isOwned) {
-                buttonElement.className = `shop-btn use-btn ${isActive ? 'active' : ''}`;
-                buttonElement.dataset.id = item.id;
-                buttonElement.dataset.type = type;
-                buttonElement.textContent = isActive ? '使用中' : '使用';
-            } else {
-                buttonElement.className = 'shop-btn buy-btn';
-                buttonElement.dataset.id = item.id;
-                buttonElement.dataset.type = type;
-                buttonElement.disabled = userData.points < item.price;
-                buttonElement.textContent = '購買';
-            }
-            
-            itemDiv.appendChild(previewDiv);
-            itemDiv.appendChild(nameElement);
-            itemDiv.appendChild(priceElement);
-            itemDiv.appendChild(buttonElement);
-            
-            buttonElement.addEventListener('click', (e) => {
-                const id = e.target.dataset.id;
-                const itemType = e.target.dataset.type;
-                if (isOwned) {
-                    if (switchItem(id, itemType)) {
-                        renderShopItems();
+                
+                const nameElement = document.createElement('h3');
+                nameElement.textContent = item.name + (tab === 'foods' && ownedCount > 0 ? ` (${ownedCount})` : '');
+                
+                const priceElement = document.createElement('div');
+                priceElement.className = 'price';
+                if (tab === 'foods') {
+                    priceElement.textContent = `${item.price} 點 (+${item.nutrition}飽腹)`;
+                } else {
+                    priceElement.textContent = `${item.price} 點`;
+                }
+                
+                const buttonElement = document.createElement('button');
+                if (tab === 'foods') {
+                    if (ownedCount > 0) {
+                        buttonElement.className = 'shop-btn use-btn';
+                        buttonElement.textContent = '投餵';
+                        buttonElement.onclick = () => {
+                            if (useItem(item.id, 'food')) {
+                                renderShopItems(tab);
+                                addMessage(`投餵了${item.name}，飽腹值增加${item.nutrition}！`, 'ai');
+                            }
+                        };
+                    } else {
+                        buttonElement.className = 'shop-btn buy-btn';
+                        buttonElement.disabled = userData.points < item.price;
+                        buttonElement.textContent = '購買';
+                        buttonElement.onclick = () => {
+                            if (purchaseItem(item.id, 'food')) {
+                                renderShopItems(tab);
+                                addMessage(`成功購買${item.name}！`, 'ai');
+                            }
+                        };
                     }
                 } else {
-                    if (purchaseItem(id, itemType)) {
-                        renderShopItems();
-                        alert(`成功購買${item.name}！`);
+                    if (isOwned) {
+                        buttonElement.className = `shop-btn use-btn ${isActive ? 'active' : ''}`;
+                        buttonElement.textContent = isActive ? '使用中' : '使用';
+                        buttonElement.onclick = () => {
+                            if (useItem(item.id, tab.slice(0, -1))) {
+                                renderShopItems(tab);
+                            }
+                        };
+                    } else {
+                        buttonElement.className = 'shop-btn buy-btn';
+                        buttonElement.disabled = userData.points < item.price;
+                        buttonElement.textContent = '購買';
+                        buttonElement.onclick = () => {
+                            if (purchaseItem(item.id, tab.slice(0, -1))) {
+                                renderShopItems(tab);
+                                addMessage(`成功購買${item.name}！`, 'ai');
+                            }
+                        };
                     }
                 }
+                
+                itemDiv.appendChild(previewDiv);
+                itemDiv.appendChild(nameElement);
+                itemDiv.appendChild(priceElement);
+                itemDiv.appendChild(buttonElement);
+                shopItems.appendChild(itemDiv);
             });
-            
-            return itemDiv;
         }
 
         // 商店事件監聽
         shopButton.addEventListener('click', () => {
             shopModal.style.display = 'flex';
-            renderShopItems();
+            renderShopItems('expressions');
         });
 
         closeShop.addEventListener('click', () => {
@@ -1451,6 +1715,14 @@
             if (e.target === shopModal) {
                 shopModal.style.display = 'none';
             }
+        });
+
+        shopTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                shopTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                renderShopItems(tab.dataset.tab);
+            });
         });
 
         // VTUBER 嘴型動畫控制
@@ -1496,19 +1768,6 @@
             return 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
         }
 
-        function parseFormatting(text) {
-            text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
-            text = text.replace(/(?:^|\n)\s*-\s+(.*?)(?=\n|$)/g, '<li>$1</li>');
-            text = text.replace(/(<li>.*<\/li>)+/g, '<ul>$&</ul>');
-            text = text.replace(/(?:^|\n)\s*\d+\.\s+(.*?)(?=\n|$)/g, '<li>$1</li>');
-            text = text.replace(/(<li>.*<\/li>)+/g, '<ol>$&</ol>');
-            text = text.replace(/(?:^|\n)>\s*(.*?)(?=\n|$)/g, '<div class="indent">$1</div>');
-            text = text.replace(/(?:^|\n)>>\s*(.*?)(?=\n|$)/g, '<blockquote>$1</blockquote>');
-            text = text.replace(/\n/g, '<br>');
-            return text;
-        }
-
         // 語音識別初始化
         function initSpeechRecognition() {
             if (!isSpeechRecognitionSupported()) {
@@ -1524,7 +1783,6 @@
             recognition.interimResults = true;
 
             recognition.onstart = function() {
-                console.log('Speech recognition started');
                 isRecording = true;
                 voiceBtn.classList.add('recording');
                 recordingIndicator.style.display = 'flex';
@@ -1653,16 +1911,6 @@
                         
                         utterance.onerror = function() {
                             stopTalking();
-                        };
-                        
-                        utterance.onboundary = function(event) {
-                            if (vtuberMouth.classList.contains('talking')) {
-                                const randomHeight = 15 + Math.floor(Math.random() * 10);
-                                vtuberMouth.style.height = `${randomHeight}px`;
-                                setTimeout(() => {
-                                    vtuberMouth.style.height = '';
-                                }, 100);
-                            }
                         };
                         
                         speechSynthesis.speak(utterance);
@@ -1798,6 +2046,74 @@
             voiceBtn.disabled = false;
         }
 
+        // 流暢拖拽實現
+        let dragOffset = { x: 0, y: 0 };
+        let dragStartPos = { x: 0, y: 0 };
+
+        function handleDragStart(e) {
+            e.preventDefault();
+            isDragging = true;
+            dragStartTime = Date.now();
+            
+            const clientX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
+            const clientY = e.type === 'mousedown' ? e.clientY : e.touches[0].clientY;
+            const rect = vtuberContainer.getBoundingClientRect();
+            
+            dragOffset.x = clientX - rect.left;
+            dragOffset.y = clientY - rect.top;
+            dragStartPos.x = clientX;
+            dragStartPos.y = clientY;
+            
+            vtuberContainer.style.cursor = 'grabbing';
+            vtuberContainer.style.transition = 'none';
+            
+            document.addEventListener('mousemove', handleDragMove);
+            document.addEventListener('mouseup', handleDragEnd);
+            document.addEventListener('touchmove', handleDragMove, { passive: false });
+            document.addEventListener('touchend', handleDragEnd);
+        }
+
+        function handleDragMove(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+            
+            requestAnimationFrame(() => {
+                const clientX = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
+                const clientY = e.type === 'mousemove' ? e.clientY : e.touches[0].clientY;
+                
+                const x = clientX - dragOffset.x;
+                const y = clientY - dragOffset.y;
+                
+                const maxX = window.innerWidth - vtuberContainer.offsetWidth;
+                const maxY = window.innerHeight - vtuberContainer.offsetHeight;
+                
+                const boundedX = Math.max(0, Math.min(x, maxX));
+                const boundedY = Math.max(0, Math.min(y, maxY));
+                
+                vtuberContainer.style.right = 'auto';
+                vtuberContainer.style.bottom = 'auto';
+                vtuberContainer.style.left = `${boundedX}px`;
+                vtuberContainer.style.top = `${boundedY}px`;
+            });
+        }
+
+        function handleDragEnd() {
+            isDragging = false;
+            vtuberContainer.style.cursor = 'grab';
+            vtuberContainer.style.transition = 'all 0.3s ease';
+            
+            document.removeEventListener('mousemove', handleDragMove);
+            document.removeEventListener('mouseup', handleDragEnd);
+            document.removeEventListener('touchmove', handleDragMove);
+            document.removeEventListener('touchend', handleDragEnd);
+            
+            // 檢查是否是點擊而不是拖拽
+            const dragTime = Date.now() - dragStartTime;
+            if (dragTime < 200) {
+                // 這是一個點擊，可以添加點擊事件處理
+            }
+        }
+
         // 事件監聽器
         sendBtn.addEventListener('click', sendMessage);
         userInput.addEventListener('keypress', (e) => {
@@ -1824,66 +2140,9 @@
             }
         });
 
-        let isDragging = false;
-        let offsetX, offsetY;
-
-        vtuberContainer.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            offsetX = e.clientX - vtuberContainer.getBoundingClientRect().left;
-            offsetY = e.clientY - vtuberContainer.getBoundingClientRect().top;
-            vtuberContainer.style.cursor = 'grabbing';
-        });
-
-        document.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            
-            const x = e.clientX - offsetX;
-            const y = e.clientY - offsetY;
-            
-            const maxX = window.innerWidth - vtuberContainer.offsetWidth;
-            const maxY = window.innerHeight - vtuberContainer.offsetHeight;
-            
-            const boundedX = Math.max(0, Math.min(x, maxX));
-            const boundedY = Math.max(0, Math.min(y, maxY));
-            
-            vtuberContainer.style.right = 'auto';
-            vtuberContainer.style.bottom = 'auto';
-            vtuberContainer.style.left = `${boundedX}px`;
-            vtuberContainer.style.top = `${boundedY}px`;
-        });
-
-        document.addEventListener('mouseup', () => {
-            isDragging = false;
-            vtuberContainer.style.cursor = 'grab';
-        });
-
-        vtuberContainer.addEventListener('touchstart', (e) => {
-            isDragging = true;
-            offsetX = e.touches[0].clientX - vtuberContainer.getBoundingClientRect().left;
-            offsetY = e.touches[0].clientY - vtuberContainer.getBoundingClientRect().top;
-        });
-
-        document.addEventListener('touchmove', (e) => {
-            if (!isDragging) return;
-            
-            const x = e.touches[0].clientX - offsetX;
-            const y = e.touches[0].clientY - offsetY;
-            
-            const maxX = window.innerWidth - vtuberContainer.offsetWidth;
-            const maxY = window.innerHeight - vtuberContainer.offsetHeight;
-            
-            const boundedX = Math.max(0, Math.min(x, maxX));
-            const boundedY = Math.max(0, Math.min(y, maxY));
-            
-            vtuberContainer.style.right = 'auto';
-            vtuberContainer.style.bottom = 'auto';
-            vtuberContainer.style.left = `${boundedX}px`;
-            vtuberContainer.style.top = `${boundedY}px`;
-        });
-
-        document.addEventListener('touchend', () => {
-            isDragging = false;
-        });
+        // 設置VTUBER拖拽事件
+        vtuberContainer.addEventListener('mousedown', handleDragStart);
+        vtuberContainer.addEventListener('touchstart', handleDragStart);
 
         // 初始問候語
         document.addEventListener('DOMContentLoaded', () => {
@@ -1921,6 +2180,15 @@
             
             initUserData();
         });
+
+        // 開發者工具：調整飽腹值衰減速度
+        // 在瀏覽器控制台中使用以下命令進行測試：
+        // 修改衰減係數: HUNGER_DECAY_RATE = 0.1 (每24小時減10%)
+        // 快速測試: userData.lastFeedTime = Date.now() - 86400000; updateHungerLevel(); (模擬24小時前)
+        console.log('開發者工具提示：');
+        console.log('修改飽腹值衰減係數: HUNGER_DECAY_RATE = 0.1 (每24小時減10%)');
+        console.log('快速測試飢餓: userData.lastFeedTime = Date.now() - 86400000; updateHungerLevel();');
+        console.log('重置飽腹值: userData.hungerLevel = 100; updateHungerDisplay(); updateVtuberAppearance();');
     </script>
 </body>
 </html>
