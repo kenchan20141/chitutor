@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>陳SIR教室 - 修訂版</title>
+    <title>陳SIR教室</title>
 
     <!-- 添加到主畫面設定 -->
     <meta name="application-name" content="陳SIR教室">
@@ -129,7 +129,13 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
-        .shop-button {
+        .left-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .shop-button, .settings-button {
             background: linear-gradient(135deg, var(--gold), var(--silver));
             color: white;
             padding: 12px 18px;
@@ -143,7 +149,12 @@
             border: none;
         }
 
-        .shop-button:hover {
+        .settings-button {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            padding: 12px 15px;
+        }
+
+        .shop-button:hover, .settings-button:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(0,0,0,0.15);
         }
@@ -711,8 +722,8 @@
             10% { transform: scaleY(0.1); }
         }
 
-        /* 商店系統樣式 */
-        .shop-modal {
+        /* 商店和設置彈窗樣式 */
+        .modal {
             display: none;
             position: fixed;
             top: 0;
@@ -726,7 +737,7 @@
             padding: 20px;
         }
 
-        .shop-content {
+        .modal-content {
             background: white;
             border-radius: var(--radius);
             width: 100%;
@@ -738,19 +749,19 @@
             position: relative;
         }
 
-        .shop-header {
+        .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
         }
 
-        .shop-header h2 {
+        .modal-header h2 {
             font-size: 1.8rem;
             color: var(--primary);
         }
 
-        .close-shop {
+        .close-modal {
             background: none;
             border: none;
             font-size: 1.8rem;
@@ -775,14 +786,14 @@
             color: var(--gold);
         }
 
-        .shop-tabs {
+        .shop-tabs, .settings-tabs {
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
             flex-wrap: wrap;
         }
 
-        .shop-tab {
+        .tab {
             padding: 10px 20px;
             background: #e2e8f0;
             border-radius: 20px;
@@ -792,7 +803,7 @@
             border: none;
         }
 
-        .shop-tab.active {
+        .tab.active {
             background: var(--primary);
             color: white;
         }
@@ -999,6 +1010,85 @@
             background: var(--active-orange);
         }
 
+        /* 設置界面樣式 */
+        .settings-section {
+            margin-bottom: 30px;
+        }
+
+        .settings-section h3 {
+            margin-bottom: 15px;
+            color: var(--primary);
+            font-size: 1.3rem;
+        }
+
+        .name-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .name-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .name-input:focus {
+            border-color: var(--primary);
+        }
+
+        .name-save-btn {
+            padding: 12px 20px;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .name-save-btn:hover {
+            background: #3daa65;
+        }
+
+        .name-save-btn:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+        }
+
+        .current-name-display {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f0f4f8;
+            border-radius: 8px;
+            color: var(--text-dark);
+        }
+
+        .warning-message {
+            background: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .error-message-input {
+            background: #ffe6e6;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border-left: 4px solid #e57373;
+        }
+
         /* 表情樣式 */
         .happy .expression-mouth {
             border-radius: 50%;
@@ -1170,33 +1260,37 @@
 
     .top-controls {
         padding: 10px 15px;
-        flex-direction: row; /* 改為水平排列 */
+        flex-direction: row;
         gap: 10px;
         align-items: center;
         justify-content: space-between;
     }
 
-    .shop-button {
-        flex: 1; /* 平均分配空間 */
-        padding: 8px 12px; /* 縮小內邊距 */
-        font-size: 0.9rem; /* 縮小字體 */
+    .left-controls {
+        flex: 1;
+        gap: 8px;
+    }
+
+    .shop-button, .settings-button {
+        flex: 1;
+        padding: 8px 12px;
+        font-size: 0.9rem;
     }
 
     .hunger-bar-container {
-        flex: 1; /* 平均分配空間 */
-        min-width: 120px; /* 縮小最小寬度 */
-        padding: 8px 10px; /* 縮小內邊距 */
+        flex: 1;
+        min-width: 120px;
+        padding: 8px 10px;
     }
 
     .hunger-icon {
-        font-size: 1rem; /* 縮小圖標 */
+        font-size: 1rem;
     }
 
     .hunger-percentage {
-        font-size: 0.8rem; /* 縮小字體 */
+        font-size: 0.8rem;
     }
 
-    /* 以下係其他原有樣式，保持不變 */
     .vtuber-container {
         width: 100px;
         height: 100px;
@@ -1292,6 +1386,14 @@
                 font-size: 0.8rem;
                 padding: 5px 10px;
             }
+
+            .name-input-group {
+                flex-direction: column;
+            }
+
+            .name-input {
+                min-width: 100%;
+            }
         }
 
         /* 垂直滾動軸樣式 */
@@ -1316,11 +1418,18 @@
 <body>
     <!-- 頂部控制區域 -->
     <div class="top-controls">
-        <button class="shop-button" id="shop-button">
-            <i class="fas fa-store"></i>
-            <span>商店</span>
-            <span class="points" id="points-display">0 點</span>
-        </button>
+        <div class="left-controls">
+            <button class="shop-button" id="shop-button">
+                <i class="fas fa-store"></i>
+                <span>商店</span>
+                <span class="points" id="points-display">0 點</span>
+            </button>
+            
+            <button class="settings-button" id="settings-button">
+                <i class="fas fa-cog"></i>
+                <span>設置</span>
+            </button>
+        </div>
 
         <div class="hunger-bar-container" id="hunger-bar-container">
             <i class="fas fa-drumstick-bite hunger-icon" id="hunger-icon"></i>
@@ -1332,11 +1441,11 @@
     </div>
 
     <!-- 商店彈窗 -->
-    <div class="shop-modal" id="shop-modal">
-        <div class="shop-content">
-            <div class="shop-header">
+    <div class="modal" id="shop-modal">
+        <div class="modal-content">
+            <div class="modal-header">
                 <h2><i class="fas fa-gift"></i> 商店</h2>
-                <button class="close-shop" id="close-shop">×</button>
+                <button class="close-modal" id="close-shop">×</button>
             </div>
             <div class="points-display">
                 <i class="fas fa-coins"></i>
@@ -1345,14 +1454,39 @@
             <p>與陳SIR聊天可以獲得點數，每完成一輪對話獲得1點</p>
             
             <div class="shop-tabs">
-                <button class="shop-tab active" data-tab="expressions">表情</button>
-                <button class="shop-tab" data-tab="hairstyles">髮型</button>
-                <button class="shop-tab" data-tab="foods">食物</button>
-                <button class="shop-tab" data-tab="personalities">性格</button>
+                <button class="tab active" data-tab="expressions">表情</button>
+                <button class="tab" data-tab="hairstyles">髮型</button>
+                <button class="tab" data-tab="foods">食物</button>
+                <button class="tab" data-tab="personalities">性格</button>
             </div>
             
             <div class="shop-items" id="shop-items">
                 <!-- 商品將通過JS動態生成 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 設置彈窗 -->
+    <div class="modal" id="settings-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-cog"></i> 設置</h2>
+                <button class="close-modal" id="close-settings">×</button>
+            </div>
+            
+            <div class="settings-section">
+                <h3><i class="fas fa-user"></i> VTuber 名稱設定</h3>
+                <div class="name-input-group">
+                    <input type="text" class="name-input" id="vtuber-name-input" placeholder="輸入自定義名稱（例如：小美、助手等）" maxlength="20">
+                    <button class="name-save-btn" id="save-name-btn">保存</button>
+                </div>
+                <div class="current-name-display" id="current-name-display">
+                    當前名稱：陳SIR
+                </div>
+                <div class="warning-message">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    注意：禁止使用粗言穢語或不當詞語作為名稱，系統會自動過濾。
+                </div>
             </div>
         </div>
     </div>
@@ -1380,7 +1514,7 @@
     <div id="chat-container">
         <div id="chat-header">
             <i class="fas fa-robot"></i>
-            <h2>陳SIR</h2>
+            <h2 id="vtuber-display-name">陳SIR</h2>
             <select id="mode-select">
                 <option value="comfort">閱讀卷</option>
                 <option value="philosophy">寫作卷</option>
@@ -1450,10 +1584,19 @@
         const shopPoints = document.getElementById('shop-points');
         const pointsDisplay = document.getElementById('points-display');
         const shopItems = document.getElementById('shop-items');
-        const shopTabs = document.querySelectorAll('.shop-tab');
+        const shopTabs = document.querySelectorAll('.shop-tabs .tab');
         const hungerIcon = document.getElementById('hunger-icon');
         const hungerFill = document.getElementById('hunger-fill');
         const hungerPercentage = document.getElementById('hunger-percentage');
+        
+        // 設置相關元素
+        const settingsButton = document.getElementById('settings-button');
+        const settingsModal = document.getElementById('settings-modal');
+        const closeSettings = document.getElementById('close-settings');
+        const vtuberNameInput = document.getElementById('vtuber-name-input');
+        const saveNameBtn = document.getElementById('save-name-btn');
+        const currentNameDisplay = document.getElementById('current-name-display');
+        const vtuberDisplayName = document.getElementById('vtuber-display-name');
         
         let conversationHistory = [];
         let isRecording = false;
@@ -1465,6 +1608,21 @@
         let isTalking = false;
         let isDragging = false;
         let dragStartTime = 0;
+        
+        // 粗言穢語過濾器
+        const profanityFilter = [
+            '屌', '撚', '仆街', '仆你', '撚你', '屌你', '仆佢', '撚佢', '屌佢',
+            'diu', 'lan', 'puk', 'dick', 'fuck', 'shit', 'damn', 'hell',
+            '媽的', '他媽', '你媽', '幹你', '幹他', '去死', '死人',
+            '白痴', '智障', '傻逼', '蠢豬', '廢物', '垃圾人', '賤人',
+            '婊子', '妓女', '雞婆', '臭婆', '死女人', '死男人'
+        ];
+        
+        // 檢查是否包含粗言穢語
+        function containsProfanity(text) {
+            const lowerText = text.toLowerCase();
+            return profanityFilter.some(word => lowerText.includes(word.toLowerCase()));
+        }
         
         // 表情、髮型、食物和性格商店數據
         const expressions = [
@@ -1565,7 +1723,8 @@
             currentHairstyle: '',
             currentPersonality: 'default',
             hungerLevel: 100,
-            lastFeedTime: Date.now()
+            lastFeedTime: Date.now(),
+            vtuberName: '陳SIR'  // 新增VTuber名稱
         };
 
         // 飽腹值衰減係數（可調整用於測試）
@@ -1576,16 +1735,96 @@
         function initUserData() {
             const savedData = localStorage.getItem('vtuberUserData');
             if (savedData) {
-                userData = JSON.parse(savedData);
+                userData = { ...userData, ...JSON.parse(savedData) };
                 // 計算飽腹值衰減
                 updateHungerLevel();
             }
             updatePointsDisplay();
             updateHungerDisplay();
             updateVtuberAppearance();
+            updateVtuberName();
             
             // 開始飽腹值定時更新
             setInterval(updateHungerLevel, 60000); // 每分鐘檢查一次
+        }
+
+        // 更新VTuber名稱顯示
+        function updateVtuberName() {
+            vtuberDisplayName.textContent = userData.vtuberName;
+            currentNameDisplay.textContent = `當前名稱：${userData.vtuberName}`;
+        }
+
+        // 設置VTuber名稱
+        function setVtuberName(name) {
+            const trimmedName = name.trim();
+            
+            if (!trimmedName) {
+                showNameError('名稱不能為空');
+                return false;
+            }
+            
+            if (trimmedName.length > 20) {
+                showNameError('名稱長度不能超過20個字符');
+                return false;
+            }
+            
+            if (containsProfanity(trimmedName)) {
+                showNameError('名稱包含不當詞語，請重新輸入');
+                return false;
+            }
+            
+            userData.vtuberName = trimmedName;
+            saveUserData();
+            updateVtuberName();
+            
+            // 顯示成功消息
+            showNameSuccess(`名稱已更改為：${trimmedName}`);
+            vtuberNameInput.value = '';
+            
+            return true;
+        }
+
+        // 顯示名稱錯誤消息
+        function showNameError(message) {
+            clearNameMessages();
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message-input';
+            errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+            vtuberNameInput.parentNode.appendChild(errorDiv);
+            
+            setTimeout(() => {
+                if (errorDiv.parentNode) {
+                    errorDiv.parentNode.removeChild(errorDiv);
+                }
+            }, 3000);
+        }
+
+        // 顯示名稱成功消息
+        function showNameSuccess(message) {
+            clearNameMessages();
+            const successDiv = document.createElement('div');
+            successDiv.className = 'warning-message';
+            successDiv.style.backgroundColor = '#d4edda';
+            successDiv.style.color = '#155724';
+            successDiv.style.borderColor = '#c3e6cb';
+            successDiv.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+            vtuberNameInput.parentNode.appendChild(successDiv);
+            
+            setTimeout(() => {
+                if (successDiv.parentNode) {
+                    successDiv.parentNode.removeChild(successDiv);
+                }
+            }, 3000);
+        }
+
+        // 清除名稱消息
+        function clearNameMessages() {
+            const messages = vtuberNameInput.parentNode.querySelectorAll('.error-message-input, .warning-message[style]');
+            messages.forEach(msg => {
+                if (msg.parentNode) {
+                    msg.parentNode.removeChild(msg);
+                }
+            });
         }
 
         // 更新飽腹值
@@ -1670,7 +1909,7 @@
             saveUserData();
         }
 
-        // 購買商品
+        // 購買商品 (修復性格購買問題)
         function purchaseItem(itemId, type) {
             let items, purchasedArray;
             
@@ -1683,7 +1922,7 @@
             } else if (type === 'food') {
                 items = foods;
                 purchasedArray = userData.purchasedFoods;
-            } else if (type === 'personality') {
+            } else if (type === 'personality') {  // 修復：確保正確匹配
                 items = personalities;
                 purchasedArray = userData.purchasedPersonalities;
             }
@@ -1703,7 +1942,7 @@
             return false;
         }
 
-        // 切換外觀或使用食物
+        // 切換外觀或使用食物 (修復性格使用問題)
         function useItem(itemId, type) {
             if (type === 'expression') {
                 if (userData.purchasedExpressions.includes(itemId)) {
@@ -1719,7 +1958,7 @@
                     updateVtuberAppearance();
                     return true;
                 }
-            } else if (type === 'personality') {
+            } else if (type === 'personality') {  // 修復：確保性格切換正常工作
                 if (userData.purchasedPersonalities.includes(itemId)) {
                     userData.currentPersonality = itemId;
                     saveUserData();
@@ -1758,7 +1997,18 @@
             }, 1500);
         }
 
-        // 渲染商店商品
+        // 獲取正確的商品類型名稱 (修復商店tab到type的轉換問題)
+        function getItemType(tab) {
+            const typeMap = {
+                'expressions': 'expression',
+                'hairstyles': 'hairstyle',
+                'foods': 'food',
+                'personalities': 'personality'  // 修復：確保正確映射
+            };
+            return typeMap[tab] || tab.slice(0, -1);
+        }
+
+        // 渲染商店商品 (修復性格商品渲染)
         function renderShopItems(tab = 'expressions') {
             shopItems.innerHTML = '';
             let items, purchasedArray, currentItem;
@@ -1828,12 +2078,14 @@
                 }
                 
                 const buttonElement = document.createElement('button');
+                const itemType = getItemType(tab);  // 使用修復後的類型轉換函數
+                
                 if (tab === 'foods') {
                     if (ownedCount > 0) {
                         buttonElement.className = 'shop-btn use-btn';
                         buttonElement.textContent = '投餵';
                         buttonElement.onclick = () => {
-                            if (useItem(item.id, 'food')) {
+                            if (useItem(item.id, itemType)) {
                                 renderShopItems(tab);
                                 addMessage(`投餵了${item.name}，飽腹值增加${item.nutrition}！`, 'ai');
                             }
@@ -1843,7 +2095,7 @@
                         buttonElement.disabled = userData.points < item.price;
                         buttonElement.textContent = '購買';
                         buttonElement.onclick = () => {
-                            if (purchaseItem(item.id, 'food')) {
+                            if (purchaseItem(item.id, itemType)) {
                                 renderShopItems(tab);
                                 addMessage(`成功購買${item.name}！`, 'ai');
                             }
@@ -1854,7 +2106,7 @@
                         buttonElement.className = `shop-btn use-btn ${isActive ? 'active' : ''}`;
                         buttonElement.textContent = isActive ? '使用中' : '使用';
                         buttonElement.onclick = () => {
-                            if (useItem(item.id, tab.slice(0, -1))) {
+                            if (useItem(item.id, itemType)) {
                                 renderShopItems(tab);
                                 if (tab === 'personalities') {
                                     addMessage(`已切換為${item.name}性格！`, 'ai');
@@ -1866,7 +2118,7 @@
                         buttonElement.disabled = userData.points < item.price;
                         buttonElement.textContent = '購買';
                         buttonElement.onclick = () => {
-                            if (purchaseItem(item.id, tab.slice(0, -1))) {
+                            if (purchaseItem(item.id, itemType)) {
                                 renderShopItems(tab);
                                 addMessage(`成功購買${item.name}！`, 'ai');
                             }
@@ -1882,22 +2134,51 @@
             });
         }
 
-        // 商店事件監聽
+        // 商店和設置事件監聽
         shopButton.addEventListener('click', () => {
             shopModal.style.display = 'flex';
             renderShopItems('expressions');
+        });
+
+        settingsButton.addEventListener('click', () => {
+            settingsModal.style.display = 'flex';
+            vtuberNameInput.value = '';  // 清空輸入框
+            clearNameMessages();  // 清除之前的消息
         });
 
         closeShop.addEventListener('click', () => {
             shopModal.style.display = 'none';
         });
 
+        closeSettings.addEventListener('click', () => {
+            settingsModal.style.display = 'none';
+        });
+
+        // 保存名稱按鈕事件
+        saveNameBtn.addEventListener('click', () => {
+            const newName = vtuberNameInput.value;
+            setVtuberName(newName);
+        });
+
+        // 名稱輸入框回車事件
+        vtuberNameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const newName = vtuberNameInput.value;
+                setVtuberName(newName);
+            }
+        });
+
+        // 點擊模態框外部關閉
         window.addEventListener('click', (e) => {
             if (e.target === shopModal) {
                 shopModal.style.display = 'none';
             }
+            if (e.target === settingsModal) {
+                settingsModal.style.display = 'none';
+            }
         });
 
+        // 商店標籤事件
         shopTabs.forEach(tab => {
             tab.addEventListener('click', () => {
                 shopTabs.forEach(t => t.classList.remove('active'));
@@ -2118,7 +2399,7 @@
             messageHeader.className = 'message-header';
             messageHeader.innerHTML = `
                 <i class="fas ${role === 'ai' ? 'fa-robot' : 'fa-user'}"></i>
-                <span>${role === 'ai' ? '陳SIR' : '你'}</span>
+                <span>${role === 'ai' ? userData.vtuberName : '你'}</span>
             `;
 
             const messageContent = document.createElement('div');
@@ -2147,7 +2428,7 @@
             chatOutput.scrollTop = chatOutput.scrollHeight;
         }
 
-        // 發送消息到API
+        // 發送消息到API (修復性格prompt應用問題)
         async function sendMessage() {
             let message = userInput.value.trim();
             if (!message) return;
@@ -2172,8 +2453,9 @@
                 stopTalking();
 
                 const mode = modeSelect.value;
+                // 修復：確保正確獲取當前性格的prompt
                 const currentPersonality = personalities.find(p => p.id === userData.currentPersonality);
-                let personalityPrompt = currentPersonality ? currentPersonality.prompt : '';
+                let personalityPrompt = currentPersonality && currentPersonality.prompt ? currentPersonality.prompt : '';
                 
                 let systemPrompt = '';
                 if (mode === 'comfort') {
@@ -2373,6 +2655,7 @@
         console.log('修改飽腹值衰減係數: HUNGER_DECAY_RATE = 0.1 (每24小時減10%)');
         console.log('快速測試飢餓: userData.lastFeedTime = Date.now() - 86400000; updateHungerLevel();');
         console.log('重置飽腹值: userData.hungerLevel = 100; updateHungerDisplay(); updateVtuberAppearance();');
+        console.log('測試名稱功能: setVtuberName("新名稱");');
     </script>
 </body>
 </html>
