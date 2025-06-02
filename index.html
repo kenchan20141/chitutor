@@ -155,6 +155,21 @@
             width: 40px;
         }
 
+        /* 移動端適配 */
+    @media (max-width: 768px) {
+        /* 設置按鈕使用自動寬度 */
+        .settings-button {
+            flex: 0 0 auto !important; /* 禁止伸縮 */
+            padding: 8px 10px !important; /* 進一步減少內邊距 */
+            min-width: unset !important; /* 移除最小寬度限制 */
+        }
+        
+        /* 商店按鈕保持伸縮 */
+        .shop-button {
+            flex: 1;
+        }
+    }
+
         .shop-button:hover, .settings-button:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(0,0,0,0.15);
