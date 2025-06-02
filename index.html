@@ -776,6 +776,21 @@
             return 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
         }
 
+  function parseFormatting(text) {
+      text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+      text = text.replace(/(?:^|\n)\s*-\s+(.*?)(?=\n|$)/g, '<li>$1</li>');
+      text = text.replace(/(<li>.*<\/li>)+/g, '<ul>$&</ul>');
+      text = text.replace(/(?:^|\n)\s*\d+\.\s+(.*?)(?=\n|$)/g, '<li>$1</li>');
+      text = text.replace(/(<li>.*<\/li>)+/g, '<ol>$&</ol>');
+      text = text.replace(/(?:^|\n)>\s*(.*?)(?=\n|$)/g, '<div class="indent">$1</div>');
+      text = text.replace(/(?:^|\n)>>\s*(.*?)(?=\n|$)/g, '<blockquote>$1</blockquote>');
+      text = text.replace(/\n/g, '<br>');
+      return text;
+    }
+
+
+            
         // 語音識別初始化
         function initSpeechRecognition() {
             if (!isSpeechRecognitionSupported()) {
