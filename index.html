@@ -1,0 +1,1179 @@
+
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>陳SIR教室</title>
+
+    <!-- 添加到主畫面設定 -->
+    <meta name="application-name" content="陳SIR教室">
+    <meta name="apple-mobile-web-app-title" content="陳SIR教室">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="https://i.ibb.co/pr4X1tyR/image-29.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Android 圖示 -->
+    <link rel="icon" sizes="192x192" href="https://i.ibb.co/pr4X1tyR/image-29.png">
+    <link rel="icon" sizes="144x144" href="https://i.ibb.co/pr4X1tyR/image-29.png">
+    <link rel="icon" sizes="96x96" href="https://i.ibb.co/pr4X1tyR/image-29.png">
+    <!-- iOS 圖示 -->
+    <link rel="apple-touch-icon" sizes="180x180" href="https://i.ibb.co/pr4X1tyR/image-29.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="https://i.ibb.co/pr4X1tyR/image-29.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="https://i.ibb.co/pr4X1tyR/image-29.png">
+        
+    <style>
+        :root {
+            --primary: #4a90e2;
+            --primary-dark: #357abd;
+            --secondary: #50c878;
+            --user-bg: #e6f0fa;
+            --user-border: #4a90e2;
+            --ai-bg: #f0f4f8;
+            --ai-border: #d1e0e8;
+            --error-bg: #ffe6e6;
+            --error-border: #e57373;
+            --recording-bg: #e74c3c;
+            --text-dark: #2d3748;
+            --text-light: #718096;
+            --shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+            --radius: 20px;
+            --radius-sm: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Serif TC', 'cwTeXHei', 'cwTeXFangSong', 'cwTeXKai', 'cwTeXMing', 'PingFang TC', 'Microsoft JhengHei', serif;
+            background-image: url('https://i.ibb.co/PvJfB2CW/image.png');
+            background-size: cover;
+            background-position: center;
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .copyright-footer {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            padding: 5px 10px;
+            background-color: #f1f1f1;
+        }
+
+        .copyright-footer p {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .copyright-footer p {
+                font-size: 12px;
+            }
+        }
+        
+        #chat-container {
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 160px);
+        }
+
+        #chat-header {
+            background: linear-gradient(to right, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        #chat-header i {
+            font-size: 1.8rem;
+        }
+
+        #chat-header h2 {
+            font-weight: 700;
+            font-size: 1.6rem;
+            flex-grow: 1;
+        }
+
+        #mode-select {
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            background: white;
+            color: var(--text-dark);
+            border: none;
+            cursor: pointer;
+        }
+
+        #chat-output {
+            flex: 1;
+            overflow-y: auto;
+            padding: 25px;
+            background: #f7fafc;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 18px 24px;
+            border-radius: var(--radius-sm);
+            position: relative;
+            box-shadow: var(--shadow);
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .user-message {
+            background: var(--user-bg);
+            border-left: 5px solid var(--user-border);
+            align-self: flex-end;
+        }
+
+        .ai-message {
+            background: var(--ai-bg);
+            border-left: 5px solid var(--ai-border);
+            align-self: flex-start;
+        }
+
+        .error-message {
+            background: var(--error-bg);
+            border-left: 5px solid var(--error-border);
+            align-self: center;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .user-message .message-header {
+            color: var(--primary-dark);
+        }
+
+        .ai-message .message-header {
+            color: var(--secondary);
+        }
+
+        .message-content {
+            line-height: 1.7;
+            font-size: 1.05rem;
+        }
+
+        .message-actions {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 50%;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: all 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: white;
+            color: var(--primary);
+        }
+
+        .copy-btn.copied {
+            color: var(--secondary);
+            transform: scale(1.15);
+        }
+
+        .copy-btn.copied i::before {
+            content: "\f00c";
+        }
+
+        #input-container {
+            display: flex;
+            padding: 25px;
+            background: white;
+            border-top: 1px solid #edf2f7;
+            gap: 15px;
+            align-items: center;
+            position: relative;
+        }
+
+        #user-input {
+            flex: 1;
+            padding: 18px 25px;
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        #user-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 8px rgba(74, 144, 226, 0.3);
+        }
+
+        #voice-btn {
+            padding: 0 25px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        #send-btn {
+            padding: 0 25px;
+            background: #45b39d;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        #voice-btn:hover {
+            background: #a3bffa;
+            transform: translateY(-2px);
+        }
+
+        #send-btn:hover {
+            background: #45b39d;
+            transform: translateY(-2px);
+        }
+
+        #voice-btn:disabled {
+            background: #a3bffa;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #send-btn:disabled {
+            background: #45b39d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #voice-btn.recording {
+            background: var(--recording-bg);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        #tts-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1rem;
+            color: var(--text-dark);
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 15px 20px;
+            background: var(--ai-bg);
+            border-radius: var(--radius-sm);
+            align-self: flex-start;
+            box-shadow: var(--shadow);
+        }
+
+        .typing-indicator span {
+            height: 12px;
+            width: 12px;
+            background: var(--text-light);
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 3px;
+            animation: typing 1s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        .recording-indicator {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--recording-bg);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: slideDown 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes slideDown {
+            from { top: -60px; opacity: 0; }
+            to { top: -40px; opacity: 1; }
+        }
+
+        .recording-indicator i {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .swipe-hint {
+            position: absolute;
+            top: 0px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            display: none;
+        }
+
+        /* VTUBER 頭像相關樣式 */
+        .vtuber-container {
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 100;
+            border: 3px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .vtuber-avatar {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .vtuber-face {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #fde2e4;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .vtuber-eyes {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90px;
+            height: 25px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .vtuber-eye {
+            width: 30px;
+            height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .vtuber-pupil {
+            width: 12px;
+            height: 12px;
+            background: #333;
+            border-radius: 50%;
+            position: absolute;
+            animation: blink 4s infinite;
+        }
+
+        .vtuber-mouth {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 15px;
+            background: #ff9aa2;
+            border-radius: 0 0 20px 20px;
+            transition: all 0.2s ease;
+            overflow: hidden;
+        }
+
+        .vtuber-mouth.talking {
+            height: 20px;
+            animation: talking 0.3s infinite alternate;
+        }
+
+        .vtuber-mouth-inner {
+            width: 100%;
+            height: 10px;
+            background: #990000;
+            border-radius: 50% / 100%;
+            position: absolute;
+            bottom: 0;
+        }
+
+        @keyframes talking {
+            from { height: 15px; }
+            to { height: 20px; }
+        }
+
+        @keyframes blink {
+            0%, 5%, 15%, 100% { transform: scaleY(1); }
+            10% { transform: scaleY(0.1); }
+        }
+
+        /* 移動端適配 */
+        @media (max-width: 768px) {
+            .vtuber-container {
+                width: 100px;
+                height: 100px;
+                bottom: 20px;
+                right: 20px;
+            }
+
+            .vtuber-face {
+                width: 80px;
+                height: 80px;
+            }
+
+            .vtuber-eyes {
+                width: 60px;
+                height: 15px;
+            }
+
+            .vtuber-eye {
+                width: 20px;
+                height: 15px;
+            }
+
+            .vtuber-pupil {
+                width: 8px;
+                height: 8px;
+            }
+
+            .vtuber-mouth {
+                width: 30px;
+                height: 10px;
+                bottom: 20px;
+            }
+
+            .vtuber-mouth.talking {
+                height: 18px;
+            }
+
+            #chat-container {
+                height: calc(100vh - 120px);
+            }
+
+            #input-container {
+                padding: 20px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            #voice-btn, #send-btn {
+                padding: 0 15px;
+                font-size: 1rem;
+                width: 48%;
+            }
+
+            #tts-toggle {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+                margin-top: 10px;
+            }
+        }
+
+        /* 垂直滾動軸樣式 */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #edf2f7;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+    </style>
+</head>
+<body>
+    <!-- VTUBER 動畫顯示區 -->
+    <div class="vtuber-container" id="vtuber-container">
+        <div class="vtuber-avatar">
+            <div class="vtuber-face">
+                <div class="vtuber-eyes">
+                    <div class="vtuber-eye">
+                        <div class="vtuber-pupil"></div>
+                    </div>
+                    <div class="vtuber-eye">
+                        <div class="vtuber-pupil"></div>
+                    </div>
+                </div>
+                <div class="vtuber-mouth" id="vtuber-mouth">
+                    <div class="vtuber-mouth-inner"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="chat-container">
+        <div id="chat-header">
+            <i class="fas fa-robot"></i>
+            <h2>陳SIR</h2>
+            <select id="mode-select">
+                <option value="philosophy">閱讀卷</option>
+                <option value="comfort">寫作卷</option>
+            </select>
+        </div>
+
+        <div id="chat-output">
+            <!-- Initial message will be added via JavaScript -->
+        </div>
+
+        <div class="typing-indicator" id="typing-indicator">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <div id="input-container">
+            <input type="text" id="user-input" placeholder="輸入你的訊息，或者用語音輸入..." />
+            <button id="voice-btn" title="點擊語音輸入">
+                <i class="fas fa-microphone" style="display: block; margin: 0 auto;"></i>
+            </button>
+            <button id="send-btn">
+                <i class="fas fa-paper-plane" style="display: block; margin: 0 auto;"></i>
+            </button>
+            <div id="tts-toggle">
+                <input type="checkbox" id="tts-auto-play" checked>
+                <label for="tts-auto-play">自動播放語音</label>
+            </div>
+            <div class="recording-indicator" id="recording-indicator" style="display: none;">
+                <i class="fas fa-circle"></i> 正在聆聽...
+            </div>
+            <div class="swipe-hint" id="swipe-hint">
+                滑動取消
+            </div>
+        </div>
+    </div>
+
+    <footer class="copyright-footer">
+        <p>Copyright © 2025 陳冠健、黃子謙. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const API_KEYS = [
+            "sk-MoqwsgO8P9MEoCrftvdSYA",
+            "sk-04KvBMK1EUyinjzdCb1wXQ"
+        ];
+        let currentApiKeyIndex = 0;
+        const API_URL = "https://chatapi.akash.network/api/v1/chat/completions";
+        const MODEL = "DeepSeek-R1-0528";
+
+        const chatOutput = document.getElementById('chat-output');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const voiceBtn = document.getElementById('voice-btn');
+        const modeSelect = document.getElementById('mode-select');
+        const typingIndicator = document.getElementById('typing-indicator');
+        const ttsAutoPlay = document.getElementById('tts-auto-play');
+        const recordingIndicator = document.getElementById('recording-indicator');
+        const swipeHint = document.getElementById('swipe-hint');
+        const vtuberMouth = document.getElementById('vtuber-mouth');
+        const vtuberContainer = document.getElementById('vtuber-container');
+        
+        let conversationHistory = [];
+        let isRecording = false;
+        let touchStartY, touchStartX;
+        const SWIPE_THRESHOLD = 100;
+        let recognition;
+        let transcript = '';
+        let silenceTimeout;
+        let isTalking = false;
+
+        // VTUBER 嘴型動畫控制
+        function startTalking() {
+            if (!isTalking) {
+                isTalking = true;
+                vtuberMouth.classList.add('talking');
+                vtuberContainer.style.transform = 'scale(1.1)';
+                vtuberContainer.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.2)';
+            }
+        }
+
+        function stopTalking() {
+            if (isTalking) {
+                isTalking = false;
+                vtuberMouth.classList.remove('talking');
+                vtuberContainer.style.transform = '';
+                vtuberContainer.style.boxShadow = '';
+            }
+        }
+
+        // 隨機眨眼動畫
+        function randomBlinking() {
+            const pupils = document.querySelectorAll('.vtuber-pupil');
+            const randomTime = Math.floor(Math.random() * 4000) + 2000;
+            
+            setTimeout(() => {
+                pupils.forEach(pupil => {
+                    pupil.style.animation = 'blink 0.3s ease';
+                    setTimeout(() => {
+                        pupil.style.animation = '';
+                        randomBlinking();
+                    }, 300);
+                });
+            }, randomTime);
+        }
+
+        // 啟動隨機眨眼
+        randomBlinking();
+
+        // 檢查瀏覽器是否支援語音識別
+        function isSpeechRecognitionSupported() {
+            return 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
+        }
+
+        // 語音識別初始化
+        function initSpeechRecognition() {
+            if (!isSpeechRecognitionSupported()) {
+                voiceBtn.disabled = true;
+                voiceBtn.title = '您的瀏覽器不支援語音輸入';
+                return null;
+            }
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.lang = 'zh-HK';
+            recognition.continuous = true;
+            recognition.interimResults = true;
+
+            recognition.onstart = function() {
+                console.log('Speech recognition started');
+                isRecording = true;
+                voiceBtn.classList.add('recording');
+                recordingIndicator.style.display = 'flex';
+                swipeHint.style.display = 'block';
+                voiceBtn.title = '正在語音輸入，滑動取消';
+            };
+
+            recognition.onresult = function(event) {
+                clearTimeout(silenceTimeout);
+                let interimTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        transcript += event.results[i][0].transcript;
+                    } else {
+                        interimTranscript += event.results[i][0].transcript;
+                    }
+                }
+                userInput.value = transcript + interimTranscript;
+                silenceTimeout = setTimeout(() => {
+                    recognition.stop();
+                    sendMessage();
+                }, 2000);
+            };
+
+            recognition.onerror = function(event) {
+                console.error('語音識別錯誤:', event.error);
+                addMessage(`語音輸入出錯: ${event.error}`, 'error');
+                stopRecording();
+            };
+
+            recognition.onend = function() {
+                stopRecording();
+            };
+
+            return recognition;
+        }
+
+        // 初始化語音識別
+        recognition = initSpeechRecognition();
+
+        // 開始錄音
+        function startRecording() {
+            if (!recognition || voiceBtn.disabled) return;
+            
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel();
+                stopTalking();
+            }
+            
+            try {
+                transcript = '';
+                recognition.start();
+            } catch (error) {
+                console.error('啟動語音識別失敗:', error);
+                addMessage('啟動麥克風失敗，請確保已授予權限', 'error');
+                stopRecording();
+            }
+        }
+
+        // 停止錄音
+        function stopRecording() {
+            isRecording = false;
+            voiceBtn.classList.remove('recording');
+            recordingIndicator.style.display = 'none';
+            swipeHint.style.display = 'none';
+            voiceBtn.title = '點擊語音輸入';
+            voiceBtn.disabled = false;
+            clearTimeout(silenceTimeout);
+        }
+
+        // 檢查滑動取消
+        function checkSwipe(e) {
+            if (!isRecording) return;
+            
+            let currentX, currentY;
+            if (e.type === 'touchmove') {
+                currentX = e.touches[0].clientX;
+                currentY = e.touches[0].clientY;
+            } else {
+                currentX = e.clientX;
+                currentY = e.clientY;
+            }
+            
+            const deltaX = Math.abs(currentX - touchStartX);
+            const deltaY = Math.abs(currentY - touchStartY);
+            
+            if (deltaX > SWIPE_THRESHOLD || deltaY > SWIPE_THRESHOLD) {
+                recognition.stop();
+                addMessage('語音輸入已取消', 'error');
+            }
+        }
+
+        // 語音合成
+        function speak(text) {
+            if ('speechSynthesis' in window && ttsAutoPlay.checked) {
+                speechSynthesis.cancel(); // 取消任何正在進行的語音
+                stopTalking(); // 確保停止動畫
+                
+                const textWithoutParentheses = text.replace(/\([^)]*\)/g, '');
+                const textWithoutEmoji = textWithoutParentheses.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2700}-\u{27BF}]/gu, '');
+                const sentences = textWithoutEmoji.split(/(?<=[。！？])/);
+                
+                let currentIndex = 0;
+                
+                function speakNext() {
+                    if (currentIndex >= sentences.length) {
+                        stopTalking();
+                        return;
+                    }
+                    
+                    const sentence = sentences[currentIndex].trim();
+                    if (sentence) {
+                        const utterance = new SpeechSynthesisUtterance(sentence);
+                        utterance.lang = 'zh-HK';
+                        utterance.rate = 1.05;
+                        utterance.pitch = 0.5;
+                        
+                        utterance.onstart = function() {
+                            startTalking();
+                        };
+                        
+                        utterance.onend = function() {
+                            currentIndex++;
+                            speakNext();
+                        };
+                        
+                        utterance.onerror = function() {
+                            stopTalking();
+                        };
+                        
+                        speechSynthesis.speak(utterance);
+                    } else {
+                        currentIndex++;
+                        speakNext();
+                    }
+                }
+                
+                speakNext();
+            }
+        }
+
+        // 添加消息到聊天
+        function addMessage(content, role) {
+            if (role === 'ai') {
+                content = content.replace(/<think>[\s\S]*?<\/think>/g, '');
+            }
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role === 'ai' ? 'ai-message' : role === 'user' ? 'user-message' : 'error-message'}`;
+
+            const messageHeader = document.createElement('div');
+            messageHeader.className = 'message-header';
+            messageHeader.innerHTML = `
+                <i class="fas ${role === 'ai' ? 'fa-robot' : 'fa-user'}"></i>
+                <span>${role === 'ai' ? '陳SIR' : '你'}</span>
+            `;
+
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            messageContent.textContent = content;
+
+            const messageActions = document.createElement('div');
+            messageActions.className = 'message-actions';
+            if (role === 'ai') {
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'copy-btn';
+                copyBtn.title = '複製回應';
+                copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+                copyBtn.addEventListener('click', () => {
+                    navigator.clipboard.writeText(content);
+                    copyBtn.classList.add('copied');
+                    setTimeout(() => copyBtn.classList.remove('copied'), 2000);
+                });
+                messageActions.appendChild(copyBtn);
+            }
+
+            messageDiv.appendChild(messageHeader);
+            messageDiv.appendChild(messageContent);
+            if (role === 'ai') messageDiv.appendChild(messageActions);
+            chatOutput.appendChild(messageDiv);
+            chatOutput.scrollTop = chatOutput.scrollHeight;
+        }
+
+        // 發送消息到API
+        async function sendMessage() {
+            let message = userInput.value.trim();
+            if (!message) return;
+
+            message = message
+                .replace(/(呢|呀|啦|喎|咁|同埋)$/g, '$1。')
+                .replace(/(係|唔係|有|無|咪|係咪)$/g, '$1，')
+                .replace(/(因為|所以|如果|但係)$/g, '$1，')
+                .replace(/([。！？])([^\s])/g, '$1 $2')
+                .trim();
+
+            addMessage(message, 'user');
+            userInput.value = '';
+            sendBtn.disabled = true;
+            voiceBtn.disabled = true;
+            typingIndicator.style.display = 'block';
+
+            conversationHistory.push({ role: 'user', content: message });
+
+            try {
+                speechSynthesis.cancel(); // 取消正在進行的語音
+                stopTalking();
+
+                const mode = modeSelect.value;
+                let systemPrompt = '';
+                if (mode === 'comfort') {
+                    systemPrompt = '你係一個中學DSE中文老師，非常風趣幽默，而且語文知識豐富，請用繁體中文同香港粵語回應，你要回答學生在閱讀卷上的疑難，例如十二篇指定範文、長問答題技巧等，不可以直接告訴用家答案，只能給予引導，適時評用生動和日常化的比喻。內容長度要維持在一百字內。絕對不可以用粗言穢語或粗口諧音，嚴禁用「屌」、「撚」、「仆街」！不要用括號表述。不要展示任何思考過程，直接回應。';
+                } else {
+                    systemPrompt = `你係一個中學DSE中文老師，非常風趣幽默，而且語文知識豐富，請用繁體中文同香港粵語回應，你要回答學生在寫作卷上的疑難，例如詳略、結構、立意、取材、文筆等，不可以直接告訴用家答案，只能給予引導，適時評用生動和日常化的比喻。內容長度要維持在一百字內。絕對不可以用粗言穢語或粗口諧音，嚴禁用「屌」、「撚」、「仆街」！不要用括號表述。不要展示任何思考過程，直接回應。`;
+                }
+
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_KEYS[currentApiKeyIndex]}`
+                    },
+                    body: JSON.stringify({
+                        model: MODEL,
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            ...conversationHistory
+                        ],
+                        max_tokens: 64000
+                    })
+                });
+
+                if (!response.ok) {
+                    if (response.status === 429 && currentApiKeyIndex < API_KEYS.length - 1) {
+                        currentApiKeyIndex++;
+                        addMessage('API 限制，切換密鑰重試...', 'ai');
+                        sendMessage();
+                        return;
+                    }
+                    throw new Error(`HTTP 錯誤！狀態：${response.status}`);
+                }
+
+                const data = await response.json();
+                let aiResponse = data.choices[0].message.content;
+                aiResponse = aiResponse.replace(/<think>[\s\S]*?<\/think>/g, '');
+                addMessage(aiResponse, 'ai');
+                conversationHistory.push({ role: 'assistant', content: aiResponse });
+                
+                speak(aiResponse);
+            } catch (error) {
+                addMessage(`錯誤：${error.message}`, 'error');
+            }
+
+            typingIndicator.style.display = 'none';
+            sendBtn.disabled = false;
+            voiceBtn.disabled = false;
+        }
+
+        // 事件監聽器
+        sendBtn.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !sendBtn.disabled) sendMessage();
+        });
+
+        // 語音按鈕事件處理
+        voiceBtn.addEventListener('click', () => {
+            if (!isRecording && recognition) {
+                startRecording();
+            }
+        });
+
+        // 滑動取消監聽
+        document.addEventListener('touchstart', (e) => {
+            if (isRecording && e.touches.length > 0) {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+            }
+        });
+
+        document.addEventListener('touchmove', checkSwipe);
+        document.addEventListener('touchend', () => {
+            if (isRecording) {
+                // 結束錄音處理
+            }
+        });
+
+        // 讓VTUBER頭像可拖動
+        let isDragging = false;
+        let offsetX, offsetY;
+
+        vtuberContainer.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            offsetX = e.clientX - vtuberContainer.getBoundingClientRect().left;
+            offsetY = e.clientY - vtuberContainer.getBoundingClientRect().top;
+            vtuberContainer.style.cursor = 'grabbing';
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            
+            const x = e.clientX - offsetX;
+            const y = e.clientY - offsetY;
+            
+            const maxX = window.innerWidth - vtuberContainer.offsetWidth;
+            const maxY = window.innerHeight - vtuberContainer.offsetHeight;
+            
+            const boundedX = Math.max(0, Math.min(x, maxX));
+            const boundedY = Math.max(0, Math.min(y, maxY));
+            
+            vtuberContainer.style.right = 'auto';
+            vtuberContainer.style.bottom = 'auto';
+            vtuberContainer.style.left = `${boundedX}px`;
+            vtuberContainer.style.top = `${boundedY}px`;
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            vtuberContainer.style.cursor = 'grab';
+        });
+
+        // 觸控設備的拖動支持
+        vtuberContainer.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            offsetX = e.touches[0].clientX - vtuberContainer.getBoundingClientRect().left;
+            offsetY = e.touches[0].clientY - vtuberContainer.getBoundingClientRect().top;
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            
+            const x = e.touches[0].clientX - offsetX;
+            const y = e.touches[0].clientY - offsetY;
+            
+            const maxX = window.innerWidth - vtuberContainer.offsetWidth;
+            const maxY = window.innerHeight - vtuberContainer.offsetHeight;
+            
+            const boundedX = Math.max(0, Math.min(x, maxX));
+            const boundedY = Math.max(0, Math.min(y, maxY));
+            
+            vtuberContainer.style.right = 'auto';
+            vtuberContainer.style.bottom = 'auto';
+            vtuberContainer.style.left = `${boundedX}px`;
+            vtuberContainer.style.top = `${boundedY}px`;
+        });
+
+        document.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+        // 初始問候語
+        document.addEventListener('DOMContentLoaded', () => {
+            const greetings = [
+                "最近你又好似變蠢咗咁。點啊？有咩分享啊？",
+                "喂，你今日心情點啊？唔好話我知你又喺度發呆呀。",
+                "哎呀，你又嚟啦。準備好俾我笑未？",
+                "哇！你個樣仲殘過我尋晚煲劇嘅黑眼圈。",
+                "係咪地球重力突然加大？你個頭耷到貼地喎。",
+                "今日你個髮型好有創意喎，係咪用咗電飯煲剪頭髮？",
+                "喂！你件衫同我阿婆張梳化撞款喎，復古大師？",
+                "睇你個樣似被外星人綁架完放返嚟，分享下經歷啦！",
+                "你對眼瞇到得條線，尋晚去咗做賊啊？",
+                "你個樣似食咗十粒安眠藥但仲要返工，堅強呀兄弟！",
+                "今日你個氣場好特別，似足茶餐廳杯凍檸茶——少甜走冰。",
+                "你個樣愁過考試肥佬，係咪便秘咗三日呀？",
+                "個頭油到反光，可以借嚟當鏡照啦！",
+                "今日氣場頹過淋雨嘅流浪貓，需要熱牛奶？",
+                "你件外套似我屋企張梳化套，有冇親戚關係？",
+                "個笑容僵過蠟像館展品，需要幫你解凍？",
+                "成個人霉過回南天，需要抽濕機定太陽燈？",
+                "成身散發咖啡因氣息，今日第幾杯？",
+                "成個人散發怨氣，剛撞鬼定撞見老細？",
+                "眼袋深過馬里亞納海溝，需要填充？",
+                "個樣呆過未插電嘅機械人，需要充電？"
+            ];
+            const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
+            addMessage(randomGreeting, 'ai');
+            conversationHistory.push({ role: 'assistant', content: randomGreeting });
+            speak(randomGreeting);
+            
+            if (!isSpeechRecognitionSupported()) {
+                addMessage("提示：您的瀏覽器不支援語音輸入功能，請使用最新版Chrome或Edge瀏覽器", 'error');
+            }
+        });
+    </script>
+</body>
+</html>
