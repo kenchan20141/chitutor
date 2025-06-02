@@ -1,44 +1,5 @@
 
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
@@ -82,6 +43,9 @@
             --shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
             --radius: 20px;
             --radius-sm: 12px;
+            --gold: #FFD700;
+            --silver: #C0C0C0;
+            --active-orange: #FF8C00; /* 橙色 */
         }
 
         * {
@@ -108,6 +72,7 @@
             max-width: 900px;
             margin-left: auto;
             margin-right: auto;
+            position: relative;
         }
 
         .header h1 {
@@ -468,6 +433,7 @@
             z-index: 100;
             border: 3px solid var(--primary);
             transition: all 0.3s ease;
+            cursor: pointer;
         }
 
         .vtuber-avatar {
@@ -556,7 +522,377 @@
             10% { transform: scaleY(0.1); }
         }
 
-        /* 移動端適配 */
+        /* 商店系统样式 */
+        .shop-button {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, var(--gold), var(--silver));
+            color: white;
+            padding: 12px 18px;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 101;
+            transition: all 0.3s ease;
+        }
+
+        .shop-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .shop-button .points {
+            background: rgba(255, 255, 255, 0.3);
+            padding: 3px 10px;
+            border-radius: 15px;
+        }
+
+        .shop-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .shop-content {
+            background: white;
+            border-radius: var(--radius);
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .shop-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .shop-header h2 {
+            font-size: 1.8rem;
+            color: var(--primary);
+        }
+
+        .close-shop {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+
+        .points-display {
+            font-size: 1.4rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--gold), var(--silver));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .points-display i {
+            color: var(--gold);
+        }
+
+        .shop-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .shop-item {
+            background: #f9f9f9;
+            border-radius: var(--radius-sm);
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid #e2e8f0;
+        }
+
+        .shop-item:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+            border-color: var(--primary);
+        }
+
+        .shop-item.owned {
+            border-color: var(--secondary);
+        }
+
+        .expression-preview {
+            width: 100px;
+            height: 100px;
+            background: #fde2e4;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .expression-eyes {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70px;
+            height: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .expression-eye {
+            width: 25px;
+            height: 16px;
+            background: #fff;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .expression-pupil {
+            width: 10px;
+            height: 10px;
+            background: #333;
+            border-radius: 50%;
+            position: absolute;
+            top: 3px;
+            left: 7px;
+        }
+
+        .expression-mouth {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 35px;
+            height: 12px;
+            background: #ff9aa2;
+            border-radius: 0 0 15px 15px;
+            overflow: hidden;
+        }
+
+        .expression-mouth-inner {
+            width: 100%;
+            height: 7px;
+            background: #990000;
+            border-radius: 50% / 100%;
+            position: absolute;
+            bottom: 0;
+        }
+
+        .shop-item h3 {
+            margin: 10px 0;
+            font-size: 1.2rem;
+            color: var(--text-dark);
+        }
+
+        .shop-item .price {
+            font-size: 1.1rem;
+            color: var(--gold);
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .shop-btn {
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .buy-btn {
+            background: var(--primary);
+            color: white;
+        }
+
+        .buy-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .buy-btn:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+        }
+
+        .use-btn {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .use-btn:hover {
+            background: #3daa65;
+        }
+
+        .shop-item.owned .use-btn {
+            background: var(--secondary);
+        }
+
+        .shop-item.owned .use-btn.active {
+            background: var(--active-orange);
+        }
+
+        /* 表情样式 - 修改部分 */
+        /* 開心表情修改為大笑 */
+        .happy .expression-mouth {
+            border-radius: 50%;
+            height: 25px; /* 更大的嘴巴 */
+            width: 35px; /* 更寬的嘴巴 */
+            bottom: 25px;
+        }
+        
+        .vtuber-face.happy .vtuber-mouth {
+            border-radius: 50%;
+            height: 25px;
+            width: 35px;
+            bottom: 25px;
+        }
+
+        /* 生氣表情添加生氣符號 */
+        .angry .expression-eyes {
+            transform: translate(-50%, -50%) rotate(10deg);
+        }
+        
+        .angry::before {
+            content: "💢";
+            position: absolute;
+            top: 0;
+            right: 0;
+            font-size: 28px;
+        }
+        
+        .vtuber-face.angry::before {
+            content: "💢";
+            position: absolute;
+            top: 0;
+            right: 0;
+            font-size: 28px;
+        }
+
+        .angry .expression-mouth {
+            border-radius: 50%;
+            height: 8px;
+            width: 40px;
+            background: #d9534f;
+        }
+        
+        .vtuber-face.angry .vtuber-mouth {
+            height: 8px;
+            width: 40px;
+            background: #d9534f;
+            border-radius: 50%;
+        }
+        
+        .angry .expression-eye,
+        .vtuber-face.angry .vtuber-eye {
+            transform: rotate(10deg) scaleX(0.8);
+        }
+
+        .surprised .expression-eyes {
+            transform: translate(-50%, -50%) scale(1.2);
+        }
+
+        .surprised .expression-pupil {
+            transform: scale(0.8);
+        }
+
+        .surprised .expression-mouth {
+            border-radius: 50%;
+            height: 25px;
+            width: 20px;
+        }
+        
+        .vtuber-face.surprised .vtuber-eyes {
+            transform: translate(-50%, -50%) scale(1.2);
+        }
+        
+        .vtuber-face.surprised .vtuber-pupil {
+            transform: scale(0.8);
+        }
+        
+        .vtuber-face.surprised .vtuber-mouth {
+            border-radius: 50%;
+            height: 25px;
+            width: 20px;
+        }
+
+        .sad .expression-eyes {
+            transform: translate(-50%, -30%) rotate(-5deg);
+        }
+
+        .sad .expression-mouth {
+            border-radius: 50% 50% 0 0;
+            height: 10px;
+            width: 30px;
+            top: 60px;
+            background: #5bc0de;
+        }
+        
+        .vtuber-face.sad .vtuber-eyes {
+            transform: translate(-50%, -30%) rotate(-5deg);
+        }
+        
+        .vtuber-face.sad .vtuber-mouth {
+            border-radius: 50% 50% 0 0;
+            height: 10px;
+            width: 30px;
+            top: 60px;
+            bottom: unset;
+            background: #5bc0de;
+        }
+
+        .wink .expression-eye:first-child {
+            height: 5px;
+        }
+
+        .wink .expression-eye:first-child .expression-pupil {
+            display: none;
+        }
+
+        .wink .expression-mouth {
+            transform: translateX(-50%) rotate(5deg);
+            border-radius: 20px;
+            height: 10px;
+            width: 35px;
+        }
+        
+        .vtuber-face.wink .vtuber-eye:first-child {
+            height: 5px;
+        }
+        
+        .vtuber-face.wink .vtuber-eye:first-child .vtuber-pupil {
+            display: none;
+        }
+        
+        .vtuber-face.wink .vtuber-mouth {
+            transform: translateX(-50%) rotate(5deg);
+            border-radius: 20px;
+            height: 10px;
+            width: 35px;
+        }
+
+        /* 移动端适配 */
         @media (max-width: 768px) {
             .vtuber-container {
                 width: 100px;
@@ -617,9 +953,25 @@
                 justify-content: center;
                 margin-top: 10px;
             }
+
+            .shop-button {
+                top: 15px;
+                right: 15px;
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+
+            .shop-items {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+
+            .expression-preview {
+                width: 80px;
+                height: 80px;
+            }
         }
 
-        /* 垂直滾動軸樣式 */
+        /* 垂直滚动轴样式 */
         ::-webkit-scrollbar {
             width: 10px;
         }
@@ -639,10 +991,36 @@
     </style>
 </head>
 <body>
-    <!-- VTUBER 動畫顯示區 -->
+    <!-- 商店按钮 -->
+    <div class="shop-button" id="shop-button">
+        <i class="fas fa-store"></i>
+        <span>表情商店</span>
+        <span class="points" id="points-display">0 點</span>
+    </div>
+
+    <!-- 商店弹窗 -->
+    <div class="shop-modal" id="shop-modal">
+        <div class="shop-content">
+            <div class="shop-header">
+                <h2><i class="fas fa-gift"></i> 表情商店</h2>
+                <button class="close-shop" id="close-shop">&times;</button>
+            </div>
+            <div class="points-display">
+                <i class="fas fa-coins"></i>
+                <span>點數: <span id="shop-points">0</span></span>
+            </div>
+            <p>與陳SIR聊天可以獲得點數，每完成一輪對話獲得1點</p>
+            
+            <div class="shop-items" id="shop-items">
+                <!-- 商品将通过JS动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- VTUBER 动画显示区 -->
     <div class="vtuber-container" id="vtuber-container">
         <div class="vtuber-avatar">
-            <div class="vtuber-face">
+            <div class="vtuber-face" id="vtuber-face">
                 <div class="vtuber-eyes">
                     <div class="vtuber-eye">
                         <div class="vtuber-pupil"></div>
@@ -700,7 +1078,7 @@
     </div>
 
     <footer class="copyright-footer">
-        <p>Copyright © 2025 陳冠健、黃子謙. All rights reserved.</p>
+        <p>Copyright © 2025 謙. All rights reserved.</p>
     </footer>
 
     <script>
@@ -723,6 +1101,13 @@
         const swipeHint = document.getElementById('swipe-hint');
         const vtuberMouth = document.getElementById('vtuber-mouth');
         const vtuberContainer = document.getElementById('vtuber-container');
+        const vtuberFace = document.getElementById('vtuber-face');
+        const shopButton = document.getElementById('shop-button');
+        const shopModal = document.getElementById('shop-modal');
+        const closeShop = document.getElementById('close-shop');
+        const shopPoints = document.getElementById('shop-points');
+        const pointsDisplay = document.getElementById('points-display');
+        const shopItems = document.getElementById('shop-items');
         
         let conversationHistory = [];
         let isRecording = false;
@@ -732,8 +1117,213 @@
         let transcript = '';
         let silenceTimeout;
         let isTalking = false;
+        
+        // 表情商店数据
+        const expressions = [
+            { id: 'default', name: '默認表情', price: 0, className: '' },
+            { id: 'happy', name: '開心', price: 0, className: 'happy' },
+            { id: 'angry', name: '生氣', price: 0, className: 'angry' },
+            { id: 'surprised', name: '驚訝', price: 0, className: 'surprised' },
+            { id: 'sad', name: '傷心', price: 0, className: 'sad' },
+            { id: 'wink', name: '眨眼', price: 0, className: 'wink' }
+        ];
+        
+        // 用户数据
+        let userData = {
+            points: 0,
+            purchasedExpressions: ['default'],
+            currentExpression: 'default'
+        };
 
-        // VTUBER 嘴型動畫控制
+        // 初始化用户数据
+        function initUserData() {
+            const savedData = localStorage.getItem('vtuberUserData');
+            if (savedData) {
+                userData = JSON.parse(savedData);
+            }
+            updatePointsDisplay();
+            updateVtuberExpression();
+        }
+
+        // 保存用户数据到localStorage
+        function saveUserData() {
+            localStorage.setItem('vtuberUserData', JSON.stringify(userData));
+        }
+
+        // 更新点數顯示
+        function updatePointsDisplay() {
+            pointsDisplay.textContent = userData.points + ' 點';
+            shopPoints.textContent = userData.points;
+        }
+
+        // 更新VTuber表情 - 修正表情更新函數
+        function updateVtuberExpression() {
+            const expression = expressions.find(e => e.id === userData.currentExpression);
+            if (expression) {
+                // 清除所有表情類名
+                vtuberFace.className = 'vtuber-face';
+                
+                // 添加新的表情類名
+                if (expression.className) {
+                    vtuberFace.classList.add(expression.className);
+                }
+                
+                // 確保語音播放時的嘴型動畫可以工作
+                if (isTalking) {
+                    vtuberMouth.classList.add('talking');
+                }
+            }
+        }
+
+        // 增加點數
+        function addPoints(amount) {
+            userData.points += amount;
+            updatePointsDisplay();
+            saveUserData();
+        }
+
+        // 購買表情
+        function purchaseExpression(expressionId) {
+            const expression = expressions.find(e => e.id === expressionId);
+            if (!expression) return false;
+            
+            if (userData.points >= expression.price) {
+                userData.points -= expression.price;
+                
+                if (!userData.purchasedExpressions.includes(expressionId)) {
+                    userData.purchasedExpressions.push(expressionId);
+                }
+                
+                updatePointsDisplay();
+                saveUserData();
+                return true;
+            }
+            return false;
+        }
+
+        // 切換表情 - 修正切換表情函數
+        function switchExpression(expressionId) {
+            if (userData.purchasedExpressions.includes(expressionId)) {
+                userData.currentExpression = expressionId;
+                saveUserData();
+                updateVtuberExpression();
+                return true;
+            }
+            return false;
+        }
+
+        // 渲染商店商品 - 修改使用中顯示為橙色
+        function renderShopItems() {
+            shopItems.innerHTML = '';
+            
+            expressions.forEach(expression => {
+                const isOwned = userData.purchasedExpressions.includes(expression.id);
+                const isActive = userData.currentExpression === expression.id;
+                
+                const item = document.createElement('div');
+                item.className = `shop-item ${isOwned ? 'owned' : ''}`;
+                
+                // 創建表情預覽元素
+                const previewDiv = document.createElement('div');
+                previewDiv.className = `expression-preview ${expression.className}`;
+                
+                // 添加眼睛
+                const eyesDiv = document.createElement('div');
+                eyesDiv.className = 'expression-eyes';
+                
+                // 添加兩個眼睛
+                for (let i = 0; i < 2; i++) {
+                    const eyeDiv = document.createElement('div');
+                    eyeDiv.className = 'expression-eye';
+                    
+                    const pupilDiv = document.createElement('div');
+                    pupilDiv.className = 'expression-pupil';
+                    
+                    eyeDiv.appendChild(pupilDiv);
+                    eyesDiv.appendChild(eyeDiv);
+                }
+                
+                // 添加嘴巴
+                const mouthDiv = document.createElement('div');
+                mouthDiv.className = 'expression-mouth';
+                
+                const mouthInnerDiv = document.createElement('div');
+                mouthInnerDiv.className = 'expression-mouth-inner';
+                
+                mouthDiv.appendChild(mouthInnerDiv);
+                
+                // 組裝表情預覽
+                previewDiv.appendChild(eyesDiv);
+                previewDiv.appendChild(mouthDiv);
+                
+                // 創建其餘商品內容
+                const nameElement = document.createElement('h3');
+                nameElement.textContent = expression.name;
+                
+                const priceElement = document.createElement('div');
+                priceElement.className = 'price';
+                priceElement.textContent = `${expression.price} 點`;
+                
+                // 創建按鈕
+                const buttonElement = document.createElement('button');
+                if (isOwned) {
+                    buttonElement.className = `shop-btn use-btn ${isActive ? 'active' : ''}`;
+                    buttonElement.dataset.id = expression.id;
+                    buttonElement.textContent = isActive ? '橙色' : '使用';
+                } else {
+                    buttonElement.className = 'shop-btn buy-btn';
+                    buttonElement.dataset.id = expression.id;
+                    buttonElement.disabled = userData.points < expression.price;
+                    buttonElement.textContent = '購買';
+                }
+                
+                // 組裝商品項目
+                item.appendChild(previewDiv);
+                item.appendChild(nameElement);
+                item.appendChild(priceElement);
+                item.appendChild(buttonElement);
+                
+                shopItems.appendChild(item);
+            });
+            
+            // 添加事件监听
+            document.querySelectorAll('.buy-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const expressionId = e.target.dataset.id;
+                    if (purchaseExpression(expressionId)) {
+                        renderShopItems();
+                        alert(`成功購買${expressions.find(e => e.id === expressionId).name}表情！`);
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.use-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const expressionId = e.target.dataset.id;
+                    if (switchExpression(expressionId)) {
+                        renderShopItems();
+                    }
+                });
+            });
+        }
+
+        // 商店事件监听
+        shopButton.addEventListener('click', () => {
+            shopModal.style.display = 'flex';
+            renderShopItems();
+        });
+
+        closeShop.addEventListener('click', () => {
+            shopModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === shopModal) {
+                shopModal.style.display = 'none';
+            }
+        });
+
+        // VTUBER 嘴型動畫控制 - 修正嘴型動畫
         function startTalking() {
             if (!isTalking) {
                 isTalking = true;
@@ -776,21 +1366,19 @@
             return 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
         }
 
-  function parseFormatting(text) {
-      text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-      text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
-      text = text.replace(/(?:^|\n)\s*-\s+(.*?)(?=\n|$)/g, '<li>$1</li>');
-      text = text.replace(/(<li>.*<\/li>)+/g, '<ul>$&</ul>');
-      text = text.replace(/(?:^|\n)\s*\d+\.\s+(.*?)(?=\n|$)/g, '<li>$1</li>');
-      text = text.replace(/(<li>.*<\/li>)+/g, '<ol>$&</ol>');
-      text = text.replace(/(?:^|\n)>\s*(.*?)(?=\n|$)/g, '<div class="indent">$1</div>');
-      text = text.replace(/(?:^|\n)>>\s*(.*?)(?=\n|$)/g, '<blockquote>$1</blockquote>');
-      text = text.replace(/\n/g, '<br>');
-      return text;
-    }
+        function parseFormatting(text) {
+            text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            text = text.replace(/(?:^|\n)\s*-\s+(.*?)(?=\n|$)/g, '<li>$1</li>');
+            text = text.replace(/(<li>.*<\/li>)+/g, '<ul>$&</ul>');
+            text = text.replace(/(?:^|\n)\s*\d+\.\s+(.*?)(?=\n|$)/g, '<li>$1</li>');
+            text = text.replace(/(<li>.*<\/li>)+/g, '<ol>$&</ol>');
+            text = text.replace(/(?:^|\n)>\s*(.*?)(?=\n|$)/g, '<div class="indent">$1</div>');
+            text = text.replace(/(?:^|\n)>>\s*(.*?)(?=\n|$)/g, '<blockquote>$1</blockquote>');
+            text = text.replace(/\n/g, '<br>');
+            return text;
+        }
 
-
-            
         // 語音識別初始化
         function initSpeechRecognition() {
             if (!isSpeechRecognitionSupported()) {
@@ -899,7 +1487,7 @@
             }
         }
 
-        // 語音合成
+        // 語音合成 - 優化嘴型動畫
         function speak(text) {
             if ('speechSynthesis' in window && ttsAutoPlay.checked) {
                 speechSynthesis.cancel(); // 取消任何正在進行的語音
@@ -935,6 +1523,18 @@
                         
                         utterance.onerror = function() {
                             stopTalking();
+                        };
+                        
+                        utterance.onboundary = function(event) {
+                            // 處理語音邊界事件，讓嘴型更自然
+                            if (vtuberMouth.classList.contains('talking')) {
+                                // 暫時改變嘴型大小，增加變化感
+                                const randomHeight = 15 + Math.floor(Math.random() * 10);
+                                vtuberMouth.style.height = `${randomHeight}px`;
+                                setTimeout(() => {
+                                    vtuberMouth.style.height = '';
+                                }, 100);
+                            }
                         };
                         
                         speechSynthesis.speak(utterance);
@@ -1058,6 +1658,9 @@
                 aiResponse = aiResponse.replace(/<think>[\s\S]*?<\/think>/g, '');
                 addMessage(aiResponse, 'ai');
                 conversationHistory.push({ role: 'assistant', content: aiResponse });
+                
+                // 增加點數（每完成一輪對話）
+                addPoints(1);
                 
                 speak(aiResponse);
             } catch (error) {
@@ -1193,6 +1796,9 @@
             if (!isSpeechRecognitionSupported()) {
                 addMessage("提示：您的瀏覽器不支援語音輸入功能，請使用最新版Chrome或Edge瀏覽器", 'error');
             }
+            
+            // 初始化用户数据和表情
+            initUserData();
         });
     </script>
 </body>
