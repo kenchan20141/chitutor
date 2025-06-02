@@ -1162,34 +1162,47 @@
         }
 
         /* 移動端適配 */
-        @media (max-width: 768px) {
-            body {
-                padding: 15px;
-                padding-top: 80px;
-            }
+       @media (max-width: 768px) {
+    body {
+        padding: 15px;
+        padding-top: 80px;
+    }
 
-            .top-controls {
-                padding: 10px 15px;
-                flex-direction: column;
-                gap: 10px;
-                align-items: stretch;
-            }
+    .top-controls {
+        padding: 10px 15px;
+        flex-direction: row; /* 改為水平排列 */
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+    }
 
-            .shop-button {
-                justify-content: center;
-            }
+    .shop-button {
+        flex: 1; /* 平均分配空間 */
+        padding: 8px 12px; /* 縮小內邊距 */
+        font-size: 0.9rem; /* 縮小字體 */
+    }
 
-            .hunger-bar-container {
-                min-width: auto;
-                width: 100%;
-            }
+    .hunger-bar-container {
+        flex: 1; /* 平均分配空間 */
+        min-width: 120px; /* 縮小最小寬度 */
+        padding: 8px 10px; /* 縮小內邊距 */
+    }
 
-            .vtuber-container {
-                width: 100px;
-                height: 100px;
-                bottom: 20px;
-                right: 20px;
-            }
+    .hunger-icon {
+        font-size: 1rem; /* 縮小圖標 */
+    }
+
+    .hunger-percentage {
+        font-size: 0.8rem; /* 縮小字體 */
+    }
+
+    /* 以下係其他原有樣式，保持不變 */
+    .vtuber-container {
+        width: 100px;
+        height: 100px;
+        bottom: 20px;
+        right: 20px;
+    }
 
             .vtuber-face {
                 width: 80px;
