@@ -54,6 +54,9 @@
             --personality-orange: #FF9800;
             --personality-red: #F44336;
             --personality-pink: #E91E63;
+            --mysterybox-bronze: #CD7F32;
+            --mysterybox-silver: #C0C0C0;
+            --mysterybox-gold: #FFD700;
         }
 
         * {
@@ -879,6 +882,30 @@
             color: white;
         }
 
+        /* 新增盲盒預覽樣式 */
+        .mysterybox-preview {
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .mysterybox-bronze {
+            background: linear-gradient(135deg, var(--mysterybox-bronze), #A57044);
+        }
+
+        .mysterybox-silver {
+            background: linear-gradient(135deg, var(--mysterybox-silver), #A8A9AD);
+        }
+
+        .mysterybox-gold {
+            background: linear-gradient(135deg, var(--mysterybox-gold), #E5C100);
+        }
+
         .expression-eyes {
             position: absolute;
             top: 40%;
@@ -1264,6 +1291,203 @@
             background: linear-gradient(135deg, #FF6347, #FF4500);
         }
 
+        /* 盲盒動畫相關樣式 */
+        .mysterybox-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 300;
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .gift-box {
+            width: 200px;
+            height: 200px;
+            position: relative;
+            transform: scale(0);
+            animation: appear 0.5s forwards, shake 0.5s 0.5s infinite alternate;
+        }
+
+        @keyframes appear {
+            to { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            from { transform: rotate(-5deg); }
+            to { transform: rotate(5deg); }
+        }
+
+        .gift-box-top {
+            position: absolute;
+            top: -30px;
+            left: 0;
+            width: 200px;
+            height: 50px;
+            background: var(--mysterybox-gold);
+            border: 5px solid #8B4513;
+            z-index: 2;
+            transform-origin: bottom center;
+            transition: transform 0.5s ease;
+        }
+
+        .gift-box-body {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 200px;
+            height: 150px;
+            background: var(--mysterybox-silver);
+            border: 5px solid #8B4513;
+            overflow: hidden;
+        }
+
+        .gift-box.bronze .gift-box-top {
+            background: var(--mysterybox-bronze);
+        }
+
+        .gift-box.bronze .gift-box-body {
+            background: #CE955B;
+        }
+
+        .gift-box.silver .gift-box-top {
+            background: var(--mysterybox-silver);
+        }
+
+        .gift-box.silver .gift-box-body {
+            background: #D9D9D9;
+        }
+
+        .gift-box.gold .gift-box-top {
+            background: var(--mysterybox-gold);
+        }
+
+        .gift-box.gold .gift-box-body {
+            background: #FFE873;
+        }
+
+        .gift-bow {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            background: #FF0000;
+            border-radius: 50%;
+            z-index: 3;
+        }
+
+        .gift-bow::before, .gift-bow::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 50px;
+            background: #FF0000;
+            border-radius: 50%;
+        }
+
+        .gift-bow::before {
+            top: -10px;
+            left: -15px;
+            transform: rotate(-30deg);
+        }
+
+        .gift-bow::after {
+            top: -10px;
+            right: -15px;
+            transform: rotate(30deg);
+        }
+
+        .gift-ribbon {
+            position: absolute;
+            top: 0;
+            left: 95px;
+            width: 10px;
+            height: 150px;
+            background: #FF0000;
+            z-index: 1;
+        }
+
+        .gift-box.opening .gift-box-top {
+            transform: translateY(-50px) rotateX(60deg);
+        }
+
+        .gift-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, 100%);
+            opacity: 0;
+            transition: all 0.5s ease 0.5s;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .gift-box.opened .gift-content {
+            transform: translate(-50%, -50%);
+            opacity: 1;
+        }
+
+        .gift-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .gift-text {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ff0000;
+            opacity: 0;
+        }
+
+        @keyframes confetti-fall {
+            from {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0.3;
+            }
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 400;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .notification.show {
+            opacity: 1;
+        }
+
         /* 移動端適配 */
        @media (max-width: 768px) {
     body {
@@ -1407,6 +1631,34 @@
             .name-input {
                 min-width: 100%;
             }
+
+            .gift-box {
+                width: 150px;
+                height: 150px;
+            }
+
+            .gift-box-top {
+                width: 150px;
+                height: 40px;
+            }
+
+            .gift-box-body {
+                width: 150px;
+                height: 110px;
+            }
+
+            .gift-ribbon {
+                left: 70px;
+                height: 110px;
+            }
+
+            .gift-icon {
+                font-size: 3rem;
+            }
+
+            .gift-text {
+                font-size: 1.2rem;
+            }
         }
 
         /* 垂直滾動軸樣式 */
@@ -1472,6 +1724,7 @@
                 <button class="tab" data-tab="hairstyles">髮型</button>
                 <button class="tab" data-tab="foods">食物</button>
                 <button class="tab" data-tab="personalities">性格</button>
+                <button class="tab" data-tab="mysteryboxes">盲盒</button>
             </div>
             
             <div class="shop-items" id="shop-items">
@@ -1500,6 +1753,26 @@
                
             </div>
         </div>
+    </div>
+
+    <!-- 盲盒動畫容器 -->
+    <div class="mysterybox-animation" id="mysterybox-animation" style="display: none;">
+        <div class="gift-box" id="gift-box">
+            <div class="gift-box-top"></div>
+            <div class="gift-box-body"></div>
+            <div class="gift-ribbon"></div>
+            <div class="gift-bow"></div>
+            <div class="gift-content" id="gift-content">
+                <div class="gift-icon" id="gift-icon"></div>
+                <div class="gift-text" id="gift-text"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 通知提示 -->
+    <div class="notification" id="notification">
+        <i class="fas fa-bell"></i>
+        <span id="notification-text"></span>
     </div>
 
     <!-- VTUBER 動畫顯示區 -->
@@ -1599,6 +1872,15 @@
         const hungerIcon = document.getElementById('hunger-icon');
         const hungerFill = document.getElementById('hunger-fill');
         const hungerPercentage = document.getElementById('hunger-percentage');
+        
+        // 盲盒相關元素
+        const mysteryboxAnimation = document.getElementById('mysterybox-animation');
+        const giftBox = document.getElementById('gift-box');
+        const giftContent = document.getElementById('gift-content');
+        const giftIcon = document.getElementById('gift-icon');
+        const giftText = document.getElementById('gift-text');
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notification-text');
         
         // 設置相關元素
         const settingsButton = document.getElementById('settings-button');
@@ -1745,6 +2027,55 @@
             }
         ];
         
+        // 新增盲盒系統
+        const mysteryboxes = [
+            { 
+                id: 'bronze', 
+                name: '銅級盲盒', 
+                price: 15, 
+                class: 'mysterybox-bronze', 
+                icon: '🎁',
+                color: '#CD7F32',
+                odds: {
+                    nothing: 0.3,        // 30% 機率什麼都沒抽到
+                    food: 0.4,           // 40% 機率抽到食物
+                    expression: 0.2,     // 20% 機率抽到表情
+                    hairstyle: 0.09,     // 9% 機率抽到髮型
+                    personality: 0.01    // 1% 機率抽到性格
+                }
+            },
+            { 
+                id: 'silver', 
+                name: '銀級盲盒', 
+                price: 30, 
+                class: 'mysterybox-silver', 
+                icon: '🎁',
+                color: '#C0C0C0',
+                odds: {
+                    nothing: 0.1,        // 10% 機率什麼都沒抽到
+                    food: 0.4,           // 40% 機率抽到食物
+                    expression: 0.3,     // 30% 機率抽到表情
+                    hairstyle: 0.15,     // 15% 機率抽到髮型
+                    personality: 0.05    // 5% 機率抽到性格
+                }
+            },
+            { 
+                id: 'gold', 
+                name: '金級盲盒', 
+                price: 70, 
+                class: 'mysterybox-gold', 
+                icon: '🎁',
+                color: '#FFD700',
+                odds: {
+                    nothing: 0.05,       // 5% 機率什麼都沒抽到
+                    food: 0.3,           // 30% 機率抽到食物
+                    expression: 0.3,     // 30% 機率抽到表情
+                    hairstyle: 0.25,     // 25% 機率抽到髮型
+                    personality: 0.1     // 10% 機率抽到性格
+                }
+            }
+        ];
+        
         // 用戶數據
         let userData = {
             points: 0,
@@ -1757,10 +2088,10 @@
             currentPersonality: 'default',
             hungerLevel: 100,
             lastFeedTime: Date.now(),
-            vtuberName: '陳SIR'  // 新增VTuber名稱
+            vtuberName: '陳SIR'
         };
 
-        // 飽腹值衰減係數（可調整用於測試）
+        // 飽腹值衰減係數
         const HUNGER_DECAY_RATE = 0.5; // 每24小時減50%
         const HUNGER_DECAY_INTERVAL = 24 * 60 * 60 * 1000; // 24小時毫秒數
 
@@ -1942,7 +2273,7 @@
             saveUserData();
         }
 
-        // 購買商品 (修復性格購買問題)
+        // 購買商品
         function purchaseItem(itemId, type) {
             let items, purchasedArray;
             
@@ -1955,9 +2286,21 @@
             } else if (type === 'food') {
                 items = foods;
                 purchasedArray = userData.purchasedFoods;
-            } else if (type === 'personality') {  // 修復：確保正確匹配
+            } else if (type === 'personality') {
                 items = personalities;
                 purchasedArray = userData.purchasedPersonalities;
+            } else if (type === 'mysterybox') {
+                items = mysteryboxes;
+                // 盲盒不需要購買記錄，直接使用
+                const mysterybox = items.find(i => i.id === itemId);
+                if (mysterybox && userData.points >= mysterybox.price) {
+                    userData.points -= mysterybox.price;
+                    updatePointsDisplay();
+                    saveUserData();
+                    openMysteryBox(mysterybox);
+                    return true;
+                }
+                return false;
             }
             
             const item = items.find(i => i.id === itemId);
@@ -1975,7 +2318,7 @@
             return false;
         }
 
-        // 切換外觀或使用食物 (修復性格使用問題)
+        // 切換外觀或使用食物
         function useItem(itemId, type) {
             if (type === 'expression') {
                 if (userData.purchasedExpressions.includes(itemId)) {
@@ -1991,7 +2334,7 @@
                     updateVtuberAppearance();
                     return true;
                 }
-            } else if (type === 'personality') {  // 修復：確保性格切換正常工作
+            } else if (type === 'personality') {
                 if (userData.purchasedPersonalities.includes(itemId)) {
                     userData.currentPersonality = itemId;
                     saveUserData();
@@ -2030,18 +2373,19 @@
             }, 1500);
         }
 
-        // 獲取正確的商品類型名稱 (修復商店tab到type的轉換問題)
+        // 獲取正確的商品類型名稱
         function getItemType(tab) {
             const typeMap = {
                 'expressions': 'expression',
                 'hairstyles': 'hairstyle',
                 'foods': 'food',
-                'personalities': 'personality'  // 修復：確保正確映射
+                'personalities': 'personality',
+                'mysteryboxes': 'mysterybox'
             };
             return typeMap[tab] || tab.slice(0, -1);
         }
 
-        // 渲染商店商品 (修復性格商品渲染)
+        // 渲染商店商品
         function renderShopItems(tab = 'expressions') {
             shopItems.innerHTML = '';
             let items, purchasedArray, currentItem;
@@ -2062,6 +2406,51 @@
                 items = personalities;
                 purchasedArray = userData.purchasedPersonalities;
                 currentItem = userData.currentPersonality;
+            } else if (tab === 'mysteryboxes') {
+                items = mysteryboxes;
+                purchasedArray = [];
+                currentItem = null;
+                
+                // 為盲盒創建特殊渲染邏輯
+                items.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'shop-item';
+                    
+                    const previewDiv = document.createElement('div');
+                    previewDiv.className = `item-preview mysterybox-preview ${item.class}`;
+                    previewDiv.textContent = item.icon;
+                    
+                    const nameElement = document.createElement('h3');
+                    nameElement.textContent = item.name;
+                    
+                    const priceElement = document.createElement('div');
+                    priceElement.className = 'price';
+                    priceElement.textContent = `${item.price} 點`;
+                    
+                    const buttonElement = document.createElement('button');
+                    buttonElement.className = 'shop-btn buy-btn';
+                    buttonElement.disabled = userData.points < item.price;
+                    buttonElement.textContent = '抽獎';
+                    buttonElement.onclick = () => {
+                        if (purchaseItem(item.id, 'mysterybox')) {
+                            // 抽盲盒邏輯在 purchaseItem 中處理
+                        }
+                    };
+                    
+                    const descElement = document.createElement('p');
+                    descElement.style.fontSize = '0.8rem';
+                    descElement.style.marginTop = '10px';
+                    descElement.textContent = '內含隨機驚喜!';
+                    
+                    itemDiv.appendChild(previewDiv);
+                    itemDiv.appendChild(nameElement);
+                    itemDiv.appendChild(priceElement);
+                    itemDiv.appendChild(buttonElement);
+                    itemDiv.appendChild(descElement);
+                    shopItems.appendChild(itemDiv);
+                });
+                
+                return;
             }
 
             items.forEach(item => {
@@ -2111,7 +2500,7 @@
                 }
                 
                 const buttonElement = document.createElement('button');
-                const itemType = getItemType(tab);  // 使用修復後的類型轉換函數
+                const itemType = getItemType(tab);
                 
                 if (tab === 'foods') {
                     if (ownedCount > 0) {
@@ -2167,6 +2556,185 @@
             });
         }
 
+        // 打開盲盒動畫和獎勵系統
+        function openMysteryBox(boxData) {
+            // 設置盲盒樣式
+            giftBox.className = `gift-box ${boxData.id}`;
+            
+            // 顯示動畫容器
+            mysteryboxAnimation.style.display = 'flex';
+            
+            // 抽獎邏輯 - 根據機率決定獎品類型
+            const randomValue = Math.random();
+            let accumulatedOdds = 0;
+            let rewardType = 'nothing';
+            
+            for (const [type, odds] of Object.entries(boxData.odds)) {
+                accumulatedOdds += odds;
+                if (randomValue <= accumulatedOdds) {
+                    rewardType = type;
+                    break;
+                }
+            }
+            
+            // 添加搖晃動畫
+            setTimeout(() => {
+                // 3秒後打開盒子
+                giftBox.classList.add('opening');
+                
+                setTimeout(() => {
+                    // 0.5秒後顯示獎品
+                    giftBox.classList.add('opened');
+                    
+                    // 根據獎品類型設置內容
+                    let reward = null;
+                    let rewardText = '';
+                    let rewardIcon = '';
+                    
+                    if (rewardType === 'nothing') {
+                        rewardText = '什麼都沒抽到...';
+                        rewardIcon = '❌';
+                    } else {
+                        // 從各類別隨機選擇一個未擁有的物品
+                        switch (rewardType) {
+                            case 'food':
+                                reward = getRandomItem(foods);
+                                if (reward) {
+                                    userData.purchasedFoods.push(reward.id);
+                                    rewardText = `獲得了食物：${reward.name}！`;
+                                    rewardIcon = reward.emoji;
+                                }
+                                break;
+                                
+                            case 'expression':
+                                reward = getRandomUnownedItem(expressions, userData.purchasedExpressions);
+                                if (reward) {
+                                    userData.purchasedExpressions.push(reward.id);
+                                    rewardText = `獲得了表情：${reward.name}！`;
+                                    rewardIcon = '😊';
+                                } else {
+                                    // 如果全部表情已擁有，改為獲得食物
+                                    reward = getRandomItem(foods);
+                                    if (reward) {
+                                        userData.purchasedFoods.push(reward.id);
+                                        rewardText = `表情全部已擁有！獲得了食物：${reward.name}！`;
+                                        rewardIcon = reward.emoji;
+                                    }
+                                }
+                                break;
+                                
+                            case 'hairstyle':
+                                reward = getRandomUnownedItem(hairstyles, userData.purchasedHairstyles);
+                                if (reward) {
+                                    userData.purchasedHairstyles.push(reward.id);
+                                    rewardText = `獲得了髮型：${reward.name}！`;
+                                    rewardIcon = '💇';
+                                } else {
+                                    // 如果全部髮型已擁有，改為獲得食物
+                                    reward = getRandomItem(foods);
+                                    if (reward) {
+                                        userData.purchasedFoods.push(reward.id);
+                                        rewardText = `髮型全部已擁有！獲得了食物：${reward.name}！`;
+                                        rewardIcon = reward.emoji;
+                                    }
+                                }
+                                break;
+                                
+                            case 'personality':
+                                reward = getRandomUnownedItem(personalities, userData.purchasedPersonalities);
+                                if (reward) {
+                                    userData.purchasedPersonalities.push(reward.id);
+                                    rewardText = `獲得了性格：${reward.name}！`;
+                                    rewardIcon = reward.icon;
+                                } else {
+                                    // 如果全部性格已擁有，改為獲得食物
+                                    reward = getRandomItem(foods);
+                                    if (reward) {
+                                        userData.purchasedFoods.push(reward.id);
+                                        rewardText = `性格全部已擁有！獲得了食物：${reward.name}！`;
+                                        rewardIcon = reward.emoji;
+                                    }
+                                }
+                                break;
+                        }
+                    }
+                    
+                    // 設置獎勵顯示
+                    giftIcon.textContent = rewardIcon;
+                    giftText.textContent = rewardText;
+                    
+                    // 如果獲得了獎品，創建紙屑效果
+                    if (rewardType !== 'nothing') {
+                        createConfetti();
+                    }
+                    
+                    // 保存用戶數據
+                    saveUserData();
+                    
+                    // 3秒後關閉動畫
+                    setTimeout(() => {
+                        mysteryboxAnimation.style.display = 'none';
+                        giftBox.classList.remove('opening', 'opened');
+                        
+                        // 顯示獲得的獎勵通知
+                        showNotification(rewardText);
+                    }, 3000);
+                    
+                }, 500);
+                
+            }, 2000);
+        }
+
+        // 從列表中獲取一個隨機項目
+        function getRandomItem(items) {
+            if (items.length === 0) return null;
+            const randomIndex = Math.floor(Math.random() * items.length);
+            return items[randomIndex];
+        }
+
+        // 從列表中獲取一個隨機未擁有的項目
+        function getRandomUnownedItem(items, ownedItems) {
+            // 過濾出未擁有的項目
+            const unownedItems = items.filter(item => !ownedItems.includes(item.id));
+            return getRandomItem(unownedItems);
+        }
+
+        // 創建紙屑效果
+        function createConfetti() {
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+            const confettiCount = 100;
+            
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.width = `${Math.random() * 10 + 5}px`;
+                confetti.style.height = `${Math.random() * 10 + 5}px`;
+                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                confetti.style.animation = `confetti-fall ${Math.random() * 2 + 3}s ease forwards`;
+                
+                mysteryboxAnimation.appendChild(confetti);
+                
+                // 動畫結束後移除紙屑元素
+                setTimeout(() => {
+                    if (confetti.parentNode) {
+                        confetti.parentNode.removeChild(confetti);
+                    }
+                }, 5000);
+            }
+        }
+
+        // 顯示通知
+        function showNotification(text) {
+            notificationText.textContent = text;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
         // 商店和設置事件監聽
         shopButton.addEventListener('click', () => {
             shopModal.style.display = 'flex';
@@ -2208,6 +2776,9 @@
             }
             if (e.target === settingsModal) {
                 settingsModal.style.display = 'none';
+            }
+            if (e.target === mysteryboxAnimation) {
+                // 不允許點擊關閉盲盒動畫
             }
         });
 
@@ -2258,12 +2829,12 @@
         // 啟動隨機眨眼
         randomBlinking();
 
-        // 檢查瀏覽器是否支援語音識別
+        // 檢查瀏覽器是否支援語音識別 - 修復語音輸入問題
         function isSpeechRecognitionSupported() {
             return 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
         }
 
-        // 語音識別初始化
+        // 語音識別初始化 - 修復語音輸入問題
         function initSpeechRecognition() {
             if (!isSpeechRecognitionSupported()) {
                 voiceBtn.disabled = true;
@@ -2271,48 +2842,80 @@
                 return null;
             }
 
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            recognition = new SpeechRecognition();
-            recognition.lang = 'zh-HK';
-            recognition.continuous = true;
-            recognition.interimResults = true;
-
-            recognition.onstart = function() {
-                isRecording = true;
-                voiceBtn.classList.add('recording');
-                recordingIndicator.style.display = 'flex';
-                swipeHint.style.display = 'block';
-                voiceBtn.title = '正在語音輸入，滑動取消';
-            };
-
-            recognition.onresult = function(event) {
-                clearTimeout(silenceTimeout);
-                let interimTranscript = '';
-                for (let i = event.resultIndex; i < event.results.length; ++i) {
-                    if (event.results[i].isFinal) {
-                        transcript += event.results[i][0].transcript;
-                    } else {
-                        interimTranscript += event.results[i][0].transcript;
-                    }
+            try {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (!SpeechRecognition) {
+                    console.error('Speech recognition not supported');
+                    voiceBtn.disabled = true;
+                    voiceBtn.title = '您的瀏覽器不支援語音輸入';
+                    return null;
                 }
-                userInput.value = transcript + interimTranscript;
-                silenceTimeout = setTimeout(() => {
-                    recognition.stop();
-                    sendMessage();
-                }, 2000);
-            };
 
-            recognition.onerror = function(event) {
-                console.error('語音識別錯誤:', event.error);
-                addMessage(`語音輸入出錯: ${event.error}`, 'error');
-                stopRecording();
-            };
+                const recognizer = new SpeechRecognition();
+                recognizer.lang = 'zh-HK';
+                recognizer.continuous = true;
+                recognizer.interimResults = true;
 
-            recognition.onend = function() {
-                stopRecording();
-            };
+                recognizer.onstart = function() {
+                    isRecording = true;
+                    voiceBtn.classList.add('recording');
+                    recordingIndicator.style.display = 'flex';
+                    swipeHint.style.display = 'block';
+                    voiceBtn.title = '正在語音輸入，滑動取消';
+                };
 
-            return recognition;
+                recognizer.onresult = function(event) {
+                    if (!event || !event.results) {
+                        console.error('語音識別結果無效');
+                        return;
+                    }
+
+                    clearTimeout(silenceTimeout);
+                    let interimTranscript = '';
+                    for (let i = event.resultIndex; i < event.results.length; ++i) {
+                        if (event.results[i] && event.results[i][0]) {
+                            if (event.results[i].isFinal) {
+                                transcript += event.results[i][0].transcript;
+                            } else {
+                                interimTranscript += event.results[i][0].transcript;
+                            }
+                        }
+                    }
+
+                    // 防止輸入框延遲，使用requestAnimationFrame進行優化
+                    requestAnimationFrame(() => {
+                        userInput.value = transcript + interimTranscript;
+                    });
+                    
+                    // 設置自動停止
+                    silenceTimeout = setTimeout(() => {
+                        try {
+                            recognizer.stop();
+                            sendMessage();
+                        } catch (error) {
+                            console.error('停止語音識別出錯:', error);
+                            stopRecording();
+                        }
+                    }, 2000);
+                };
+
+                recognizer.onerror = function(event) {
+                    console.error('語音識別錯誤:', event.error);
+                    addMessage(`語音輸入出錯: ${event.error}`, 'error');
+                    stopRecording();
+                };
+
+                recognizer.onend = function() {
+                    stopRecording();
+                };
+
+                return recognizer;
+            } catch (error) {
+                console.error('初始化語音識別失敗:', error);
+                voiceBtn.disabled = true;
+                voiceBtn.title = '語音輸入初始化失敗';
+                return null;
+            }
         }
 
         // 初始化語音識別
@@ -2320,7 +2923,12 @@
 
         // 開始錄音
         function startRecording() {
-            if (!recognition || voiceBtn.disabled) return;
+            if (!recognition) {
+                addMessage('語音識別功能未能初始化', 'error');
+                return;
+            }
+            
+            if (voiceBtn.disabled) return;
             
             if (speechSynthesis.speaking) {
                 speechSynthesis.cancel();
@@ -2332,8 +2940,24 @@
                 recognition.start();
             } catch (error) {
                 console.error('啟動語音識別失敗:', error);
-                addMessage('啟動麥克風失敗，請確保已授予權限', 'error');
-                stopRecording();
+                
+                // 嘗試重新初始化語音識別
+                recognition = initSpeechRecognition();
+                if (recognition) {
+                    setTimeout(() => {
+                        try {
+                            transcript = '';
+                            recognition.start();
+                        } catch (retryError) {
+                            console.error('重試啟動語音識別失敗:', retryError);
+                            addMessage('啟動麥克風失敗，請確保已授予權限', 'error');
+                            stopRecording();
+                        }
+                    }, 500);
+                } else {
+                    addMessage('啟動麥克風失敗，請確保已授予權限', 'error');
+                    stopRecording();
+                }
             }
         }
 
@@ -2346,6 +2970,14 @@
             voiceBtn.title = '點擊語音輸入';
             voiceBtn.disabled = false;
             clearTimeout(silenceTimeout);
+            
+            if (recognition) {
+                try {
+                    recognition.stop();
+                } catch (error) {
+                    console.error('停止語音識別時出錯:', error);
+                }
+            }
         }
 
         // 檢查滑動取消
@@ -2365,71 +2997,93 @@
             const deltaY = Math.abs(currentY - touchStartY);
             
             if (deltaX > SWIPE_THRESHOLD || deltaY > SWIPE_THRESHOLD) {
-                recognition.stop();
-                addMessage('語音輸入已取消', 'error');
-            }
-        }
-
-        // 語音合成 - 修復版本，徹底清理文本格式
-        function speak(text) {
-            if ('speechSynthesis' in window && ttsAutoPlay.checked) {
-                speechSynthesis.cancel();
-                stopTalking();
-                
-                // 徹底清理文本格式
-                let cleanedText = cleanText(text);
-                
-                // 額外清理特殊符號和括號內容
-                cleanedText = cleanedText
-                    .replace(/\([^)]*\)/g, '') // 移除括號內容
-                    .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2700}-\u{27BF}]/gu, '') // 移除emoji
-                    .replace(/[^\u4e00-\u9fff\u3400-\u4dbf\u20000-\u2a6df\u2a700-\u2b73f\u2b740-\u2b81f\u2b820-\u2ceaf\u2ceb0-\u2ebe0。，、；：？！""''（）〔〕【】《》〈〉…—\s]/g, '') // 只保留中文、標點符號和空格
-                    .trim();
-                
-                if (!cleanedText) return;
-                
-                const sentences = cleanedText.split(/(?<=[。！？])/);
-                
-                let currentIndex = 0;
-                
-                function speakNext() {
-                    if (currentIndex >= sentences.length) {
-                        stopTalking();
-                        return;
-                    }
-                    
-                    const sentence = sentences[currentIndex].trim();
-                    if (sentence) {
-                        const utterance = new SpeechSynthesisUtterance(sentence);
-                        utterance.lang = 'zh-HK';
-                        utterance.rate = 1.05;
-                        utterance.pitch = 0.3;
-                        
-                        utterance.onstart = function() {
-                            startTalking();
-                        };
-                        
-                        utterance.onend = function() {
-                            currentIndex++;
-                            speakNext();
-                        };
-                        
-                        utterance.onerror = function() {
-                            stopTalking();
-                        };
-                        
-                        speechSynthesis.speak(utterance);
-                    } else {
-                        currentIndex++;
-                        speakNext();
+                if (recognition) {
+                    try {
+                        recognition.stop();
+                    } catch (error) {
+                        console.error('滑動取消時停止語音識別出錯:', error);
                     }
                 }
-                
-                speakNext();
+                addMessage('語音輸入已取消', 'error');
+                stopRecording();
             }
         }
 
-        // 添加消息到聊天 - 修復版本，確保文本清理
+        // 語音合成 - 修復版本
+        function speak(text) {
+            if ('speechSynthesis' in window && ttsAutoPlay.checked) {
+                try {
+                    speechSynthesis.cancel();
+                    stopTalking();
+                    
+                    // 徹底清理文本格式
+                    let cleanedText = cleanText(text);
+                    
+                    // 額外清理特殊符號和括號內容
+                    cleanedText = cleanedText
+                        .replace(/\([^)]*\)/g, '') // 移除括號內容
+                        .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2700}-\u{27BF}]/gu, '') // 移除emoji
+                        .replace(/[^\u4e00-\u9fff\u3400-\u4dbf\u20000-\u2a6df\u2a700-\u2b73f\u2b740-\u2b81f\u2b820-\u2ceaf\u2ceb0-\u2ebe0。，、；：？！""''（）〔〕【】《》〈〉…—\s]/g, '') // 只保留中文、標點符號和空格
+                        .trim();
+                    
+                    if (!cleanedText) return;
+                    
+                    const sentences = cleanedText.split(/(?<=[。！？])/);
+                    
+                    let currentIndex = 0;
+                    
+                    function speakNext() {
+                        if (currentIndex >= sentences.length) {
+                            stopTalking();
+                            return;
+                        }
+                        
+                        const sentence = sentences[currentIndex].trim();
+                        if (sentence) {
+                            const utterance = new SpeechSynthesisUtterance(sentence);
+                            utterance.lang = 'zh-HK';
+                            utterance.rate = 1.05;
+                            utterance.pitch = 0.3;
+                            
+                            utterance.onstart = function() {
+                                startTalking();
+                            };
+                            
+                            utterance.onend = function() {
+                                currentIndex++;
+                                speakNext();
+                            };
+                            
+                            utterance.onerror = function(e) {
+                                console.error('語音合成錯誤:', e);
+                                stopTalking();
+                                currentIndex++;
+                                setTimeout(speakNext, 500);
+                            };
+                            
+                            try {
+                                speechSynthesis.speak(utterance);
+                            } catch (error) {
+                                console.error('語音合成發生錯誤:', error);
+                                stopTalking();
+                                currentIndex++;
+                                setTimeout(speakNext, 500);
+                            }
+                        } else {
+                            currentIndex++;
+                            speakNext();
+                        }
+                    }
+                    
+                    speakNext();
+                } catch (error) {
+                    console.error('語音合成初始化錯誤:', error);
+                    stopTalking();
+                }
+            }
+        }
+
+        // 添加消息到聊天
         function addMessage(content, role) {
             // 清理內容中的思考標籤和格式符號
             if (role === 'ai') {
@@ -2472,7 +3126,7 @@
             chatOutput.scrollTop = chatOutput.scrollHeight;
         }
 
-        // 發送消息到API - 修復版本，強化系統提示詞
+        // 發送消息到API
         async function sendMessage() {
             let message = userInput.value.trim();
             if (!message) return;
@@ -2497,7 +3151,6 @@
                 stopTalking();
 
                 const mode = modeSelect.value;
-                // 修復：確保正確獲取當前性格的prompt
                 const currentPersonality = personalities.find(p => p.id === userData.currentPersonality);
                 let personalityPrompt = currentPersonality && currentPersonality.prompt ? currentPersonality.prompt : '';
                 
