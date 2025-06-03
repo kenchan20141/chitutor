@@ -2015,25 +2015,32 @@
 
     <!-- 設置彈窗 -->
     <div class="modal" id="settings-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-cog"></i> 設置</h2>
-                <button class="close-modal" id="close-settings">×</button>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-cog"></i> 設置</h2>
+            <button class="close-modal" id="close-settings">×</button>
+        </div>
+        
+        <div class="settings-section">
+            <h3><i class="fas fa-user"></i> 角色名稱設定</h3>
+            <div class="name-input-group">
+                <input type="text" class="name-input" id="vtuber-name-input" placeholder="輸入自定義名稱" maxlength="20">
+                <button class="name-save-btn" id="save-name-btn">保存</button>
             </div>
-            
-            <div class="settings-section">
-                <h3><i class="fas fa-user"></i> 角色名稱設定</h3>
-                <div class="name-input-group">
-                    <input type="text" class="name-input" id="vtuber-name-input" placeholder="輸入自定義名稱" maxlength="20">
-                    <button class="name-save-btn" id="save-name-btn">保存</button>
-                </div>
-                <div class="current-name-display" id="current-name-display">
-                    當前名稱：陳SIR
-                </div>
-               
+            <div class="current-name-display" id="current-name-display">
+                當前名稱：陳SIR
+            </div>
+        </div>
+        
+        <div class="settings-section">
+            <h3><i class="fas fa-volume-up"></i> 語音設置</h3>
+            <div class="tts-toggle">
+                <label for="tts-auto-play">自動播放語音回應</label>
+                <input type="checkbox" id="tts-auto-play" checked>
             </div>
         </div>
     </div>
+</div>
 
     <!-- 盲盒動畫容器 -->
     <div class="mysterybox-animation" id="mysterybox-animation" style="display: none;">
@@ -2095,25 +2102,21 @@
             <span></span>
         </div>
 
-        <div id="input-container">
-            <input type="text" id="user-input" placeholder="輸入你的訊息..." />
-            <button id="voice-btn" title="點擊語音輸入">
-                <i class="fas fa-microphone"></i>
-            </button>
-            <button id="send-btn">
-                <i class="fas fa-paper-plane"></i>
-            </button>
-            <div id="tts-toggle">
-                <label for="tts-auto-play">🎙️</label>
-                <input type="checkbox" id="tts-auto-play" checked>
-            </div>
-            <div class="recording-indicator" id="recording-indicator" style="display: none;">
-                <i class="fas fa-circle"></i> 正在聆聽...
-            </div>
-            <div class="swipe-hint" id="swipe-hint">
-                滑動取消
-            </div>
-        </div>
+       <div id="input-container">
+    <input type="text" id="user-input" placeholder="輸入你的訊息..." />
+    <button id="voice-btn" title="點擊語音輸入">
+        <i class="fas fa-microphone"></i>
+    </button>
+    <button id="send-btn">
+        <i class="fas fa-paper-plane"></i>
+    </button>
+    <div class="recording-indicator" id="recording-indicator" style="display: none;">
+        <i class="fas fa-circle"></i> 正在聆聽...
+    </div>
+    <div class="swipe-hint" id="swipe-hint">
+        滑動取消
+    </div>
+</div>
     </div>
 
     <footer class="copyright-footer">
@@ -2313,7 +2316,7 @@ const personalities = [
         icon: '🗡️',
         className: 'personality-hidden-wuxia',
         isHidden: true,
-        prompt: '你要用武俠小說的武俠高手語氣回應，如金庸小說中的大俠風格，使用江湖俠義用語，稱呼學生為「少俠」，讓學生感受大俠風範，語調要剛勁有力，充滿正義感。' 
+        prompt: '你要用武俠小說的大俠語氣回應，如金庸小說中的大俠風格，使用江湖俠義用語，稱呼學生為「少俠」，讓學生感受大俠風範，語調要剛勁有力，充滿正義感。' 
     },
     { 
         id: 'hidden-poet', 
@@ -2322,7 +2325,7 @@ const personalities = [
         icon: '🖋️',
         className: 'personality-hidden-poet',
         isHidden: true,
-        prompt: '你要用詩人的語氣回應，文辭優美，富有詩意，可適當引用古詩詞，稱呼學生為「賢才」，語調要柔和飽含感情，表達要有意境。' 
+        prompt: '你要用詩人的語氣回應，文辭優美，富有詩意，可適當引用古詩詞，稱呼學生為「足下」，語調要柔和飽含感情，表達要有意境。' 
     },
     { 
         id: 'hidden-sage', 
@@ -2331,7 +2334,7 @@ const personalities = [
         icon: '📜',
         className: 'personality-hidden-sage',
         isHidden: true,
-        prompt: '用1930年代黑色電影腔調說話，把每個問題當成案件。開場彈打火機音效[咔嚓]，稱對方「老兄」。關鍵線索用「這煙蒂告訴我...」等現場證據比喻，結尾必說「這城市需要更多像你這樣的腦袋」' 
+        prompt: '用1930年代黑色電影腔調說話，把每個問題當成案件。開場彈打火機音效[咔嚓]，稱對方"老兄"。關鍵線索用「係煙頭話我聽...」等現場證據比喻，結尾必說「呢個城市需要更加多好似你咁樣嘅的腦袋」' 
     }
 ];
         
@@ -2990,7 +2993,7 @@ function renderShopItems(tab = 'expressions') {
         redeemTitle.style.marginBottom = '15px';
         
         const redeemDesc = document.createElement('p');
-        redeemDesc.textContent = '輸入開發者提供的一次性密碼，可隨機獲得一款隱藏版商品！';
+        redeemDesc.textContent = '輸入陳SIR提供的一次性密碼，可隨機獲得一款隱藏版商品！';
         redeemDesc.style.color = 'white';
         redeemDesc.style.marginBottom = '15px';
         
