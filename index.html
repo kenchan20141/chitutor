@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
@@ -1129,6 +1131,284 @@
             border-left: 4px solid #e57373;
         }
 
+
+
+/* 隱藏版表情樣式 */
+.hidden-sleepy .expression-mouth,
+.vtuber-face.hidden-sleepy .vtuber-mouth {
+    width: 20px;
+    height: 8px;
+    background: #8B8B8B;
+    border-radius: 50%;
+    transform: translateX(-50%);
+    animation: sleepyBreath 3s ease-in-out infinite;
+}
+
+.hidden-sleepy .expression-eyes,
+.vtuber-face.hidden-sleepy .vtuber-eyes {
+    transform: translate(-50%, -50%) scale(1.1);
+}
+
+.hidden-sleepy .expression-eye,
+.vtuber-face.hidden-sleepy .vtuber-eye {
+    height: 6px;
+    background: #8B8B8B;
+    transform: scaleY(0.3);
+    border-radius: 10px;
+    position: relative;
+}
+
+.hidden-sleepy .expression-eye::before,
+.vtuber-face.hidden-sleepy .vtuber-eye::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #333;
+    border-radius: 50% 50% 0 0;
+}
+.hidden-sleepy .expression-pupil,
+.vtuber-face.hidden-sleepy .vtuber-pupil {
+    display: none;
+}
+
+.hidden-sleepy::after,
+.vtuber-face.hidden-sleepy::after {
+    content: 'Zzz...';
+    position: absolute;
+    top: -25px;
+    right: 10px;
+    font-size: 16px;
+    color: #666;
+    animation: sleepFloating 2s ease-in-out infinite alternate;
+    font-style: italic;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+@keyframes sleepyBreath {
+    0%, 100% { 
+        width: 20px; 
+        height: 8px; 
+        opacity: 0.8;
+    }
+    50% { 
+        width: 25px; 
+        height: 10px; 
+        opacity: 1;
+    }
+}
+
+@keyframes sleepFloating {
+    from { 
+        opacity: 0.3; 
+        transform: translateY(0px) scale(0.8); 
+    }
+    to { 
+        opacity: 0.8; 
+        transform: translateY(-8px) scale(1.1); 
+    }
+}
+.hidden-shock-eyes .expression-eyes,
+.vtuber-face.hidden-shock-eyes .vtuber-eyes {
+    transform: translate(-50%, -50%) scale(1.8);
+}
+
+.hidden-shock-eyes .expression-eye,
+.vtuber-face.hidden-shock-eyes .vtuber-eye {
+    transform: scale(1.2);
+    background: #FFFFFF;
+    border: 3px solid #FF0000;
+}
+
+.hidden-shock-eyes .expression-pupil,
+.vtuber-face.hidden-shock-eyes .vtuber-pupil {
+    transform: scale(0.5);
+    background: #000;
+}
+
+.hidden-shock-eyes .expression-mouth,
+.vtuber-face.hidden-shock-eyes .vtuber-mouth {
+    width: 8px;
+    height: 25px;
+    border-radius: 50%;
+    background: #000;
+    transform: translateX(-50%);
+}
+
+.hidden-shock-eyes::after,
+.vtuber-face.hidden-shock-eyes::after {
+    content: "⚡⚡⚡";
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 18px;
+    animation: lightning 0.5s infinite alternate;
+}
+
+@keyframes lightning {
+    from { opacity: 1; transform: translateX(-50%) scale(1); }
+    to { opacity: 0.5; transform: translateX(-50%) scale(1.2); }
+}
+
+.hidden-cold .expression-eyes,
+.vtuber-face.hidden-cold .vtuber-eyes {
+    transform: translate(-50%, -50%) rotate(-5deg) scaleY(0.8);
+}
+
+.hidden-cold .expression-mouth,
+.vtuber-face.hidden-cold .vtuber-mouth {
+    width: 25px;
+    height: 5px;
+    background: #4682B4;
+    border-radius: 0;
+}
+
+/* 隱藏版髮型樣式 */
+/* 隱藏版髮型樣式 */
+.hidden-hair-1 {
+    background: linear-gradient(45deg, #FF0000, #FF7F00, #FFFF00, #00FF00, #0000FF, #4B0082, #9400D3);
+    background-size: 200% 200%;
+    animation: rainbowFlow 2s ease-in-out infinite;
+    clip-path: polygon(0 0, 100% 0, 95% 60%, 5% 60%);
+    height: 45px;
+    position: relative;
+    overflow: hidden;
+}
+
+.hidden-hair-1::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes rainbowFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.hidden-hair-2 {
+    background: radial-gradient(circle at 30% 30%, #000033, #000066, #003366, #006699, #0099CC);
+    clip-path: polygon(0 0, 100% 0, 90% 35%, 75% 55%, 25% 55%, 10% 35%);
+    height: 40px;
+    position: relative;
+    overflow: hidden;
+}
+
+.hidden-hair-2::before {
+    content: '✨';
+    position: absolute;
+    top: 8px;
+    left: 20%;
+    font-size: 12px;
+    color: white;
+    animation: twinkle 2s infinite alternate;
+}
+
+.hidden-hair-2::after {
+    content: '⭐';
+    position: absolute;
+    top: 15px;
+    right: 25%;
+    font-size: 10px;
+    color: #FFD700;
+    animation: twinkle 1.5s infinite alternate-reverse;
+}
+
+@keyframes twinkle {
+    from { opacity: 0.3; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1.2); }
+}
+
+.hidden-hair-3 {
+    background: linear-gradient(135deg, #FF00FF, #00FFFF, #FFFF00, #FF69B4, #7B68EE, #00FA9A);
+    background-size: 300% 300%;
+    animation: auroraFlow 3s ease-in-out infinite;
+    clip-path: polygon(0 0, 100% 0, 95% 30%, 80% 50%, 20% 50%, 5% 30%);
+    height: 42px;
+    position: relative;
+    filter: blur(0.5px);
+}
+
+.hidden-hair-3::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%);
+    animation: auroraShine 2s infinite;
+}
+
+@keyframes auroraFlow {
+    0% { background-position: 0% 0%; filter: hue-rotate(0deg); }
+    25% { background-position: 100% 100%; filter: hue-rotate(90deg); }
+    50% { background-position: 0% 100%; filter: hue-rotate(180deg); }
+    75% { background-position: 100% 0%; filter: hue-rotate(270deg); }
+    100% { background-position: 0% 0%; filter: hue-rotate(360deg); }
+}
+
+@keyframes auroraShine {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
+}
+
+/* 隱藏版性格樣式 */
+.personality-hidden-wuxia {
+    background: linear-gradient(135deg, #8B0000, #4B0082);
+}
+
+.personality-hidden-poet {
+    background: linear-gradient(135deg, #4682B4, #87CEEB);
+}
+
+.personality-hidden-sage {
+    background: linear-gradient(135deg, #DAA520, #D2B48C);
+}
+
+/* 隱藏商品樣式 */
+.hidden-item-preview {
+    background: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+}
+
+.shop-item.hidden-item .item-preview::after {
+    content: '?';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2.5rem;
+    color: white;
+    font-weight: bold;
+    text-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
+
+.shop-item.hidden-item .item-preview {
+    background: linear-gradient(135deg, #8a2be2, #4b0082);
+}
+
+
+
+
         /* 表情樣式 */
         .happy .expression-mouth {
             border-radius: 50%;
@@ -1723,7 +2003,7 @@
                 <button class="tab active" data-tab="expressions">表情</button>
                 <button class="tab" data-tab="hairstyles">髮型</button>
                 <button class="tab" data-tab="foods">食物</button>
-                <button class="tab" data-tab="personalities">性格</button>
+                <button class="tab" data-tab="personalities">形象</button>
                 <button class="tab" data-tab="mysteryboxes">盲盒</button>
             </div>
             
@@ -1940,25 +2220,122 @@
         }
         
         // 表情、髮型、食物和性格商店數據
-        const expressions = [
-            { id: 'default', name: '默認表情', price: 0, className: '' },
-            { id: 'happy', name: '無奈', price: 20, className: 'happy' },
-            { id: 'angry', name: '生氣', price: 50, className: 'angry' },
-            { id: 'surprised', name: '驚訝', price: 100, className: 'surprised' },
-            { id: 'sad', name: '發呆', price: 150, className: 'sad' },
-            { id: 'wink', name: '反白眼', price: 200, className: 'wink' }
-        ];
+       const expressions = [
+    { id: 'default', name: '默認表情', price: 0, className: '' },
+    { id: 'happy', name: '無奈', price: 20, className: 'happy' },
+    { id: 'angry', name: '生氣', price: 50, className: 'angry' },
+    { id: 'surprised', name: '驚訝', price: 100, className: 'surprised' },
+    { id: 'sad', name: '發呆', price: 150, className: 'sad' },
+    { id: 'wink', name: '反白眼', price: 200, className: 'wink' },
+   // 隱藏版表情
+{ id: 'hidden-emoji-1', name: '惺忪', price: 300, className: 'hidden-sleepy', isHidden: true },
+{ id: 'hidden-emoji-2', name: '震驚', price: 300, className: 'hidden-shock-eyes', isHidden: true },
+    { id: 'hidden-emoji-3', name: '冷酷', price: 300, className: 'hidden-cold', isHidden: true }
+];
 
-        const hairstyles = [
-            { id: 'hair-1', name: '短棕髮', price: 30, className: 'hair-1' },
-            { id: 'hair-2', name: '金色波浪', price: 60, className: 'hair-2' },
-            { id: 'hair-3', name: '橙色平頂', price: 90, className: 'hair-3' },
-            { id: 'hair-4', name: '藍色尖髮', price: 120, className: 'hair-4' },
-            { id: 'hair-5', name: '綠色層次', price: 150, className: 'hair-5' },
-            { id: 'hair-6', name: '紫色弧形', price: 180, className: 'hair-6' }
-        ];
+const hairstyles = [
+    { id: 'hair-1', name: '短棕髮', price: 30, className: 'hair-1' },
+    { id: 'hair-2', name: '金色波浪', price: 60, className: 'hair-2' },
+    { id: 'hair-3', name: '橙色平頂', price: 90, className: 'hair-3' },
+    { id: 'hair-4', name: '藍色尖髮', price: 120, className: 'hair-4' },
+    { id: 'hair-5', name: '綠色層次', price: 150, className: 'hair-5' },
+    { id: 'hair-6', name: '紫色弧形', price: 180, className: 'hair-6' },
+    // 隱藏版髮型
+    // 隱藏版髮型
+{ id: 'hidden-hair-1', name: '彩虹流光髮', price: 400, className: 'hidden-hair-1', isHidden: true },
+{ id: 'hidden-hair-2', name: '星空銀河髮', price: 400, className: 'hidden-hair-2', isHidden: true },
+{ id: 'hidden-hair-3', name: '極光幻彩髮', price: 400, className: 'hidden-hair-3', isHidden: true }
+];
 
-        const foods = [
+// 新增性格系統
+const personalities = [
+    { 
+        id: 'default', 
+        name: '默認形象', 
+        price: 0, 
+        icon: '😐',
+        className: 'personality-default',
+        prompt: '' 
+    },
+    { 
+        id: 'gentle', 
+        name: '溫和親切', 
+        price: 30, 
+        icon: '😊',
+        className: 'personality-gentle',
+        prompt: '你要用非常溫和、親切、鼓勵的語氣回應，多用正面詞語，語調要溫柔體貼，像一個慈祥的長者。' 
+    },
+    { 
+        id: 'serious', 
+        name: '嚴肅認真', 
+        price: 50, 
+        icon: '😤',
+        className: 'personality-serious',
+        prompt: '你要用嚴肅、認真、專業的語氣回應，語調要正式，重視學術準確性，像一個嚴格的教授。' 
+    },
+    { 
+        id: 'cheerful', 
+        name: '開朗活潑', 
+        price: 80, 
+        icon: '😄',
+        className: 'personality-cheerful',
+        prompt: '你要用非常開朗、活潑、充滿活力的語氣回應，多用感嘆詞和積極詞語，語調要輕快愉悅。' 
+    },
+    { 
+        id: 'sarcastic', 
+        name: '諷刺毒舌', 
+        price: 120, 
+        icon: '😏',
+        className: 'personality-sarcastic',
+        prompt: '你要用諷刺、毒舌但不過分的語氣回應，可以適度調侃學生，但要保持教育意義，語調要略帶挖苦。要用日常生活的語言，不要用文言。' 
+    },
+    { 
+        id: 'wise', 
+        name: '睿智哲理', 
+        price: 150, 
+        icon: '🧙‍♂️',
+        className: 'personality-wise',
+        prompt: '你要用充滿智慧、哲理性的語氣回應，多引用名言警句和深刻見解，語調要深沉有內涵。' 
+    },
+    { 
+        id: 'humorous', 
+        name: '幽默搞笑', 
+        price: 200, 
+        icon: '🤣',
+        className: 'personality-humorous',
+        prompt: '你要用非常幽默、搞笑的語氣回應，多用比喻和笑話，但要與教學內容相關，語調要輕鬆風趣。' 
+    },
+    // 隱藏版性格
+    { 
+        id: 'hidden-wuxia', 
+        name: '武俠大俠', 
+        price: 500, 
+        icon: '🗡️',
+        className: 'personality-hidden-wuxia',
+        isHidden: true,
+        prompt: '你要用武俠小說的語氣回應，如金庸小說中的大俠風格，使用江湖俠義用語，稱呼學生為「少俠」，讓學生感受大俠風範，語調要剛勁有力，充滿正義感。' 
+    },
+    { 
+        id: 'hidden-poet', 
+        name: '詩人雅士', 
+        price: 500, 
+        icon: '🖋️',
+        className: 'personality-hidden-poet',
+        isHidden: true,
+        prompt: '你要用詩人的語氣回應，文辭優美，富有詩意，可適當引用古詩詞，稱呼學生為「賢才」，語調要柔和飽含感情，表達要有意境。' 
+    },
+    { 
+        id: 'hidden-sage', 
+        name: '福爾摩斯', 
+        price: 500, 
+        icon: '📜',
+        className: 'personality-hidden-sage',
+        isHidden: true,
+        prompt: '用1930年代黑色電影腔調說話，把每個問題當成案件。開場彈打火機音效[咔嚓]，稱對方"老兄"。關鍵線索用「這隻煙蒂告訴我...」等現場證據比喻，結尾必說「這城市需要更多像你這樣的腦袋」' 
+    }
+];
+        
+const foods = [
             { id: 'apple', name: '蘋果', price: 3, nutrition: 15, emoji: '🍎' },
             { id: 'sandwich', name: '三明治', price: 5, nutrition: 30, emoji: '🥪' },
             { id: 'pizza', name: '披薩', price: 7, nutrition: 50, emoji: '🍕' },
@@ -1967,150 +2344,98 @@
             { id: 'cake', name: '蛋糕', price: 15, nutrition: 100, emoji: '🎂' }
         ];
 
-        // 新增性格系統
-        const personalities = [
-            { 
-                id: 'default', 
-                name: '默認性格', 
-                price: 0, 
-                icon: '😐',
-                className: 'personality-default',
-                prompt: '' 
-            },
-            { 
-                id: 'gentle', 
-                name: '溫和親切', 
-                price: 30, 
-                icon: '😊',
-                className: 'personality-gentle',
-                prompt: '你要用非常溫和、親切、鼓勵的語氣回應，多用正面詞語，語調要溫柔體貼，像一個慈祥的長者。' 
-            },
-            { 
-                id: 'serious', 
-                name: '嚴肅認真', 
-                price: 50, 
-                icon: '😤',
-                className: 'personality-serious',
-                prompt: '你要用嚴肅、認真、專業的語氣回應，語調要正式，重視學術準確性，像一個嚴格的教授。' 
-            },
-            { 
-                id: 'cheerful', 
-                name: '開朗活潑', 
-                price: 80, 
-                icon: '😄',
-                className: 'personality-cheerful',
-                prompt: '你要用非常開朗、活潑、充滿活力的語氣回應，多用感嘆詞和積極詞語，語調要輕快愉悅。' 
-            },
-            { 
-                id: 'sarcastic', 
-                name: '諷刺毒舌', 
-                price: 120, 
-                icon: '😏',
-                className: 'personality-sarcastic',
-                prompt: '你要用諷刺、毒舌但不過分的語氣回應，可以適度調侃學生，但要保持教育意義，語調要略帶挖苦。要用日常生活的語言，不要用文言。' 
-            },
-            { 
-                id: 'wise', 
-                name: '睿智哲理', 
-                price: 150, 
-                icon: '🧙‍♂️',
-                className: 'personality-wise',
-                prompt: '你要用充滿智慧、哲理性的語氣回應，多引用名言警句和深刻見解，語調要深沉有內涵。' 
-            },
-            { 
-                id: 'humorous', 
-                name: '幽默搞笑', 
-                price: 200, 
-                icon: '🤣',
-                className: 'personality-humorous',
-                prompt: '你要用非常幽默、搞笑的語氣回應，多用比喻和笑話，但要與教學內容相關，語調要輕鬆風趣。' 
-            }
-        ];
-        
         // 新增盲盒系統
-        const mysteryboxes = [
-            { 
-                id: 'bronze', 
-                name: '銅級盲盒', 
-                price: 15, 
-                class: 'mysterybox-bronze', 
-                icon: '🎁',
-                color: '#CD7F32',
-                odds: {
-                    nothing: 0.3,        // 30% 機率什麼都沒抽到
-                    food: 0.4,           // 40% 機率抽到食物
-                    expression: 0.2,     // 20% 機率抽到表情
-                    hairstyle: 0.09,     // 9% 機率抽到髮型
-                    personality: 0.01    // 1% 機率抽到性格
-                }
-            },
-            { 
-                id: 'silver', 
-                name: '銀級盲盒', 
-                price: 30, 
-                class: 'mysterybox-silver', 
-                icon: '🎁',
-                color: '#C0C0C0',
-                odds: {
-                    nothing: 0.1,        // 10% 機率什麼都沒抽到
-                    food: 0.4,           // 40% 機率抽到食物
-                    expression: 0.3,     // 30% 機率抽到表情
-                    hairstyle: 0.15,     // 15% 機率抽到髮型
-                    personality: 0.05    // 5% 機率抽到性格
-                }
-            },
-            { 
-                id: 'gold', 
-                name: '金級盲盒', 
-                price: 70, 
-                class: 'mysterybox-gold', 
-                icon: '🎁',
-                color: '#FFD700',
-                odds: {
-                    nothing: 0.05,       // 5% 機率什麼都沒抽到
-                    food: 0.3,           // 30% 機率抽到食物
-                    expression: 0.3,     // 30% 機率抽到表情
-                    hairstyle: 0.25,     // 25% 機率抽到髮型
-                    personality: 0.1     // 10% 機率抽到性格
-                }
-            }
-        ];
+const mysteryboxes = [
+    { 
+        id: 'bronze', 
+        name: '銅級盲盒', 
+        price: 15, 
+        class: 'mysterybox-bronze', 
+        icon: '🎁',
+        color: '#CD7F32',
+        odds: {
+            nothing: 0.3,        // 30% 機率什麼都沒抽到
+            food: 0.4,           // 40% 機率抽到食物
+            expression: 0.2,     // 20% 機率抽到表情
+            hairstyle: 0.09,     // 9% 機率抽到髮型
+            personality: 0.01    // 1% 機率抽到性格
+        }
+    },
+    { 
+        id: 'silver', 
+        name: '銀級盲盒', 
+        price: 30, 
+        class: 'mysterybox-silver', 
+        icon: '🎁',
+        color: '#C0C0C0',
+        odds: {
+            nothing: 0.1,        // 10% 機率什麼都沒抽到
+            food: 0.4,           // 40% 機率抽到食物
+            expression: 0.25,     // 25% 機率抽到表情
+            hairstyle: 0.15,     // 15% 機率抽到髮型
+            personality: 0.05,    // 5% 機率抽到性格
+            hidden: 0.05         // 5% 機率抽到隱藏版商品
+        }
+    },
+    { 
+        id: 'gold', 
+        name: '金級盲盒', 
+        price: 70, 
+        class: 'mysterybox-gold', 
+        icon: '🎁',
+        color: '#FFD700',
+        odds: {
+            nothing: 0.05,       // 5% 機率什麼都沒抽到
+            food: 0.3,           // 30% 機率抽到食物
+            expression: 0.27,     // 27% 機率抽到表情
+            hairstyle: 0.2,     // 20% 機率抽到髮型
+            personality: 0.1,     // 10% 機率抽到性格
+            hidden: 0.08         // 8% 機率抽到隱藏版商品
+        }
+    }
+];
         
-        // 用戶數據
-        let userData = {
-            points: 0,
-            purchasedExpressions: ['default'],
-            purchasedHairstyles: [],
-            purchasedFoods: [],
-            purchasedPersonalities: ['default'],
-            currentExpression: 'default',
-            currentHairstyle: '',
-            currentPersonality: 'default',
-            hungerLevel: 100,
-            lastFeedTime: Date.now(),
-            vtuberName: '陳SIR'
-        };
+       // 用戶數據
+let userData = {
+    points: 0,
+    purchasedExpressions: ['default'],
+    purchasedHairstyles: [],
+    purchasedFoods: [],
+    purchasedPersonalities: ['default'],
+    currentExpression: 'default',
+    currentHairstyle: '',
+    currentPersonality: 'default',
+    hungerLevel: 100,
+    lastFeedTime: Date.now(),
+    vtuberName: '陳SIR',
+    hiddenCodesUsed: []  // 新增：已使用的一次性密碼
+};
 
         // 飽腹值衰減係數
         const HUNGER_DECAY_RATE = 0.5; // 每24小時減50%
         const HUNGER_DECAY_INTERVAL = 24 * 60 * 60 * 1000; // 24小時毫秒數
 
-        // 初始化用戶數據
-        function initUserData() {
-            const savedData = localStorage.getItem('vtuberUserData');
-            if (savedData) {
-                userData = { ...userData, ...JSON.parse(savedData) };
-                // 計算飽腹值衰減
-                updateHungerLevel();
-            }
-            updatePointsDisplay();
-            updateHungerDisplay();
-            updateVtuberAppearance();
-            updateVtuberName();
-            
-            // 開始飽腹值定時更新
-            setInterval(updateHungerLevel, 60000); // 每分鐘檢查一次
+       // 初始化用戶數據
+function initUserData() {
+    const savedData = localStorage.getItem('vtuberUserData');
+    if (savedData) {
+        const parsedData = JSON.parse(savedData);
+        // 確保添加新屬性
+        if (!parsedData.hiddenCodesUsed) {
+            parsedData.hiddenCodesUsed = [];
         }
+        userData = { ...userData, ...parsedData };
+        // 計算飽腹值衰減
+        updateHungerLevel();
+    }
+    updatePointsDisplay();
+    updateHungerDisplay();
+    updateVtuberAppearance();
+    updateVtuberName();
+    
+    // 開始飽腹值定時更新
+    setInterval(updateHungerLevel, 60000); // 每分鐘檢查一次
+}
 
         // 更新VTuber名稱顯示
         function updateVtuberName() {
@@ -2147,6 +2472,183 @@
             
             return true;
         }
+
+// 打開盲盒動畫和獎勵系統
+function openMysteryBox(boxData) {
+    // 設置盲盒樣式
+    giftBox.className = `gift-box ${boxData.id}`;
+    
+    // 顯示動畫容器
+    mysteryboxAnimation.style.display = 'flex';
+    
+    // 抽獎邏輯 - 根據機率決定獎品類型
+    const randomValue = Math.random();
+    let accumulatedOdds = 0;
+    let rewardType = 'nothing';
+    
+    for (const [type, odds] of Object.entries(boxData.odds)) {
+        accumulatedOdds += odds;
+        if (randomValue <= accumulatedOdds) {
+            rewardType = type;
+            break;
+        }
+    }
+    
+    // 添加搖晃動畫
+    setTimeout(() => {
+        // 3秒後打開盒子
+        giftBox.classList.add('opening');
+        
+        setTimeout(() => {
+            // 0.5秒後顯示獎品
+            giftBox.classList.add('opened');
+            
+            // 根據獎品類型設置內容
+            let reward = null;
+            let rewardText = '';
+            let rewardIcon = '';
+            
+            if (rewardType === 'nothing') {
+                rewardText = '什麼都沒抽到...';
+                rewardIcon = '❌';
+            } else if (rewardType === 'hidden') {
+                // 隱藏商品處理邏輯
+                const hiddenExpressions = expressions.filter(item => item.isHidden);
+                const hiddenHairstyles = hairstyles.filter(item => item.isHidden);
+                const hiddenPersonalities = personalities.filter(item => item.isHidden);
+                
+                // 合併所有隱藏商品
+                const allHiddenItems = [...hiddenExpressions, ...hiddenHairstyles, ...hiddenPersonalities];
+                
+                // 過濾出未擁有的隱藏商品
+                const unownedHiddenItems = allHiddenItems.filter(item => {
+                    if (item.id.includes('hidden-emoji')) {
+                        return !userData.purchasedExpressions.includes(item.id);
+                    } else if (item.id.includes('hidden-hair')) {
+                        return !userData.purchasedHairstyles.includes(item.id);
+                    } else {
+                        return !userData.purchasedPersonalities.includes(item.id);
+                    }
+                });
+                
+                if (unownedHiddenItems.length > 0) {
+                    // 隨機選擇一個未擁有的隱藏商品
+                    reward = unownedHiddenItems[Math.floor(Math.random() * unownedHiddenItems.length)];
+                    
+                    // 根據商品類型添加到對應的購買列表
+                    if (reward.id.includes('hidden-emoji')) {
+                        userData.purchasedExpressions.push(reward.id);
+                        rewardText = `獲得了隱藏表情：${reward.name}！`;
+                    } else if (reward.id.includes('hidden-hair')) {
+                        userData.purchasedHairstyles.push(reward.id);
+                        rewardText = `獲得了隱藏髮型：${reward.name}！`;
+                    } else {
+                        userData.purchasedPersonalities.push(reward.id);
+                        rewardText = `獲得了隱藏性格：${reward.name}！`;
+                    }
+                    
+                    rewardIcon = reward.icon || '🌟';
+                } else {
+                    // 如果已經擁有所有隱藏商品，改為獲得食物
+                    reward = getRandomItem(foods);
+                    if (reward) {
+                        userData.purchasedFoods.push(reward.id);
+                        rewardText = `已擁有所有隱藏商品！獲得了食物：${reward.name}！`;
+                        rewardIcon = reward.emoji;
+                    }
+                }
+            } else {
+                // 原有的普通獎品邏輯
+                switch (rewardType) {
+                    case 'food':
+                        reward = getRandomItem(foods);
+                        if (reward) {
+                            userData.purchasedFoods.push(reward.id);
+                            rewardText = `獲得了食物：${reward.name}！`;
+                            rewardIcon = reward.emoji;
+                        }
+                        break;
+                        
+                    case 'expression':
+                        reward = getRandomUnownedItem(expressions.filter(e => !e.isHidden), userData.purchasedExpressions);
+                        if (reward) {
+                            userData.purchasedExpressions.push(reward.id);
+                            rewardText = `獲得了表情：${reward.name}！`;
+                            rewardIcon = '😊';
+                        } else {
+                            // 如果全部表情已擁有，改為獲得食物
+                            reward = getRandomItem(foods);
+                            if (reward) {
+                                userData.purchasedFoods.push(reward.id);
+                                rewardText = `表情全部已擁有！獲得了食物：${reward.name}！`;
+                                rewardIcon = reward.emoji;
+                            }
+                        }
+                        break;
+                        
+                    case 'hairstyle':
+                        reward = getRandomUnownedItem(hairstyles.filter(h => !h.isHidden), userData.purchasedHairstyles);
+                        if (reward) {
+                            userData.purchasedHairstyles.push(reward.id);
+                            rewardText = `獲得了髮型：${reward.name}！`;
+                            rewardIcon = '💇';
+                        } else {
+                            // 如果全部髮型已擁有，改為獲得食物
+                            reward = getRandomItem(foods);
+                            if (reward) {
+                                userData.purchasedFoods.push(reward.id);
+                                rewardText = `髮型全部已擁有！獲得了食物：${reward.name}！`;
+                                rewardIcon = reward.emoji;
+                            }
+                        }
+                        break;
+                        
+                    case 'personality':
+                        reward = getRandomUnownedItem(personalities.filter(p => !p.isHidden), userData.purchasedPersonalities);
+                        if (reward) {
+                            userData.purchasedPersonalities.push(reward.id);
+                            rewardText = `獲得了性格：${reward.name}！`;
+                            rewardIcon = reward.icon;
+                        } else {
+                            // 如果全部性格已擁有，改為獲得食物
+                            reward = getRandomItem(foods);
+                            if (reward) {
+                                userData.purchasedFoods.push(reward.id);
+                                rewardText = `性格全部已擁有！獲得了食物：${reward.name}！`;
+                                rewardIcon = reward.emoji;
+                            }
+                        }
+                        break;
+                }
+            }
+            
+            // 設置獎勵顯示
+            giftIcon.textContent = rewardIcon;
+            giftText.textContent = rewardText;
+            
+            // 如果獲得了獎品，創建紙屑效果
+            if (rewardType !== 'nothing') {
+                createConfetti();
+            }
+            
+            // 保存用戶數據
+            saveUserData();
+            
+            // 3秒後關閉動畫
+            setTimeout(() => {
+                mysteryboxAnimation.style.display = 'none';
+                giftBox.classList.remove('opening', 'opened');
+                
+                // 顯示獲得的獎勵通知
+                showNotification(rewardText);
+            }, 3000);
+            
+        }, 500);
+        
+    }, 2000);
+}
+
+
 
         // 顯示名稱錯誤消息
         function showNameError(message) {
@@ -2385,305 +2887,326 @@
             return typeMap[tab] || tab.slice(0, -1);
         }
 
-        // 渲染商店商品
-        function renderShopItems(tab = 'expressions') {
-            shopItems.innerHTML = '';
-            let items, purchasedArray, currentItem;
+       // 設置一次性密碼和對應的獎勵池
+const hiddenItemCodes = {
+    '11111': { valid: true, used: false },
+    '22222': { valid: true, used: false },
+    '33333': { valid: true, used: false },
+    '44444': { valid: true, used: false },
+    '55555': { valid: true, used: false }
+};
+
+// 獲取所有隱藏商品
+function getAllHiddenItems() {
+    const hiddenExpressions = expressions.filter(item => item.isHidden);
+    const hiddenHairstyles = hairstyles.filter(item => item.isHidden);
+    const hiddenPersonalities = personalities.filter(item => item.isHidden);
+    return [...hiddenExpressions, ...hiddenHairstyles, ...hiddenPersonalities];
+}
+
+// 渲染商店商品
+function renderShopItems(tab = 'expressions') {
+    shopItems.innerHTML = '';
+    let items, purchasedArray, currentItem;
+    
+    if (tab === 'expressions') {
+        items = expressions;
+        purchasedArray = userData.purchasedExpressions;
+        currentItem = userData.currentExpression;
+    } else if (tab === 'hairstyles') {
+        items = hairstyles;
+        purchasedArray = userData.purchasedHairstyles;
+        currentItem = userData.currentHairstyle;
+    } else if (tab === 'foods') {
+    items = foods;
+    purchasedArray = userData.purchasedFoods;
+    currentItem = null;
+    } else if (tab === 'personalities') {
+        items = personalities;
+        purchasedArray = userData.purchasedPersonalities;
+        currentItem = userData.currentPersonality;
+    } else if (tab === 'mysteryboxes') {
+        items = mysteryboxes;
+        purchasedArray = [];
+        currentItem = null;
+        
+        // 為盲盒創建特殊渲染邏輯
+        items.forEach(item => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'shop-item';
             
-            if (tab === 'expressions') {
-                items = expressions;
-                purchasedArray = userData.purchasedExpressions;
-                currentItem = userData.currentExpression;
-            } else if (tab === 'hairstyles') {
-                items = hairstyles;
-                purchasedArray = userData.purchasedHairstyles;
-                currentItem = userData.currentHairstyle;
-            } else if (tab === 'foods') {
-                items = foods;
-                purchasedArray = userData.purchasedFoods;
-                currentItem = null;
-            } else if (tab === 'personalities') {
-                items = personalities;
-                purchasedArray = userData.purchasedPersonalities;
-                currentItem = userData.currentPersonality;
-            } else if (tab === 'mysteryboxes') {
-                items = mysteryboxes;
-                purchasedArray = [];
-                currentItem = null;
-                
-                // 為盲盒創建特殊渲染邏輯
-                items.forEach(item => {
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = 'shop-item';
-                    
-                    const previewDiv = document.createElement('div');
-                    previewDiv.className = `item-preview mysterybox-preview ${item.class}`;
-                    previewDiv.textContent = item.icon;
-                    
-                    const nameElement = document.createElement('h3');
-                    nameElement.textContent = item.name;
-                    
-                    const priceElement = document.createElement('div');
-                    priceElement.className = 'price';
-                    priceElement.textContent = `${item.price} 點`;
-                    
-                    const buttonElement = document.createElement('button');
-                    buttonElement.className = 'shop-btn buy-btn';
-                    buttonElement.disabled = userData.points < item.price;
-                    buttonElement.textContent = '抽獎';
-                    buttonElement.onclick = () => {
-                        if (purchaseItem(item.id, 'mysterybox')) {
-                            // 抽盲盒邏輯在 purchaseItem 中處理
-                        }
-                    };
-                    
-                    const descElement = document.createElement('p');
-                    descElement.style.fontSize = '0.8rem';
-                    descElement.style.marginTop = '10px';
-                    descElement.textContent = '內含隨機驚喜!';
-                    
-                    itemDiv.appendChild(previewDiv);
-                    itemDiv.appendChild(nameElement);
-                    itemDiv.appendChild(priceElement);
-                    itemDiv.appendChild(buttonElement);
-                    itemDiv.appendChild(descElement);
-                    shopItems.appendChild(itemDiv);
-                });
-                
+            const previewDiv = document.createElement('div');
+            previewDiv.className = `item-preview mysterybox-preview ${item.class}`;
+            previewDiv.textContent = item.icon;
+            
+            const nameElement = document.createElement('h3');
+            nameElement.textContent = item.name;
+            
+            const priceElement = document.createElement('div');
+            priceElement.className = 'price';
+            priceElement.textContent = `${item.price} 點`;
+            
+            const buttonElement = document.createElement('button');
+            buttonElement.className = 'shop-btn buy-btn';
+            buttonElement.disabled = userData.points < item.price;
+            buttonElement.textContent = '抽獎';
+            buttonElement.onclick = () => {
+                if (purchaseItem(item.id, 'mysterybox')) {
+                    // 抽盲盒邏輯在 purchaseItem 中處理
+                }
+            };
+            
+            const descElement = document.createElement('p');
+            descElement.style.fontSize = '0.8rem';
+            descElement.style.marginTop = '10px';
+            
+            // 顯示隱藏商品機率信息
+            if (item.id === 'silver' || item.id === 'gold') {
+                const hiddenChance = item.id === 'silver' ? '5%' : '8%';
+                descElement.innerHTML = `內含隨機驚喜!<br><span style="color:#9370DB">有${hiddenChance}機率抽中隱藏商品!</span>`;
+            } else {
+                descElement.textContent = '內含隨機驚喜!';
+            }
+            
+            itemDiv.appendChild(previewDiv);
+            itemDiv.appendChild(nameElement);
+            itemDiv.appendChild(priceElement);
+            itemDiv.appendChild(buttonElement);
+            itemDiv.appendChild(descElement);
+            shopItems.appendChild(itemDiv);
+        });
+        
+        // 添加隱藏商品換領區
+        const redeemDiv = document.createElement('div');
+        redeemDiv.className = 'shop-item hidden-redeem';
+        redeemDiv.style.gridColumn = '1 / -1';
+        redeemDiv.style.background = 'linear-gradient(135deg, #8a2be2, #4b0082)';
+        redeemDiv.style.padding = '20px';
+        redeemDiv.style.marginTop = '20px';
+        
+        const redeemTitle = document.createElement('h3');
+        redeemTitle.textContent = '隱藏商品換領';
+        redeemTitle.style.color = 'white';
+        redeemTitle.style.marginBottom = '15px';
+        
+        const redeemDesc = document.createElement('p');
+        redeemDesc.textContent = '輸入開發者提供的一次性密碼，可隨機獲得一款隱藏版商品！';
+        redeemDesc.style.color = 'white';
+        redeemDesc.style.marginBottom = '15px';
+        
+        const codeInputGroup = document.createElement('div');
+        codeInputGroup.style.display = 'flex';
+        codeInputGroup.style.gap = '10px';
+        codeInputGroup.style.marginBottom = '10px';
+        
+        const codeInput = document.createElement('input');
+        codeInput.type = 'text';
+        codeInput.placeholder = '輸入一次性密碼...';
+        codeInput.style.flex = '1';
+        codeInput.style.padding = '10px';
+        codeInput.style.borderRadius = '5px';
+        codeInput.style.border = 'none';
+        
+        const redeemButton = document.createElement('button');
+        redeemButton.textContent = '換領';
+        redeemButton.className = 'shop-btn buy-btn';
+        redeemButton.style.width = 'auto';
+        
+        redeemButton.onclick = () => {
+            const code = codeInput.value.trim();
+            if (!code) {
+                showNotification('請輸入有效的換領碼');
                 return;
             }
-
-            items.forEach(item => {
-                const isOwned = purchasedArray.includes(item.id);
-                const isActive = currentItem === item.id;
-                const ownedCount = tab === 'foods' ? purchasedArray.filter(id => id === item.id).length : 0;
-                
-                const itemDiv = document.createElement('div');
-                itemDiv.className = `shop-item ${isOwned ? 'owned' : ''}`;
-                
-                const previewDiv = document.createElement('div');
-                previewDiv.className = `item-preview ${tab === 'expressions' ? 'expression-preview' : tab === 'foods' ? 'food-preview' : tab === 'personalities' ? 'personality-preview' : ''} ${item.className || ''}`;
-                
-                if (tab === 'expressions') {
-                    const eyesDiv = document.createElement('div');
-                    eyesDiv.className = 'expression-eyes';
-                    for (let i = 0; i < 2; i++) {
-                        const eyeDiv = document.createElement('div');
-                        eyeDiv.className = 'expression-eye';
-                        const pupilDiv = document.createElement('div');
-                        pupilDiv.className = 'expression-pupil';
-                        eyeDiv.appendChild(pupilDiv);
-                        eyesDiv.appendChild(eyeDiv);
-                    }
-                    const mouthDiv = document.createElement('div');
-                    mouthDiv.className = 'expression-mouth';
-                    const mouthInnerDiv = document.createElement('div');
-                    mouthInnerDiv.className = 'expression-mouth-inner';
-                    mouthDiv.appendChild(mouthInnerDiv);
-                    previewDiv.appendChild(eyesDiv);
-                    previewDiv.appendChild(mouthDiv);
-                } else if (tab === 'foods') {
-                    previewDiv.textContent = item.emoji;
-                } else if (tab === 'personalities') {
-                    previewDiv.textContent = item.icon;
-                }
-                
-                const nameElement = document.createElement('h3');
-                nameElement.textContent = item.name + (tab === 'foods' && ownedCount > 0 ? ` (${ownedCount})` : '');
-                
-                const priceElement = document.createElement('div');
-                priceElement.className = 'price';
-                if (tab === 'foods') {
-                    priceElement.textContent = `${item.price} 點 (+${item.nutrition}飽腹)`;
-                } else {
-                    priceElement.textContent = `${item.price} 點`;
-                }
-                
-                const buttonElement = document.createElement('button');
-                const itemType = getItemType(tab);
-                
-                if (tab === 'foods') {
-                    if (ownedCount > 0) {
-                        buttonElement.className = 'shop-btn use-btn';
-                        buttonElement.textContent = '投餵';
-                        buttonElement.onclick = () => {
-                            if (useItem(item.id, itemType)) {
-                                renderShopItems(tab);
-                                addMessage(`投餵了${item.name}，飽腹值增加${item.nutrition}！`, 'ai');
-                            }
-                        };
-                    } else {
-                        buttonElement.className = 'shop-btn buy-btn';
-                        buttonElement.disabled = userData.points < item.price;
-                        buttonElement.textContent = '購買';
-                        buttonElement.onclick = () => {
-                            if (purchaseItem(item.id, itemType)) {
-                                renderShopItems(tab);
-                                addMessage(`成功購買${item.name}！`, 'ai');
-                            }
-                        };
-                    }
-                } else {
-                    if (isOwned) {
-                        buttonElement.className = `shop-btn use-btn ${isActive ? 'active' : ''}`;
-                        buttonElement.textContent = isActive ? '使用中' : '使用';
-                        buttonElement.onclick = () => {
-                            if (useItem(item.id, itemType)) {
-                                renderShopItems(tab);
-                                if (tab === 'personalities') {
-                                    addMessage(`已切換為${item.name}性格！`, 'ai');
-                                }
-                            }
-                        };
-                    } else {
-                        buttonElement.className = 'shop-btn buy-btn';
-                        buttonElement.disabled = userData.points < item.price;
-                        buttonElement.textContent = '購買';
-                        buttonElement.onclick = () => {
-                            if (purchaseItem(item.id, itemType)) {
-                                renderShopItems(tab);
-                                addMessage(`成功購買${item.name}！`, 'ai');
-                            }
-                        };
-                    }
-                }
-                
-                itemDiv.appendChild(previewDiv);
-                itemDiv.appendChild(nameElement);
-                itemDiv.appendChild(priceElement);
-                itemDiv.appendChild(buttonElement);
-                shopItems.appendChild(itemDiv);
-            });
-        }
-
-        // 打開盲盒動畫和獎勵系統
-        function openMysteryBox(boxData) {
-            // 設置盲盒樣式
-            giftBox.className = `gift-box ${boxData.id}`;
             
-            // 顯示動畫容器
-            mysteryboxAnimation.style.display = 'flex';
-            
-            // 抽獎邏輯 - 根據機率決定獎品類型
-            const randomValue = Math.random();
-            let accumulatedOdds = 0;
-            let rewardType = 'nothing';
-            
-            for (const [type, odds] of Object.entries(boxData.odds)) {
-                accumulatedOdds += odds;
-                if (randomValue <= accumulatedOdds) {
-                    rewardType = type;
-                    break;
+            // 檢查換領碼是否有效
+            if (hiddenItemCodes[code] && hiddenItemCodes[code].valid) {
+                // 檢查是否已使用
+                if (userData.hiddenCodesUsed.includes(code)) {
+                    showNotification('此換領碼已經使用過了');
+                    return;
                 }
+                
+                // 隨機獲得一個隱藏商品
+                const hiddenItems = getAllHiddenItems();
+                const unownedHiddenItems = hiddenItems.filter(item => {
+                    if (item.id.includes('hidden-emoji')) {
+                        return !userData.purchasedExpressions.includes(item.id);
+                    } else if (item.id.includes('hidden-hair')) {
+                        return !userData.purchasedHairstyles.includes(item.id);
+                    } else if (item.id.includes('hidden-')) {
+                        return !userData.purchasedPersonalities.includes(item.id);
+                    }
+                    return false;
+                });
+                
+                if (unownedHiddenItems.length === 0) {
+                    showNotification('您已擁有所有隱藏商品！');
+                    return;
+                }
+                
+                const randomItem = unownedHiddenItems[Math.floor(Math.random() * unownedHiddenItems.length)];
+                
+                // 添加到用戶的已擁有商品
+                if (randomItem.id.includes('hidden-emoji')) {
+                    userData.purchasedExpressions.push(randomItem.id);
+                } else if (randomItem.id.includes('hidden-hair')) {
+                    userData.purchasedHairstyles.push(randomItem.id);
+                } else if (randomItem.id.includes('hidden-')) {
+                    userData.purchasedPersonalities.push(randomItem.id);
+                }
+                
+                // 記錄已使用的換領碼
+                userData.hiddenCodesUsed.push(code);
+                saveUserData();
+                
+                // 顯示獲得的獎勵
+                showNotification(`恭喜獲得隱藏商品：${randomItem.name}！`);
+                codeInput.value = '';
+                
+                // 如果當前標籤與獲得商品類型相符，刷新顯示
+                if ((randomItem.id.includes('hidden-emoji') && tab === 'expressions') ||
+                    (randomItem.id.includes('hidden-hair') && tab === 'hairstyles') ||
+                    (randomItem.id.includes('hidden-') && !randomItem.id.includes('hidden-emoji') && 
+                     !randomItem.id.includes('hidden-hair') && tab === 'personalities')) {
+                    renderShopItems(tab);
+                }
+            } else {
+                showNotification('無效的換領碼');
             }
-            
-            // 添加搖晃動畫
-            setTimeout(() => {
-                // 3秒後打開盒子
-                giftBox.classList.add('opening');
-                
-                setTimeout(() => {
-                    // 0.5秒後顯示獎品
-                    giftBox.classList.add('opened');
-                    
-                    // 根據獎品類型設置內容
-                    let reward = null;
-                    let rewardText = '';
-                    let rewardIcon = '';
-                    
-                    if (rewardType === 'nothing') {
-                        rewardText = '什麼都沒抽到...';
-                        rewardIcon = '❌';
-                    } else {
-                        // 從各類別隨機選擇一個未擁有的物品
-                        switch (rewardType) {
-                            case 'food':
-                                reward = getRandomItem(foods);
-                                if (reward) {
-                                    userData.purchasedFoods.push(reward.id);
-                                    rewardText = `獲得了食物：${reward.name}！`;
-                                    rewardIcon = reward.emoji;
-                                }
-                                break;
-                                
-                            case 'expression':
-                                reward = getRandomUnownedItem(expressions, userData.purchasedExpressions);
-                                if (reward) {
-                                    userData.purchasedExpressions.push(reward.id);
-                                    rewardText = `獲得了表情：${reward.name}！`;
-                                    rewardIcon = '😊';
-                                } else {
-                                    // 如果全部表情已擁有，改為獲得食物
-                                    reward = getRandomItem(foods);
-                                    if (reward) {
-                                        userData.purchasedFoods.push(reward.id);
-                                        rewardText = `表情全部已擁有！獲得了食物：${reward.name}！`;
-                                        rewardIcon = reward.emoji;
-                                    }
-                                }
-                                break;
-                                
-                            case 'hairstyle':
-                                reward = getRandomUnownedItem(hairstyles, userData.purchasedHairstyles);
-                                if (reward) {
-                                    userData.purchasedHairstyles.push(reward.id);
-                                    rewardText = `獲得了髮型：${reward.name}！`;
-                                    rewardIcon = '💇';
-                                } else {
-                                    // 如果全部髮型已擁有，改為獲得食物
-                                    reward = getRandomItem(foods);
-                                    if (reward) {
-                                        userData.purchasedFoods.push(reward.id);
-                                        rewardText = `髮型全部已擁有！獲得了食物：${reward.name}！`;
-                                        rewardIcon = reward.emoji;
-                                    }
-                                }
-                                break;
-                                
-                            case 'personality':
-                                reward = getRandomUnownedItem(personalities, userData.purchasedPersonalities);
-                                if (reward) {
-                                    userData.purchasedPersonalities.push(reward.id);
-                                    rewardText = `獲得了性格：${reward.name}！`;
-                                    rewardIcon = reward.icon;
-                                } else {
-                                    // 如果全部性格已擁有，改為獲得食物
-                                    reward = getRandomItem(foods);
-                                    if (reward) {
-                                        userData.purchasedFoods.push(reward.id);
-                                        rewardText = `性格全部已擁有！獲得了食物：${reward.name}！`;
-                                        rewardIcon = reward.emoji;
-                                    }
-                                }
-                                break;
+        };
+        
+        codeInputGroup.appendChild(codeInput);
+        codeInputGroup.appendChild(redeemButton);
+        
+        redeemDiv.appendChild(redeemTitle);
+        redeemDiv.appendChild(redeemDesc);
+        redeemDiv.appendChild(codeInputGroup);
+        
+        shopItems.appendChild(redeemDiv);
+        
+        return;
+    }
+
+    items.forEach(item => {
+        const isOwned = purchasedArray.includes(item.id);
+        const isActive = currentItem === item.id;
+        const ownedCount = tab === 'foods' ? purchasedArray.filter(id => id === item.id).length : 0;
+        const isHidden = item.isHidden && !isOwned;
+        
+        const itemDiv = document.createElement('div');
+        itemDiv.className = `shop-item ${isOwned ? 'owned' : ''} ${isHidden ? 'hidden-item' : ''}`;
+        
+        const previewDiv = document.createElement('div');
+        let previewClass = '';
+        
+        if (tab === 'expressions') {
+            previewClass = 'expression-preview';
+        } else if (tab === 'foods') {
+            previewClass = 'food-preview';
+        } else if (tab === 'personalities') {
+            previewClass = 'personality-preview';
+        }
+        
+        previewDiv.className = `item-preview ${previewClass} ${!isHidden ? item.className || '' : ''}`;
+        
+        if (!isHidden) {
+            if (tab === 'expressions') {
+                const eyesDiv = document.createElement('div');
+                eyesDiv.className = 'expression-eyes';
+                for (let i = 0; i < 2; i++) {
+                    const eyeDiv = document.createElement('div');
+                    eyeDiv.className = 'expression-eye';
+                    const pupilDiv = document.createElement('div');
+                    pupilDiv.className = 'expression-pupil';
+                    eyeDiv.appendChild(pupilDiv);
+                    eyesDiv.appendChild(eyeDiv);
+                }
+                const mouthDiv = document.createElement('div');
+                mouthDiv.className = 'expression-mouth';
+                const mouthInnerDiv = document.createElement('div');
+                mouthInnerDiv.className = 'expression-mouth-inner';
+                mouthDiv.appendChild(mouthInnerDiv);
+                previewDiv.appendChild(eyesDiv);
+                previewDiv.appendChild(mouthDiv);
+            } else if (tab === 'foods') {
+                previewDiv.textContent = item.emoji;
+            } else if (tab === 'personalities') {
+                previewDiv.textContent = item.icon;
+            }
+        }
+        
+        const nameElement = document.createElement('h3');
+        nameElement.textContent = isHidden ? '???' : (item.name + (tab === 'foods' && ownedCount > 0 ? ` (${ownedCount})` : ''));
+        
+        const priceElement = document.createElement('div');
+        priceElement.className = 'price';
+        if (tab === 'foods') {
+            priceElement.textContent = `${item.price} 點 (+${item.nutrition}飽腹)`;
+        } else {
+            priceElement.textContent = isHidden ? '???' : `${item.price} 點`;
+        }
+        
+        const buttonElement = document.createElement('button');
+        const itemType = getItemType(tab);
+        
+        if (isHidden) {
+            buttonElement.className = 'shop-btn buy-btn';
+            buttonElement.textContent = '未解鎖';
+            buttonElement.disabled = true;
+        } else if (tab === 'foods') {
+            if (ownedCount > 0) {
+                buttonElement.className = 'shop-btn use-btn';
+                buttonElement.textContent = '投餵';
+                buttonElement.onclick = () => {
+                    if (useItem(item.id, itemType)) {
+                        renderShopItems(tab);
+                        addMessage(`投餵了${item.name}，飽腹值增加${item.nutrition}！`, 'ai');
+                    }
+                };
+            } else {
+                buttonElement.className = 'shop-btn buy-btn';
+                buttonElement.disabled = userData.points < item.price;
+                buttonElement.textContent = '購買';
+                buttonElement.onclick = () => {
+                    if (purchaseItem(item.id, itemType)) {
+                        renderShopItems(tab);
+                        addMessage(`成功購買${item.name}！`, 'ai');
+                    }
+                };
+            }
+        } else {
+            if (isOwned) {
+                buttonElement.className = `shop-btn use-btn ${isActive ? 'active' : ''}`;
+                buttonElement.textContent = isActive ? '使用中' : '使用';
+                buttonElement.onclick = () => {
+                    if (useItem(item.id, itemType)) {
+                        renderShopItems(tab);
+                        if (tab === 'personalities') {
+                            addMessage(`已切換為${item.name}性格！`, 'ai');
                         }
                     }
-                    
-                    // 設置獎勵顯示
-                    giftIcon.textContent = rewardIcon;
-                    giftText.textContent = rewardText;
-                    
-                    // 如果獲得了獎品，創建紙屑效果
-                    if (rewardType !== 'nothing') {
-                        createConfetti();
+                };
+            } else {
+                buttonElement.className = 'shop-btn buy-btn';
+                buttonElement.disabled = userData.points < item.price;
+                buttonElement.textContent = '購買';
+                buttonElement.onclick = () => {
+                    if (purchaseItem(item.id, itemType)) {
+                        renderShopItems(tab);
+                        addMessage(`成功購買${item.name}！`, 'ai');
                     }
-                    
-                    // 保存用戶數據
-                    saveUserData();
-                    
-                    // 3秒後關閉動畫
-                    setTimeout(() => {
-                        mysteryboxAnimation.style.display = 'none';
-                        giftBox.classList.remove('opening', 'opened');
-                        
-                        // 顯示獲得的獎勵通知
-                        showNotification(rewardText);
-                    }, 3000);
-                    
-                }, 500);
-                
-            }, 2000);
+                };
+            }
         }
+        
+        itemDiv.appendChild(previewDiv);
+        itemDiv.appendChild(nameElement);
+        itemDiv.appendChild(priceElement);
+        itemDiv.appendChild(buttonElement);
+        shopItems.appendChild(itemDiv);
+    });
+}
 
         // 從列表中獲取一個隨機項目
         function getRandomItem(items) {
