@@ -2448,33 +2448,39 @@ function initUserData() {
 
         // 設置VTuber名稱
         function setVtuberName(name) {
-            const trimmedName = name.trim();
-            
-            if (!trimmedName) {
-                showNameError('名稱不能為空');
-                return false;
-            }
-            
-            if (trimmedName.length > 20) {
-                showNameError('名稱長度不能超過20個字符');
-                return false;
-            }
-            
-            if (containsProfanity(trimmedName)) {
-                showNameError('名稱包含不當詞語，請重新輸入');
-                return false;
-            }
-            
-            userData.vtuberName = trimmedName;
-            saveUserData();
-            updateVtuberName();
-            
-            // 顯示成功消息
-            showNameSuccess(`名稱已更改為：${trimmedName}`);
-            vtuberNameInput.value = '';
-            
-            return true;
-        }
+    const trimmedName = name.trim();
+    
+    if (!trimmedName) {
+        showNameError('名稱不能為空');
+        return false;
+    }
+    
+    if (trimmedName.length > 20) {
+        showNameError('名稱長度不能超過20個字符');
+        return false;
+    }
+    
+    if (containsProfanity(trimmedName)) {
+        showNameError('名稱包含不當詞語，請重新輸入');
+        return false;
+    }
+    
+    // 檢查名稱是否已以「蛋」結尾，若唔係就加上
+    let finalName = trimmedName;
+    if (!trimmedName.endsWith("蛋")) {
+        finalName = trimmedName + "蛋";
+    }
+    
+    userData.vtuberName = finalName;
+    saveUserData();
+    updateVtuberName();
+    
+    // 顯示成功消息
+    showNameSuccess(`名稱已更改為：${finalName}`);
+    vtuberNameInput.value = '';
+    
+    return true;
+}
 
 // 打開盲盒動畫和獎勵系統
 function openMysteryBox(boxData) {
