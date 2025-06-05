@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
@@ -26,6 +27,11 @@
     <link rel="apple-touch-icon" sizes="180x180" href="https://i.ibb.co/WL5vTL9/image.png">
     <link rel="apple-touch-icon" sizes="152x152" href="https://i.ibb.co/WL5vTL9/image.png">
     <link rel="apple-touch-icon" sizes="120x120" href="https://i.ibb.co/WL5vTL9/image.png">
+
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
         
     <style>
         :root {
@@ -2124,6 +2130,25 @@
     </footer>
 
     <script>
+
+
+// Firebase 配置
+const firebaseConfig = {
+  apiKey: "AIzaSyCNnFDrHrUFCPFNPcAYB2eLV_lMlBI9zB8",
+  authDomain: "aiwritingtool-243aa.firebaseapp.com",
+  databaseURL: "https://aiwritingtool-243aa-default-rtdb.firebaseio.com",
+  projectId: "aiwritingtool-243aa",
+  storageBucket: "aiwritingtool-243aa.firebasestorage.app",
+  messagingSenderId: "532808111828",
+  appId: "1:532808111828:web:74cd1001e232e196598d41"
+};
+
+// 初始化 Firebase
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
+
+
         const API_KEYS = [
             "sk-MoqwsgO8P9MEoCrftvdSYA",
             "sk-04KvBMK1EUyinjzdCb1wXQ"
@@ -2897,14 +2922,7 @@ function openMysteryBox(boxData) {
             return typeMap[tab] || tab.slice(0, -1);
         }
 
-       // 設置一次性密碼和對應的獎勵池
-const hiddenItemCodes = {
-    '': { valid: true, used: false },
-    '': { valid: true, used: false },
-    '': { valid: true, used: false },
-    '': { valid: true, used: false },
-    '': { valid: true, used: false }
-};
+       
 
 // 獲取所有隱藏商品
 function getAllHiddenItems() {
@@ -3022,69 +3040,91 @@ function renderShopItems(tab = 'expressions') {
         redeemButton.className = 'shop-btn buy-btn';
         redeemButton.style.width = 'auto';
         
-        redeemButton.onclick = () => {
-            const code = codeInput.value.trim();
-            if (!code) {
-                showNotification('請輸入有效的換領碼');
-                return;
+       redeemButton.onclick = async () => {
+    const code = codeInput.value.trim();
+    if (!code) {
+        showNotification('請輸入有效的換領碼');
+        return;
+    }
+    
+    try {
+        // 檢查 Firebase 中的密碼狀態
+        const codeRef = database.ref(`hiddenCodes/${code}`);
+        const snapshot = await codeRef.once('value');
+        const codeData = snapshot.val();
+        
+        if (!codeData || !codeData.valid) {
+            showNotification('無效的換領碼');
+            return;
+        }
+        
+        if (codeData.used) {
+            showNotification('此換領碼已經使用過了');
+            return;
+        }
+        
+        // 檢查本地是否已使用
+        if (userData.hiddenCodesUsed.includes(code)) {
+            showNotification('此換領碼已經使用過了');
+            return;
+        }
+        
+        // 隨機獲得一個隱藏商品
+        const hiddenItems = getAllHiddenItems();
+        const unownedHiddenItems = hiddenItems.filter(item => {
+            if (item.id.includes('hidden-emoji')) {
+                return !userData.purchasedExpressions.includes(item.id);
+            } else if (item.id.includes('hidden-hair')) {
+                return !userData.purchasedHairstyles.includes(item.id);
+            } else if (item.id.includes('hidden-')) {
+                return !userData.purchasedPersonalities.includes(item.id);
             }
-            
-            // 檢查換領碼是否有效
-            if (hiddenItemCodes[code] && hiddenItemCodes[code].valid) {
-                // 檢查是否已使用
-                if (userData.hiddenCodesUsed.includes(code)) {
-                    showNotification('此換領碼已經使用過了');
-                    return;
-                }
-                
-                // 隨機獲得一個隱藏商品
-                const hiddenItems = getAllHiddenItems();
-                const unownedHiddenItems = hiddenItems.filter(item => {
-                    if (item.id.includes('hidden-emoji')) {
-                        return !userData.purchasedExpressions.includes(item.id);
-                    } else if (item.id.includes('hidden-hair')) {
-                        return !userData.purchasedHairstyles.includes(item.id);
-                    } else if (item.id.includes('hidden-')) {
-                        return !userData.purchasedPersonalities.includes(item.id);
-                    }
-                    return false;
-                });
-                
-                if (unownedHiddenItems.length === 0) {
-                    showNotification('您已擁有所有隱藏商品！');
-                    return;
-                }
-                
-                const randomItem = unownedHiddenItems[Math.floor(Math.random() * unownedHiddenItems.length)];
-                
-                // 添加到用戶的已擁有商品
-                if (randomItem.id.includes('hidden-emoji')) {
-                    userData.purchasedExpressions.push(randomItem.id);
-                } else if (randomItem.id.includes('hidden-hair')) {
-                    userData.purchasedHairstyles.push(randomItem.id);
-                } else if (randomItem.id.includes('hidden-')) {
-                    userData.purchasedPersonalities.push(randomItem.id);
-                }
-                
-                // 記錄已使用的換領碼
-                userData.hiddenCodesUsed.push(code);
-                saveUserData();
-                
-                // 顯示獲得的獎勵
-                showNotification(`恭喜獲得隱藏商品：${randomItem.name}！`);
-                codeInput.value = '';
-                
-                // 如果當前標籤與獲得商品類型相符，刷新顯示
-                if ((randomItem.id.includes('hidden-emoji') && tab === 'expressions') ||
-                    (randomItem.id.includes('hidden-hair') && tab === 'hairstyles') ||
-                    (randomItem.id.includes('hidden-') && !randomItem.id.includes('hidden-emoji') && 
-                     !randomItem.id.includes('hidden-hair') && tab === 'personalities')) {
-                    renderShopItems(tab);
-                }
-            } else {
-                showNotification('無效的換領碼');
-            }
-        };
+            return false;
+        });
+        
+        if (unownedHiddenItems.length === 0) {
+            showNotification('您已擁有所有隱藏商品！');
+            return;
+        }
+        
+        const randomItem = unownedHiddenItems[Math.floor(Math.random() * unownedHiddenItems.length)];
+        
+        // 更新 Firebase 中的密碼狀態
+        await codeRef.update({
+            used: true
+        });
+        
+        // 添加到用戶的已擁有商品
+        if (randomItem.id.includes('hidden-emoji')) {
+            userData.purchasedExpressions.push(randomItem.id);
+        } else if (randomItem.id.includes('hidden-hair')) {
+            userData.purchasedHairstyles.push(randomItem.id);
+        } else if (randomItem.id.includes('hidden-')) {
+            userData.purchasedPersonalities.push(randomItem.id);
+        }
+        
+        // 記錄已使用的換領碼
+        userData.hiddenCodesUsed.push(code);
+        saveUserData();
+        
+        // 顯示獲得的獎勵
+        showNotification(`恭喜獲得隱藏商品：${randomItem.name}！`);
+        codeInput.value = '';
+        
+        // 如果當前標籤與獲得商品類型相符，刷新顯示
+        if ((randomItem.id.includes('hidden-emoji') && tab === 'expressions') ||
+            (randomItem.id.includes('hidden-hair') && tab === 'hairstyles') ||
+            (randomItem.id.includes('hidden-') && !randomItem.id.includes('hidden-emoji') && 
+             !randomItem.id.includes('hidden-hair') && tab === 'personalities')) {
+            renderShopItems(tab);
+        }
+        
+    } catch (error) {
+        console.error('Firebase 錯誤:', error);
+        showNotification('系統錯誤，請稍後再試');
+    }
+};
+
         
         codeInputGroup.appendChild(codeInput);
         codeInputGroup.appendChild(redeemButton);
