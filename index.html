@@ -2237,6 +2237,7 @@
 ];
 
 const hairstyles = [
+    { id: 'default', name: '默認髮型', price: 0, className: '' },
     { id: 'hair-1', name: '短棕髮', price: 30, className: 'hair-1' },
     { id: 'hair-2', name: '金色波浪', price: 60, className: 'hair-2' },
     { id: 'hair-3', name: '橙色平頂', price: 90, className: 'hair-3' },
@@ -2402,11 +2403,11 @@ const mysteryboxes = [
 let userData = {
     points: 0,
     purchasedExpressions: ['default'],
-    purchasedHairstyles: [],
+    purchasedHairstyles: ['default'],
     purchasedFoods: [],
     purchasedPersonalities: ['default'],
     currentExpression: 'default',
-    currentHairstyle: '',
+    currentHairstyle: 'default',
     currentPersonality: 'default',
     hungerLevel: 100,
     lastFeedTime: Date.now(),
