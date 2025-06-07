@@ -3216,13 +3216,16 @@ const friendsTabs = document.querySelectorAll('.friends-tabs .tab');
 
 
 
+                 // API 配置信息
         const API_KEYS = [
-            "sk-MoqwsgO8P9MEoCrftvdSYA",
-            "sk-04KvBMK1EUyinjzdCb1wXQ"
+            "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",
+            "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",
+            "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",
+            "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"
         ];
         let currentApiKeyIndex = 0;
-        const API_URL = "https://chatapi.akash.network/api/v1/chat/completions";
-        const MODEL = "DeepSeek-R1-0528";
+        const API_URL = "https://openrouter.ai/api/v1/chat/completions";
+        const MODEL = "deepseek/deepseek-r1-0528:free";
 
         const chatOutput = document.getElementById('chat-output');
         const userInput = document.getElementById('user-input');
