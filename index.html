@@ -4099,23 +4099,25 @@ syncUserAppearance();
         }
 
         // 更新飽腹值顯示
-        function updateHungerDisplay() {
-            const percentage = Math.round(userData.hungerLevel);
-            hungerPercentage.textContent = percentage + '%';
-            hungerFill.style.width = percentage + '%';
-            
-            // 重置所有狀態類
-            hungerIcon.className = 'fas fa-drumstick-bite hunger-icon';
-            hungerFill.className = 'hunger-fill';
-            
-            if (percentage <= 25) {
-                hungerIcon.classList.add('very-hungry');
-                hungerFill.classList.add('very-hungry');
-            } else if (percentage <= 50) {
-                hungerIcon.classList.add('hungry');
-                hungerFill.classList.add('hungry');
-            }
-        }
+       function updateHungerDisplay() {
+    const percentage = Math.round(userData.hungerLevel);
+    hungerPercentage.textContent = percentage + '%';
+    const minWidth = 20; // 設置最小寬度（像素）
+    const barWidth = Math.max(minWidth, (percentage / 100) * hungerBar.offsetWidth);
+    hungerFill.style.width = barWidth + 'px';
+    
+    // 重置所有狀態類
+    hungerIcon.className = 'fas fa-drumstick-bite hunger-icon';
+    hungerFill.className = 'hunger-fill';
+    
+    if (percentage <= 25) {
+        hungerIcon.classList.add('very-hungry');
+        hungerFill.classList.add('very-hungry');
+    } else if (percentage <= 50) {
+        hungerIcon.classList.add('hungry');
+        hungerFill.classList.add('hungry');
+    }
+}
 
         // 保存用戶數據到localStorage和Firebase
 function saveUserData() {
