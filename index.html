@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
@@ -3400,7 +3399,7 @@ const mysteryboxes = [
         
        // 用戶數據
 let userData = {
-    points: 10000,
+    points: 0,
     purchasedExpressions: ['default'],
     purchasedHairstyles: ['default'],
     purchasedFoods: [],
@@ -3420,37 +3419,52 @@ let userData = {
 
        // 初始化用戶數據
 function initUserData() {
-    const savedData = localStorage.getItem('vtuberUserData');
-    if (savedData) {
-        const parsedData = JSON.parse(savedData);
-        // 確保添加新屬性
-        if (!parsedData.hiddenCodesUsed) {
-            parsedData.hiddenCodesUsed = [];
+    if (currentUser) {
+        // 從 Firebase 載入資料
+        database.ref('users/' + currentUser.uid).once('value').then((snapshot) => {
+            const firebaseData = snapshot.val();
+            if (firebaseData) {
+                userData = { ...firebaseData };
+                // 保存到 localStorage
+                localStorage.setItem('vtuberUserData', JSON.stringify(userData));
+            } else {
+                // 如果 Firebase 無資料，使用預設值並保存到 Firebase
+                saveUserData();
+            }
+            updatePointsDisplay();
+            updateHungerDisplay();
+            updateVtuberAppearance();
+            syncUserAppearance();
+            updateVtuberName();
+            // 開始飽腹值定時更新
+            setInterval(updateHungerLevel, 60000); // 每分鐘檢查一次
+        }).catch((error) => {
+            console.error('從 Firebase 載入資料失敗:', error);
+            // 如果載入失敗，使用 localStorage 中的資料或預設值
+            const savedData = localStorage.getItem('vtuberUserData');
+            if (savedData) {
+                userData = JSON.parse(savedData);
+            }
+            updatePointsDisplay();
+            updateHungerDisplay();
+            updateVtuberAppearance();
+            syncUserAppearance();
+            updateVtuberName();
+            setInterval(updateHungerLevel, 60000);
+        });
+    } else {
+        // 如果未登入，使用 localStorage 或預設值
+        const savedData = localStorage.getItem('vtuberUserData');
+        if (savedData) {
+            userData = JSON.parse(savedData);
         }
-if (!parsedData.freeMysteryboxDraws) {
-    parsedData.freeMysteryboxDraws = {};
-}
-
-        userData = { ...userData, ...parsedData };
-        // 計算飽腹值衰減
-        updateHungerLevel();
+        updatePointsDisplay();
+        updateHungerDisplay();
+        updateVtuberAppearance();
+        syncUserAppearance();
+        updateVtuberName();
+        setInterval(updateHungerLevel, 60000);
     }
-    updatePointsDisplay();
-    updateHungerDisplay();
-    updateVtuberAppearance();
-syncUserAppearance();
-    updateVtuberName();
-    
-
-// 同步Firebase數據到本地
-if (currentUser) {
-    syncFirebaseDataToLocal();
-}
-
-
-
-    // 開始飽腹值定時更新
-    setInterval(updateHungerLevel, 60000); // 每分鐘檢查一次
 }
 
         // 更新VTuber名稱顯示
@@ -4093,8 +4107,34 @@ syncUserAppearance();
 
         // 保存用戶數據到localStorage和Firebase
 function saveUserData() {
-    localStorage.setItem('vtuberUserData', JSON.stringify(userData));
-    syncLocalDataToFirebase();
+    if (currentUser) {
+        database.ref('users/' + currentUser.uid).set(userData)
+            .then(() => {
+                localStorage.setItem('vtuberUserData', JSON.stringify(userData));
+            })
+            .catch((error) => {
+                console.error('保存到 Firebase 失敗:', error);
+            });
+    } else {
+        localStorage.setItem('vtuberUserData', JSON.stringify(userData));
+    }
+}
+
+        function initRealTimeListener() {
+    if (currentUser) {
+        database.ref('users/' + currentUser.uid).on('value', (snapshot) => {
+            const firebaseData = snapshot.val();
+            if (firebaseData) {
+                userData = { ...firebaseData };
+                localStorage.setItem('vtuberUserData', JSON.stringify(userData));
+                updatePointsDisplay();
+                updateHungerDisplay();
+                updateVtuberAppearance();
+                syncUserAppearance();
+                updateVtuberName();
+            }
+        });
+    }
 }
 
 // 同步當前用戶的外觀信息供其他用戶查看
@@ -5525,6 +5565,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loadUserProfile();
             showMainInterface();
             initUserData();
+            initRealTimeListener(); // 啟動實時監聽
             
             // 原有的問候語代碼
             const greetings = [
