@@ -2629,17 +2629,6 @@
     font-size: 0.9rem;
 }
 
-#send-friend-request {
-    padding: 10px;
-    font-size: 1.2rem;
-    background: #73c6b6 ;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-
 .chat-btn {
     background: var(--secondary);
     color: white;
@@ -2943,7 +2932,7 @@
             <button class="shop-button" id="shop-button">
                 <i class="fas fa-store"></i>
            
-                <span class="points" id="points-display">0</span>
+                <span class="points" id="points-display">0 點</span>
             </button>
             
           
@@ -3020,7 +3009,7 @@
             <div id="add-friend" class="friends-tab-content" style="display: none;">
                 <div class="add-friend-form">
                     <input type="email" id="friend-email" placeholder="輸入好友的電子郵件">
-                   <button id="send-friend-request"><i class="fas fa-user-plus"></i></button>
+                    <button id="send-friend-request">發送好友申請</button>
                 </div>
             </div>
             
@@ -3411,7 +3400,7 @@ const mysteryboxes = [
         
        // 用戶數據
 let userData = {
-    points: 0,
+    points: 10000,
     purchasedExpressions: ['default'],
     purchasedHairstyles: ['default'],
     purchasedFoods: [],
@@ -3431,52 +3420,37 @@ let userData = {
 
        // 初始化用戶數據
 function initUserData() {
-    if (currentUser) {
-        // 從 Firebase 載入資料
-        database.ref('users/' + currentUser.uid).once('value').then((snapshot) => {
-            const firebaseData = snapshot.val();
-            if (firebaseData) {
-                userData = { ...firebaseData };
-                // 保存到 localStorage
-                localStorage.setItem('vtuberUserData', JSON.stringify(userData));
-            } else {
-                // 如果 Firebase 無資料，使用預設值並保存到 Firebase
-                saveUserData();
-            }
-            updatePointsDisplay();
-            updateHungerDisplay();
-            updateVtuberAppearance();
-            syncUserAppearance();
-            updateVtuberName();
-            // 開始飽腹值定時更新
-            setInterval(updateHungerLevel, 60000); // 每分鐘檢查一次
-        }).catch((error) => {
-            console.error('從 Firebase 載入資料失敗:', error);
-            // 如果載入失敗，使用 localStorage 中的資料或預設值
-            const savedData = localStorage.getItem('vtuberUserData');
-            if (savedData) {
-                userData = JSON.parse(savedData);
-            }
-            updatePointsDisplay();
-            updateHungerDisplay();
-            updateVtuberAppearance();
-            syncUserAppearance();
-            updateVtuberName();
-            setInterval(updateHungerLevel, 60000);
-        });
-    } else {
-        // 如果未登入，使用 localStorage 或預設值
-        const savedData = localStorage.getItem('vtuberUserData');
-        if (savedData) {
-            userData = JSON.parse(savedData);
+    const savedData = localStorage.getItem('vtuberUserData');
+    if (savedData) {
+        const parsedData = JSON.parse(savedData);
+        // 確保添加新屬性
+        if (!parsedData.hiddenCodesUsed) {
+            parsedData.hiddenCodesUsed = [];
         }
-        updatePointsDisplay();
-        updateHungerDisplay();
-        updateVtuberAppearance();
-        syncUserAppearance();
-        updateVtuberName();
-        setInterval(updateHungerLevel, 60000);
+if (!parsedData.freeMysteryboxDraws) {
+    parsedData.freeMysteryboxDraws = {};
+}
+
+        userData = { ...userData, ...parsedData };
+        // 計算飽腹值衰減
+        updateHungerLevel();
     }
+    updatePointsDisplay();
+    updateHungerDisplay();
+    updateVtuberAppearance();
+syncUserAppearance();
+    updateVtuberName();
+    
+
+// 同步Firebase數據到本地
+if (currentUser) {
+    syncFirebaseDataToLocal();
+}
+
+
+
+    // 開始飽腹值定時更新
+    setInterval(updateHungerLevel, 60000); // 每分鐘檢查一次
 }
 
         // 更新VTuber名稱顯示
@@ -4099,55 +4073,28 @@ syncUserAppearance();
         }
 
         // 更新飽腹值顯示
-       function updateHungerDisplay() {
-    const percentage = Math.round(userData.hungerLevel) || 0;
-    hungerPercentage.textContent = percentage + '%';
-    const minWidth = 20;
-    const barWidth = Math.max(minWidth, (percentage / 100) * hungerBar.offsetWidth);
-    hungerFill.style.width = barWidth + 'px';
-    
-    hungerIcon.className = 'fas fa-drumstick-bite hunger-icon';
-    hungerFill.className = 'hunger-fill';
-    
-    if (percentage <= 25) {
-        hungerIcon.classList.add('very-hungry');
-        hungerFill.classList.add('very-hungry');
-    } else if (percentage <= 50) {
-        hungerIcon.classList.add('hungry');
-        hungerFill.classList.add('hungry');
-    }
-}
+        function updateHungerDisplay() {
+            const percentage = Math.round(userData.hungerLevel);
+            hungerPercentage.textContent = percentage + '%';
+            hungerFill.style.width = percentage + '%';
+            
+            // 重置所有狀態類
+            hungerIcon.className = 'fas fa-drumstick-bite hunger-icon';
+            hungerFill.className = 'hunger-fill';
+            
+            if (percentage <= 25) {
+                hungerIcon.classList.add('very-hungry');
+                hungerFill.classList.add('very-hungry');
+            } else if (percentage <= 50) {
+                hungerIcon.classList.add('hungry');
+                hungerFill.classList.add('hungry');
+            }
+        }
 
         // 保存用戶數據到localStorage和Firebase
 function saveUserData() {
-    if (currentUser) {
-        database.ref('users/' + currentUser.uid).set(userData)
-            .then(() => {
-                localStorage.setItem('vtuberUserData', JSON.stringify(userData));
-            })
-            .catch((error) => {
-                console.error('保存到 Firebase 失敗:', error);
-            });
-    } else {
-        localStorage.setItem('vtuberUserData', JSON.stringify(userData));
-    }
-}
-
-        function initRealTimeListener() {
-    if (currentUser) {
-        database.ref('users/' + currentUser.uid).on('value', (snapshot) => {
-            const firebaseData = snapshot.val();
-            if (firebaseData) {
-                userData = { ...firebaseData };
-                localStorage.setItem('vtuberUserData', JSON.stringify(userData));
-                updatePointsDisplay();
-                updateHungerDisplay();
-                updateVtuberAppearance();
-                syncUserAppearance();
-                updateVtuberName();
-            }
-        });
-    }
+    localStorage.setItem('vtuberUserData', JSON.stringify(userData));
+    syncLocalDataToFirebase();
 }
 
 // 同步當前用戶的外觀信息供其他用戶查看
@@ -4244,7 +4191,7 @@ function syncLocalDataToFirebase() {
 
         // 更新點數顯示
         function updatePointsDisplay() {
-            pointsDisplay.textContent = userData.points + ' ';
+            pointsDisplay.textContent = userData.points + ' 點';
             shopPoints.textContent = userData.points;
         }
 
@@ -4555,7 +4502,7 @@ giftDiv.innerHTML = `
         currentItem = userData.currentHairstyle;
     } else if (tab === 'foods') {
     items = foods;
-    purchasedArray = userData.purchasedFoods || [];  // 確保為數組
+    purchasedArray = userData.purchasedFoods;
     currentItem = null;
     } else if (tab === 'personalities') {
         items = personalities;
@@ -5578,7 +5525,6 @@ document.addEventListener('DOMContentLoaded', () => {
             loadUserProfile();
             showMainInterface();
             initUserData();
-            initRealTimeListener(); // 啟動實時監聽
             
             // 原有的問候語代碼
             const greetings = [
@@ -5683,34 +5629,18 @@ function initAuthEvents() {
     }
     
     auth.createUserWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-        // 創建用戶資料
-        return database.ref('users/' + userCredential.user.uid).set({
-            characterName: finalCharacterName,
-            email: email,
-            avatar: finalCharacterName.charAt(0).toUpperCase(),
-            points: 0,
-            hungerLevel: 100,
-            lastFeedTime: firebase.database.ServerValue.TIMESTAMP,
-            purchasedExpressions: ['default'],
-            purchasedHairstyles: ['default'],
-            purchasedPersonalities: ['default'],
-            purchasedFoods: [],
-            freeMysteryboxDraws: {},
-            vtuberAppearance: {
-                currentExpression: 'default',
-                currentHairstyle: 'default'
-            },
-            createdAt: firebase.database.ServerValue.TIMESTAMP
-        });
-    })
-    .then(() => {
-        // 註冊成功後立即載入用戶資料
-        loadUserProfile();
-    })
-    .catch((error) => {
-        alert('註冊失敗: ' + error.message);
-    });
+        .then((userCredential) => {
+            // 創建用戶資料
+            return database.ref('users/' + userCredential.user.uid).set({
+                characterName: finalCharacterName,
+                email: email,
+                avatar: finalCharacterName.charAt(0).toUpperCase(),
+                createdAt: firebase.database.ServerValue.TIMESTAMP
+            });
+        })
+            .catch((error) => {
+                alert('註冊失敗: ' + error.message);
+            });
     });
     
     logoutBtn.addEventListener('click', () => {
@@ -5721,60 +5651,40 @@ function initAuthEvents() {
 function loadUserProfile() {
     database.ref('users/' + currentUser.uid).once('value')
         .then((snapshot) => {
-            const firebaseData = snapshot.val();
-            if (firebaseData) {
-                userData = {
-                    points: firebaseData.points || 0,
-                    hungerLevel: firebaseData.hungerLevel || 100,
-                    lastFeedTime: firebaseData.lastFeedTime || Date.now(),
-                    purchasedExpressions: firebaseData.purchasedExpressions || ['default'],
-                    purchasedHairstyles: firebaseData.purchasedHairstyles || ['default'],
-                    purchasedPersonalities: firebaseData.purchasedPersonalities || ['default'],
-                    purchasedFoods: firebaseData.purchasedFoods || [],
-                    freeMysteryboxDraws: firebaseData.freeMysteryboxDraws || {},
-                    currentExpression: firebaseData.vtuberAppearance?.currentExpression || 'default',
-                    currentHairstyle: firebaseData.vtuberAppearance?.currentHairstyle || 'default',
-                    vtuberName: firebaseData.characterName || '喻蛋',
-                    hiddenCodesUsed: firebaseData.hiddenCodesUsed || []
-                };
-                saveUserData();
-                updatePointsDisplay();
-                updateHungerDisplay();
-                updateVtuberAppearance();
-                syncUserAppearance();
-                updateVtuberName();
-            } else {
-                // 如果Firebase中沒有數據，使用默認值
+            userProfile = snapshot.val();
+            if (!userProfile) {
+                // 如果沒有用戶資料，創建默認資料
                 let defaultName = currentUser.email.split('@')[0];
                 if (!defaultName.endsWith("蛋")) {
                     defaultName = defaultName + "蛋";
                 }
-                userData = {
-                    points: 0,
-                    hungerLevel: 100,
-                    lastFeedTime: Date.now(),
-                    purchasedExpressions: ['default'],
-                    purchasedHairstyles: ['default'],
-                    purchasedPersonalities: ['default'],
-                    purchasedFoods: [],
-                    freeMysteryboxDraws: {},
-                    currentExpression: 'default',
-                    currentHairstyle: 'default',
-                    vtuberName: defaultName,
-                    hiddenCodesUsed: []
+                userProfile = {
+                    characterName: defaultName,
+                    email: currentUser.email,
+                    avatar: defaultName.charAt(0).toUpperCase()
                 };
-                saveUserData();
-                database.ref('users/' + currentUser.uid).set(userData);
-                updatePointsDisplay();
-                updateHungerDisplay();
-                updateVtuberAppearance();
-                syncUserAppearance();
+                database.ref('users/' + currentUser.uid).set(userProfile);
+            }
+            
+            // 同步角色名稱到本地userData
+
+            if (userProfile.characterName) {
+                userData.vtuberName = userProfile.characterName;
+
+// 同步VTUBER外觀設置
+if (userProfile.vtuberAppearance) {
+    userData.currentExpression = userProfile.vtuberAppearance.currentExpression || 'default';
+    userData.currentHairstyle = userProfile.vtuberAppearance.currentHairstyle || 'default';
+} else {
+    userData.currentExpression = 'default';
+    userData.currentHairstyle = 'default';
+}
+
                 updateVtuberName();
+                saveUserData();
             }
         });
 }
-
-
 
 function checkNewGifts() {
     database.ref('users/' + currentUser.uid + '/gifts').on('child_added', (snapshot) => {
