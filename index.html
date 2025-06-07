@@ -3812,22 +3812,12 @@ function showMysteryBoxResult(rewardType) {
         rewardText = '什麼都沒抽到...';
         resultIcon.textContent = '❌';
     } else if (rewardType === 'hidden') {
-        const hiddenExpressions = expressions.filter(item => item.isHidden);
-        const hiddenHairstyles = hairstyles.filter(item => item.isHidden);
-        const hiddenPersonalities = personalities.filter(item => item.isHidden);
-        
-        const allHiddenItems = [...hiddenExpressions, ...hiddenHairstyles, ...hiddenPersonalities];
-        
-        const unownedHiddenItems = allHiddenItems.filter(item => {
-            if (item.type === 'expression') {
-                return !userData.purchasedExpressions.includes(item.id);
-            } else if (item.type === 'hairstyle') {
-                return !userData.purchasedHairstyles.includes(item.id);
-            } else if (item.type === 'personality') {
-                return !userData.purchasedPersonalities.includes(item.id);
-            }
+        const hiddenItems = [...expressions, ...hairstyles, ...personalities].filter(item => item.isHidden);
+        const unownedHiddenItems = hiddenItems.filter(item => {
+            if (item.type === 'expression') return !userData.purchasedExpressions.includes(item.id);
+            if (item.type === 'hairstyle') return !userData.purchasedHairstyles.includes(item.id);
+            if (item.type === 'personality') return !userData.purchasedPersonalities.includes(item.id);
         });
-        
         if (unownedHiddenItems.length > 0) {
             reward = unownedHiddenItems[Math.floor(Math.random() * unownedHiddenItems.length)];
             if (reward.type === 'expression') {
@@ -3836,76 +3826,42 @@ function showMysteryBoxResult(rewardType) {
             } else if (reward.type === 'hairstyle') {
                 userData.purchasedHairstyles.push(reward.id);
                 rewardText = `獲得隱藏髮型：${reward.name}！`;
-            } else if (reward.type === 'personality') {
+            } else {
                 userData.purchasedPersonalities.push(reward.id);
                 rewardText = `獲得隱藏性格：${reward.name}！`;
             }
         } else {
             reward = getRandomItem(foods);
-            if (reward) {
-                userData.purchasedFoods.push(reward.id);
-                rewardText = `獲得食物：${reward.name}！`;
-            }
+            userData.purchasedFoods.push(reward.id);
+            rewardText = `獲得食物：${reward.name}！`;
         }
     } else {
         switch (rewardType) {
             case 'food':
                 reward = getRandomItem(foods);
-                if (reward) {
-                    userData.purchasedFoods.push(reward.id);
-                    rewardText = `獲得食物：${reward.name}！`;
-                }
+                userData.purchasedFoods.push(reward.id);
+                rewardText = `獲得食物：${reward.name}！`;
                 break;
             case 'expression':
-                reward = getRandomUnownedItem(expressions.filter(e => !e.isHidden), userData.purchasedExpressions);
-                if (reward) {
-                    userData.purchasedExpressions.push(reward.id);
-                    rewardText = `獲得表情：${reward.name}！`;
-                } else {
-                    reward = getRandomItem(foods);
-                    if (reward) {
-                        userData.purchasedFoods.push(reward.id);
-                        rewardText = `獲得食物：${reward.name}！`;
-                    }
-                }
+                reward = getRandomUnownedItem(expressions.filter(e => !e.isHidden), userData.purchasedExpressions) || getRandomItem(foods);
+                userData[reward.type === 'food' ? 'purchasedFoods' : 'purchasedExpressions'].push(reward.id);
+                rewardText = `獲得${reward.type === 'food' ? '食物' : '表情'}：${reward.name}！`;
                 break;
             case 'hairstyle':
-                reward = getRandomUnownedItem(hairstyles.filter(h => !h.isHidden), userData.purchasedHairstyles);
-                if (reward) {
-                    userData.purchasedHairstyles.push(reward.id);
-                    rewardText = `獲得髮型：${reward.name}！`;
-                } else {
-                    reward = getRandomItem(foods);
-                    if (reward) {
-                        userData.purchasedFoods.push(reward.id);
-                        rewardText = `獲得食物：${reward.name}！`;
-                    }
-                }
+                reward = getRandomUnownedItem(hairstyles.filter(h => !h.isHidden), userData.purchasedHairstyles) || getRandomItem(foods);
+                userData[reward.type === 'food' ? 'purchasedFoods' : 'purchasedHairstyles'].push(reward.id);
+                rewardText = `獲得${reward.type === 'food' ? '食物' : '髮型'}：${reward.name}！`;
                 break;
             case 'personality':
-                reward = getRandomUnownedItem(personalities.filter(p => !p.isHidden), userData.purchasedPersonalities);
-                if (reward) {
-                    userData.purchasedPersonalities.push(reward.id);
-                    rewardText = `獲得性格：${reward.name}！`;
-                } else {
-                    reward = getRandomItem(foods);
-                    if (reward) {
-                        userData.purchasedFoods.push(reward.id);
-                        rewardText = `獲得食物：${reward.name}！`;
-                    }
-                }
+                reward = getRandomUnownedItem(personalities.filter(p => !p.isHidden), userData.purchasedPersonalities) || getRandomItem(foods);
+                userData[reward.type === 'food' ? 'purchasedFoods' : 'purchasedPersonalities'].push(reward.id);
+                rewardText = `獲得${reward.type === 'food' ? '食物' : '性格'}：${reward.name}！`;
                 break;
         }
     }
     
-    // 如果有獎勵，根據實際獲得的reward更新rewardType
-    if (reward) {
-        rewardType = reward.type;
-    }
-    
-    // 設置獎勵顯示
-    if (reward && (rewardType === 'expression' || rewardType === 'hairstyle' || rewardType === 'personality')) {
-        createRewardPreview(reward, rewardType, resultIcon);
+    if (reward && (rewardType === 'expression' || rewardType === 'hairstyle' || rewardType === 'personality' || rewardType === 'hidden')) {
+        createRewardPreview(reward, rewardType === 'hidden' ? reward.type : rewardType, resultIcon);
     } else if (rewardType === 'food') {
         resultIcon.textContent = reward.emoji;
     } else {
@@ -3914,28 +3870,20 @@ function showMysteryBoxResult(rewardType) {
     
     resultText.innerHTML = `<div style="text-align: center; line-height: 1.6; font-weight: bold; color: #333; font-size: 1.2rem;">${rewardText}</div>`;
     
-    // 顯示結果容器
     setTimeout(() => {
         resultContainer.classList.add('show');
+        resultContainer.addEventListener('animationend', () => {
+            mysteryboxAnimation.style.display = 'none';
+            resultContainer.classList.remove('show');
+            const giftBox3d = document.getElementById('gift-box-3d');
+            giftBox3d.classList.remove('opening');
+            giftBox3d.style.display = 'flex';
+            document.querySelectorAll('.confetti-3d').forEach(el => el.remove());
+        }, { once: true });
     }, 500);
     
-    // 保存用戶數據
     saveUserData();
-    
-    // 顯示獲得的獎勵通知
     showNotification(rewardText);
-    
-    // 3秒後自動關閉動畫
-    setTimeout(() => {
-        mysteryboxAnimation.style.display = 'none';
-        resultContainer.classList.remove('show');
-        const giftBox3d = document.getElementById('gift-box-3d');
-        giftBox3d.classList.remove('opening');
-        giftBox3d.style.display = 'flex';
-        
-        const confettiElements = mysteryboxAnimation.querySelectorAll('.confetti-3d');
-        confettiElements.forEach(el => el.remove());
-    }, 3000);
 }
 
 function createRewardPreview(reward, rewardType, container) {
@@ -7019,28 +6967,28 @@ function claimGift(giftId, itemId, itemType) {
     
     // 處理盲盒禮物
     if (itemType === 'mysteryboxGift') {
-        // 從Firebase獲取盲盒禮物數據
         database.ref('mysteryboxGifts/' + itemId).once('value')
             .then((snapshot) => {
                 const mysteryboxGiftData = snapshot.val();
-                if (mysteryboxGiftData) {
-                    // 找到對應的盲盒類型
-                    const mysteryboxType = mysteryboxes.find(box => box.id === mysteryboxGiftData.boxType);
-                    if (mysteryboxType) {
-                        // 立即打開盲盒動畫
-                        openMysteryBox(mysteryboxType);
-                        
-                        // 刪除盲盒禮物數據
-                        database.ref('mysteryboxGifts/' + itemId).remove();
-                        
-                        // 從接收者的禮物列表中刪除
-                        database.ref('users/' + currentUser.uid + '/gifts/' + giftId).remove()
-                            .then(() => {
-                                // 重新渲染禮物列表
-                                renderShopItems('gifts');
-                            });
-                    }
+                if (!mysteryboxGiftData) {
+                    throw new Error('盲盒禮物數據不存在');
                 }
+                const mysteryboxType = mysteryboxes.find(box => box.id === mysteryboxGiftData.boxType);
+                if (!mysteryboxType) {
+                    throw new Error('無效的盲盒類型');
+                }
+                console.log('開始處理盲盒:', { giftId, itemId, boxType: mysteryboxGiftData.boxType });
+                openMysteryBox(mysteryboxType);
+                
+                // 確保所有刪除操作完成
+                return Promise.all([
+                    database.ref('mysteryboxGifts/' + itemId).remove(),
+                    database.ref('users/' + currentUser.uid + '/gifts/' + giftId).remove()
+                ]);
+            })
+            .then(() => {
+                console.log('盲盒刪除成功，重新渲染禮物列表');
+                renderShopItems('gifts');
             })
             .catch((error) => {
                 console.error('處理盲盒禮物失敗:', error);
@@ -7052,22 +7000,15 @@ function claimGift(giftId, itemId, itemType) {
         return;
     }
     
-    // 原有的普通禮物處理邏輯
+    // 普通禮物處理邏輯
     if (itemType === 'expression' && !userData.purchasedExpressions.includes(itemId)) {
         userData.purchasedExpressions.push(itemId);
     } else if (itemType === 'hairstyle' && !userData.purchasedHairstyles.includes(itemId)) {
         userData.purchasedHairstyles.push(itemId);
     } else if (itemType === 'personality' && !userData.purchasedPersonalities.includes(itemId)) {
         userData.purchasedPersonalities.push(itemId);
-    }
-
-    // 如果領取的是盲盒，添加免費抽獎次數
-    if (itemType === 'mysterybox') {
-        if (!userData.freeMysteryboxDraws) {
-            userData.freeMysteryboxDraws = {};
-        }
-        
-        // 根據盲盒等級給予免費抽獎次數
+    } else if (itemType === 'mysterybox') {
+        if (!userData.freeMysteryboxDraws) userData.freeMysteryboxDraws = {};
         if (itemId === 'bronze') {
             userData.freeMysteryboxDraws.bronze = (userData.freeMysteryboxDraws.bronze || 0) + 1;
         } else if (itemId === 'silver') {
@@ -7079,17 +7020,15 @@ function claimGift(giftId, itemId, itemType) {
     
     saveUserData();
     
-    // 從 Firebase 中刪除該禮物
     database.ref('users/' + currentUser.uid + '/gifts/' + giftId).remove()
         .then(() => {
+            console.log('普通禮物領取成功:', giftId);
             alert('禮物領取成功！');
-            // 重新渲染禮物列表
             renderShopItems('gifts');
         })
         .catch((error) => {
             console.error('領取禮物失敗:', error);
             alert('領取失敗: ' + error.message);
-            // 如果失敗，重新顯示禮物項目
             if (giftElement) {
                 giftElement.style.display = 'flex';
             }
