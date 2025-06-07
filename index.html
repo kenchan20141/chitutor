@@ -5687,7 +5687,7 @@ function initAuthEvents() {
     });
     
     registerBtn.addEventListener('click', () => {
-    const email = document.getElementById('register-email').value;
+    const email = document.getElementById('register-email').value.trim().toLowerCase(); // 轉為小寫
     const password = document.getElementById('register-password').value;
     const characterName = document.getElementById('register-character-name').value.trim();
     
@@ -5699,13 +5699,13 @@ function initAuthEvents() {
     
     auth.createUserWithEmailAndPassword(email, password)
         .then((userCredential) => {
-            currentUser = userCredential.user; // 設置當前用戶
+            currentUser = userCredential.user;
             // 初始化新用戶數據，傳入角色名稱
             initializeNewUserData(finalCharacterName);
             // 創建用戶基本資料
             return database.ref('users/' + userCredential.user.uid).update({
                 characterName: finalCharacterName,
-                email: email,
+                email: email, // 確保保存小寫 email
                 avatar: finalCharacterName.charAt(0).toUpperCase(),
                 createdAt: firebase.database.ServerValue.TIMESTAMP
             });
@@ -5830,17 +5830,20 @@ function initFriendsEvents() {
 }
 
 function sendFriendRequest() {
-    const email = document.getElementById('friend-email').value.trim();
+    const email = document.getElementById('friend-email').value.trim().toLowerCase(); // 轉為小寫
     if (!email) {
         alert('請輸入電子郵件地址');
         return;
     }
     
-    // 根據email查找用戶
+    // 根據 email 查找用戶
     database.ref('users').orderByChild('email').equalTo(email).once('value')
         .then((snapshot) => {
+            console.log('查找 email:', email); // Debug: 顯示查詢的 email
+            console.log('snapshot.exists():', snapshot.exists()); // Debug: 是否找到數據
             if (snapshot.exists()) {
                 const userData = Object.entries(snapshot.val())[0];
+                console.log('找到的用戶:', userData); // Debug: 顯示找到的用戶數據
                 const friendId = userData[0];
                 
                 if (friendId === currentUser.uid) {
@@ -5855,7 +5858,7 @@ function sendFriendRequest() {
             }
         })
         .then((friendSnapshot) => {
-            if (friendSnapshot.exists()) {
+            if (friendSnapshot && friendSnapshot.exists()) {
                 alert('該用戶已經是您的好友');
                 return;
             }
@@ -5864,9 +5867,9 @@ function sendFriendRequest() {
             return database.ref('friendRequests').orderByChild('from').equalTo(currentUser.uid).once('value');
         })
         .then((requestsSnapshot) => {
-            if (requestsSnapshot.exists()) {
+            if (requestsSnapshot && requestsSnapshot.exists()) {
                 const requests = requestsSnapshot.val();
-                const userData = Object.entries(database.ref('users').orderByChild('email').equalTo(document.getElementById('friend-email').value.trim()))[0];
+                const userData = Object.entries(database.ref('users').orderByChild('email').equalTo(email).val())[0];
                 const friendId = userData ? userData[0] : null;
                 
                 const existingRequest = Object.values(requests).find(req => 
@@ -5879,8 +5882,8 @@ function sendFriendRequest() {
                 }
             }
             
-            // 重新獲取朋友ID用於發送申請
-            return database.ref('users').orderByChild('email').equalTo(document.getElementById('friend-email').value.trim()).once('value');
+            // 重新獲取朋友 ID 用於發送申請
+            return database.ref('users').orderByChild('email').equalTo(email).once('value');
         })
         .then((snapshot) => {
             if (snapshot && snapshot.exists()) {
@@ -5903,11 +5906,10 @@ function sendFriendRequest() {
             document.getElementById('friend-email').value = '';
         })
         .catch((error) => {
-            console.error('發送好友申請失敗:', error);
+            console.error('發送好友申請失敗:', error); // Debug: 顯示錯誤詳情
             alert('發送好友申請失敗: ' + error.message);
         });
 }
-
 function loadFriendsList() {
     const container = document.getElementById('friends-list-container');
     container.innerHTML = '';
