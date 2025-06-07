@@ -248,6 +248,7 @@
             background: var(--hunger-green);
             transition: all 0.3s ease;
             border-radius: 4px;
+            min-width: 20px; /* 設置最小寬度 */
         }
 
         .hunger-fill.hungry {
@@ -2629,6 +2630,16 @@
     font-size: 0.9rem;
 }
 
+        #send-friend-request {
+    padding: 10px;
+    font-size: 1.2rem;
+    background: #73c6b6;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
 .chat-btn {
     background: var(--secondary);
     color: white;
@@ -3009,7 +3020,7 @@
             <div id="add-friend" class="friends-tab-content" style="display: none;">
                 <div class="add-friend-form">
                     <input type="email" id="friend-email" placeholder="輸入好友的電子郵件">
-                    <button id="send-friend-request">發送好友申請</button>
+                    <button id="send-friend-request"><i class="fas fa-user-plus"></i></button>
                 </div>
             </div>
             
