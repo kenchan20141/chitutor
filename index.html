@@ -2933,7 +2933,7 @@
             <button class="shop-button" id="shop-button">
                 <i class="fas fa-store"></i>
            
-                <span class="points" id="points-display">0 </span>
+                <span class="points" id="points-display">0 點</span>
             </button>
             
           
@@ -3010,7 +3010,7 @@
             <div id="add-friend" class="friends-tab-content" style="display: none;">
                 <div class="add-friend-form">
                     <input type="email" id="friend-email" placeholder="輸入好友的電子郵件">
-                     <button id="send-friend-request"><i class="fas fa-user-plus"></i></button>
+                    <button id="send-friend-request">發送好友申請</button>
                 </div>
             </div>
             
@@ -3466,7 +3466,7 @@ function initUserData() {
 }
 
 
-function initializeNewUserData(characterName) {
+function initializeNewUserData() {
     const defaultUserData = {
         points: 20,
         purchasedExpressions: ['default'],
@@ -3478,7 +3478,7 @@ function initializeNewUserData(characterName) {
         currentPersonality: 'default',
         hungerLevel: 100,
         lastFeedTime: Date.now(),
-        vtuberName: characterName,  // 使用傳入的角色名稱
+        vtuberName: '喻蛋',
         hiddenCodesUsed: [],
         freeMysteryboxDraws: {}
     };
@@ -4246,7 +4246,7 @@ function syncLocalDataToFirebase() {
 
         // 更新點數顯示
         function updatePointsDisplay() {
-            pointsDisplay.textContent = userData.points + ' ';
+            pointsDisplay.textContent = userData.points + ' 點';
             shopPoints.textContent = userData.points;
         }
 
@@ -5686,8 +5686,9 @@ function initAuthEvents() {
     auth.createUserWithEmailAndPassword(email, password)
         .then((userCredential) => {
             currentUser = userCredential.user; // 設置當前用戶
-            // 初始化新用戶數據，傳入角色名稱
-            initializeNewUserData(finalCharacterName);
+            userData.vtuberName = finalCharacterName; // 設置本地名稱
+            // 初始化新用戶數據
+            initializeNewUserData();
             // 創建用戶基本資料
             return database.ref('users/' + userCredential.user.uid).update({
                 characterName: finalCharacterName,
