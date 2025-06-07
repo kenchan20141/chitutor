@@ -3574,8 +3574,27 @@ let animationStartTime = 0;
 let isBoxOpened = false;
 
 
+
+
+
 // 3D立體盲盒動畫系統
 function openMysteryBox(boxData) {
+
+
+ // 清理之前可能殘留的元素
+    const existingCloseButton = mysteryboxAnimation.querySelector('button');
+    if (existingCloseButton) {
+        existingCloseButton.remove();
+    }
+    
+    const existingConfetti = mysteryboxAnimation.querySelectorAll('.confetti-3d');
+    existingConfetti.forEach(el => el.remove());
+
+
+
+
+
+
     // 顯示動畫容器
     mysteryboxAnimation.style.display = 'flex';
     
@@ -3936,6 +3955,41 @@ function showMysteryBoxResult(rewardType) {
         const confettiElements = mysteryboxAnimation.querySelectorAll('.confetti-3d');
         confettiElements.forEach(el => el.remove());
     }, 3000);
+
+
+
+// 添加點擊關閉功能，防止動畫卡住
+const closeButton = document.createElement('button');
+closeButton.innerHTML = '×';
+closeButton.style.cssText = `
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(0,0,0,0.5);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 999;
+`;
+closeButton.onclick = function() {
+    mysteryboxAnimation.style.display = 'none';
+    resultContainer.classList.remove('show');
+    const giftBox3d = document.getElementById('gift-box-3d');
+    giftBox3d.classList.remove('opening');
+    giftBox3d.style.display = 'flex';
+    const confettiElements = mysteryboxAnimation.querySelectorAll('.confetti-3d');
+    confettiElements.forEach(el => el.remove());
+    closeButton.remove();
+};
+mysteryboxAnimation.appendChild(closeButton);
+
+
+
+
 }
 
 function createRewardPreview(reward, rewardType, container) {
@@ -5594,10 +5648,29 @@ document.addEventListener('DOMContentLoaded', () => {
    auth.onAuthStateChanged((user) => {
     if (user) {
         currentUser = user;
-        localStorage.removeItem('vtuberUserData'); // 清除本地儲存
+        localStorage.clear(); // 清除所有 localStorage 數據
         loadUserProfile();
         showMainInterface();
-        initUserData();
+
+database.ref('users/' + currentUser.uid).once('value').then((snapshot) => {
+            const firebaseData = snapshot.val();
+            if (firebaseData) {
+                userData = { ...userData, ...firebaseData };
+                localStorage.setItem('vtuberUserData', JSON.stringify(userData));
+            } else {
+                // 新用戶，初始化數據
+                let defaultName = currentUser.email.split('@')[0];
+                if (!defaultName.endsWith("蛋")) {
+                    defaultName += "蛋";
+                }
+                initializeNewUserData(defaultName);
+            }
+            updatePointsDisplay();
+            updateHungerDisplay();
+            updateVtuberAppearance();
+            syncUserAppearance();
+            updateVtuberName();
+
         
         // 原有的問候語代碼
         const greetings = [
@@ -5623,14 +5696,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 "你個眼袋深過馬里亞納海溝呀，真係嚇死人。",
                 "你個樣呆過未插電嘅機械人，需要充電嗎？"
            ];
-        const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
-        addMessage(randomGreeting, 'ai');
-        conversationHistory.push({ role: 'assistant', content: randomGreeting });
-        speak(randomGreeting);
-        
-        if (!isSpeechRecognitionSupported()) {
-            addMessage("提示：您的瀏覽器不支援語音輸入功能，請使用最新版Chrome或Edge瀏覽器", 'error');
-        }
+       const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
+            addMessage(randomGreeting, 'ai');
+            conversationHistory.push({ role: 'assistant', content: randomGreeting });
+            speak(randomGreeting);
+        }).catch((error) => {
+            console.error('從 Firebase 載入數據失敗:', error);
+            addMessage('數據載入失敗，請重新登入', 'error');
+        });
     } else {
         showAuthInterface();
     }
@@ -5723,8 +5796,27 @@ function initAuthEvents() {
 });
     
     logoutBtn.addEventListener('click', () => {
-    auth.signOut();
-    localStorage.removeItem('vtuberUserData'); // 清除本地儲存
+    auth.signOut().then(() => {
+        localStorage.clear(); // 清除所有 localStorage 數據
+        userData = {
+            points: 20,
+            purchasedExpressions: ['default'],
+            purchasedHairstyles: ['default'],
+            purchasedFoods: [],
+            purchasedPersonalities: ['default'],
+            currentExpression: 'default',
+            currentHairstyle: 'default',
+            currentPersonality: 'default',
+            hungerLevel: 100,
+            lastFeedTime: Date.now(),
+            vtuberName: '喻蛋',
+            hiddenCodesUsed: []
+        }; // 重置 userData
+        showAuthInterface(); // 返回登入界面
+    }).catch((error) => {
+        console.error('登出失敗:', error);
+        addMessage('登出失敗，請重試', 'error');
+    });
 });
 }
 
@@ -6915,6 +7007,10 @@ function selectGiftItem(item, element) {
 }
 
 function sendGiftToFriend(item, friendId) {
+    if (!currentUser) {
+        alert('請先登入！');
+        return;
+    }
     if (!item || !friendId) {
         alert('送禮信息不完整，請重新選擇！');
         return;
@@ -6925,12 +7021,10 @@ function sendGiftToFriend(item, friendId) {
         return;
     }
     
-    // 扣除點數
     userData.points -= item.price;
     updatePointsDisplay();
     saveUserData();
     
-    // 準備禮物數據，確保符合Firebase規則
     const giftData = {
         from: currentUser.uid,
         fromName: userProfile ? (userProfile.characterName || userProfile.email.split('@')[0]) : '未知用戶',
@@ -6940,7 +7034,6 @@ function sendGiftToFriend(item, friendId) {
         timestamp: firebase.database.ServerValue.TIMESTAMP
     };
     
-    // 發送禮物到 Firebase
     database.ref('users/' + friendId + '/gifts').push(giftData)
         .then(() => {
             alert(`成功送出 ${item.name} 給好友！`);
@@ -6949,13 +7042,11 @@ function sendGiftToFriend(item, friendId) {
         .catch((error) => {
             console.error('送禮失敗:', error);
             alert('送禮失敗: ' + error.message);
-            // 回滾點數
             userData.points += item.price;
             updatePointsDisplay();
             saveUserData();
         });
 }
-
 
 
 
@@ -7011,7 +7102,6 @@ function loadReceivedGifts() {
             }
         });
 }
-
 function claimGift(giftId, itemId, itemType) {
     // 立即隱藏該禮物項目
     const giftElement = document.querySelector(`[onclick*="${giftId}"]`).closest('.received-gift-item');
