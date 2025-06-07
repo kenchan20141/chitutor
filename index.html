@@ -4555,7 +4555,7 @@ giftDiv.innerHTML = `
         currentItem = userData.currentHairstyle;
     } else if (tab === 'foods') {
     items = foods;
-    purchasedArray = userData.purchasedFoods;
+    purchasedArray = userData.purchasedFoods || [];  // 確保為數組
     currentItem = null;
     } else if (tab === 'personalities') {
         items = personalities;
