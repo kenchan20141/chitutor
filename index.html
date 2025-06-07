@@ -4245,6 +4245,7 @@ function syncLocalDataToFirebase() {
 
         // 更新點數顯示
         function updatePointsDisplay() {
+            const points = userData.points || 0;  // 若 points 未定義，設為 0
             pointsDisplay.textContent = userData.points + ' ';
             shopPoints.textContent = userData.points;
         }
@@ -4423,6 +4424,7 @@ function getAllHiddenItems() {
 // 渲染商店商品
 function renderShopItems(tab = 'expressions') {
     shopItems.innerHTML = '';
+    const points = userData.points || 0;  // 若 points 未定義，設為 0
     if (!shopTabs[0].parentElement.querySelector('[data-tab="gifts"]')) {
     const giftTab = document.createElement('button');
     giftTab.className = 'tab';
@@ -5690,6 +5692,7 @@ function initAuthEvents() {
                 characterName: finalCharacterName,
                 email: email,
                 avatar: finalCharacterName.charAt(0).toUpperCase(),
+                points: 0,  // 初始化點數為 0
                 createdAt: firebase.database.ServerValue.TIMESTAMP
             });
         })
