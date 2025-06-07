@@ -3466,7 +3466,7 @@ function initUserData() {
 }
 
 
-function initializeNewUserData() {
+function initializeNewUserData(characterName) {
     const defaultUserData = {
         points: 20,
         purchasedExpressions: ['default'],
@@ -3478,7 +3478,7 @@ function initializeNewUserData() {
         currentPersonality: 'default',
         hungerLevel: 100,
         lastFeedTime: Date.now(),
-        vtuberName: '喻蛋',
+        vtuberName: characterName,  // 使用傳入的角色名稱
         hiddenCodesUsed: [],
         freeMysteryboxDraws: {}
     };
@@ -5686,9 +5686,8 @@ function initAuthEvents() {
     auth.createUserWithEmailAndPassword(email, password)
         .then((userCredential) => {
             currentUser = userCredential.user; // 設置當前用戶
-            userData.vtuberName = finalCharacterName; // 設置本地名稱
-            // 初始化新用戶數據
-            initializeNewUserData();
+            // 初始化新用戶數據，傳入角色名稱
+            initializeNewUserData(finalCharacterName);
             // 創建用戶基本資料
             return database.ref('users/' + userCredential.user.uid).update({
                 characterName: finalCharacterName,
