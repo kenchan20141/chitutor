@@ -32,7 +32,6 @@
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
         
     <style>
         :root {
@@ -176,29 +175,6 @@
             min-width: unset !important; /* 移除最小寬度限制 */
         }
         
-
-.received-gift-item {
-    min-width: 100%;
-    flex-direction: column;
-    text-align: center;
-    gap: 10px;
-}
-
-.received-gift-item > div:first-child {
-    min-width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-}
-
-.received-gift-item .item-preview {
-    margin-right: 0;
-    margin-bottom: 10px;
-}
-
-
-
        
     }
 
@@ -864,14 +840,13 @@
         }
 
         .shop-item {
-    background: #f9f9f9;
-    border-radius: var(--radius-sm);
-    padding: 15px;
-    text-align: center;
-    transition: all 0.3s ease;
-    border: 2px solid #e2e8f0;
-    position: relative;
-}
+            background: #f9f9f9;
+            border-radius: var(--radius-sm);
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid #e2e8f0;
+        }
 
         .shop-item:hover {
             transform: translateY(-5px);
@@ -1603,617 +1578,159 @@
         }
 
         /* 盲盒動畫相關樣式 */
-/* 3D立體盲盒動畫樣式 */
-.mysterybox-animation {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 300;
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(5px);
-}
-
-.mysterybox-3d-container {
-    position: relative;
-    perspective: 1000px;
-    transform-style: preserve-3d;
-}
-
-.gift-box-3d {
-    width: 200px;
-    height: 200px;
-    position: relative;
-    transform-style: preserve-3d;
-    transform: rotateX(-10deg) rotateY(15deg);
-    animation: mysteryboxFloat 3s ease-in-out infinite;
-}
-
-@keyframes mysteryboxFloat {
-    0%, 100% { 
-        transform: rotateX(-10deg) rotateY(15deg) translateY(0px); 
-    }
-    50% { 
-        transform: rotateX(-5deg) rotateY(25deg) translateY(-15px); 
-    }
-}
-
-@keyframes mysteryboxShake {
-    0%, 100% { 
-        transform: rotateX(-10deg) rotateY(15deg) translateY(0px); 
-    }
-    25% { 
-        transform: rotateX(-8deg) rotateY(12deg) translateY(-5px) translateX(-8px); 
-    }
-    50% { 
-        transform: rotateX(-12deg) rotateY(18deg) translateY(-3px) translateX(8px); 
-    }
-    75% { 
-        transform: rotateX(-6deg) rotateY(20deg) translateY(-8px) translateX(-5px); 
-    }
-}
-
-/* 盒子消失動畫 */
-@keyframes mysteryboxDisappear {
-    0% { 
-        opacity: 1; 
-        transform: scale(1) rotateY(0deg); 
-    }
-    100% { 
-        opacity: 0; 
-        transform: scale(0.5) rotateY(180deg); 
-    }
-}
-
-/* 結果容器放大動畫 */
-.mysterybox-result-container.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(-30px) scale(1.1);
-    animation: resultEntrance 0.8s ease-out;
-}
-
-@keyframes resultEntrance {
-    0% {
-        opacity: 0;
-        transform: translateX(-50%) translateY(20px) scale(0.8);
-    }
-    50% {
-        transform: translateX(-50%) translateY(-40px) scale(1.15);
-    }
-    100% {
-        opacity: 1;
-        transform: translateX(-50%) translateY(-30px) scale(1.1);
-    }
-}
-
-
-
-
-
-/* 禮物盒各個面 */
-.box-face {
-    position: absolute;
-    width: 200px;
-    height: 200px;
-    opacity: 0.95;
-    border: 3px solid #8B4513;
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
-}
-
-.box-front {
-    background: linear-gradient(135deg, #FF6B9D 0%, #C44CAE 50%, #8A2BE2 100%);
-    transform: translateZ(100px);
-}
-
-.box-back {
-    background: linear-gradient(135deg, #E55A87 0%, #B23A8E 50%, #7B1FA2 100%);
-    transform: translateZ(-100px) rotateY(180deg);
-}
-
-.box-right {
-    background: linear-gradient(135deg, #FF8E9B 0%, #D147AA 50%, #9C27B0 100%);
-    transform: rotateY(90deg) translateZ(100px);
-}
-
-.box-left {
-    background: linear-gradient(135deg, #E84393 0%, #B8459E 50%, #8E24AA 100%);
-    transform: rotateY(-90deg) translateZ(100px);
-}
-
-.box-top {
-    background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%);
-    transform: rotateX(90deg) translateZ(100px);
-    transform-origin: center center;
-    transition: all 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-}
-
-.box-bottom {
-    background: linear-gradient(135deg, #FF69B4 0%, #DA70D6 50%, #BA55D3 100%);
-    transform: rotateX(-90deg) translateZ(100px);
-}
-
-/* 盒蓋打開動畫 */
-.gift-box-3d.opening .box-top {
-    transform: rotateX(90deg) translateZ(100px) rotateX(-120deg) translateY(-80px);
-}
-
-/* 禮物盒裝飾絲帶 */
-.ribbon-vertical {
-    position: absolute;
-    width: 20px;
-    height: 200px;
-    background: linear-gradient(90deg, #DC143C 0%, #B71C1C 50%, #8B0000 100%);
-    left: 50%;
-    top: 0;
-    transform: translateX(-50%);
-    z-index: 5;
-    box-shadow: 0 0 15px rgba(220, 20, 60, 0.5);
-}
-
-.ribbon-horizontal {
-    position: absolute;
-    width: 200px;
-    height: 20px;
-    background: linear-gradient(90deg, #DC143C 0%, #B71C1C 50%, #8B0000 100%);
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 5;
-    box-shadow: 0 0 15px rgba(220, 20, 60, 0.5);
-}
-
-/* 蝴蝶結 */
-.bow-3d {
-    position: absolute;
-    top: -30px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60px;
-    height: 40px;
-    z-index: 6;
-}
-
-.bow-left, .bow-right {
-    position: absolute;
-    width: 25px;
-    height: 35px;
-    background: linear-gradient(135deg, #FF0000, #CC0000);
-    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
-}
-
-.bow-left {
-    left: 5px;
-    transform: rotate(-25deg);
-}
-
-.bow-right {
-    right: 5px;
-    transform: rotate(25deg);
-}
-
-.bow-center {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 15px;
-    height: 30px;
-    background: linear-gradient(90deg, #B71C1C, #FF0000, #B71C1C);
-    border-radius: 3px;
-    box-shadow: inset 2px 0 0 rgba(255,255,255,0.3), inset -2px 0 0 rgba(0,0,0,0.3);
-}
-
-/* 抽獎結果顯示 */
-.mysterybox-result-container {
-    position: absolute;
-    bottom: -120px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 15px;
-    padding: 20px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-    border: 3px solid #FFD700;
-    min-width: 300px;
-    opacity: 0;
-    transition: all 0.8s ease;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-
-.mysterybox-result-container.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(-30px);
-}
-
-.mysterybox-result-icon {
-    font-size: 3rem;
-    margin-bottom: 10px;
-    display: block;
-    animation: resultPulse 2s infinite alternate;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.mysterybox-result-text {
-    font-size: 1.4rem;
-    font-weight: bold;
-    color: #333;
-    margin: 0;
-    text-align: center;
-    line-height: 1.5;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-@keyframes resultPulse {
-    0% { transform: scale(1) rotate(0deg); }
-    100% { transform: scale(1.15) rotate(5deg); }
-}
-
-/* 3D紙屑粒子效果 */
-.confetti-3d {
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    animation: confetti3dFall 4s ease-out forwards;
-    z-index: 10;
-}
-
-@keyframes confetti3dFall {
-    0% {
-        transform: translateY(-100vh) rotateX(0deg) rotateZ(0deg) scale(1);
-        opacity: 1;
-    }
-    50% {
-        transform: translateY(-50vh) rotateX(180deg) rotateZ(180deg) scale(1.2);
-        opacity: 0.8;
-    }
-    100% {
-        transform: translateY(100vh) rotateX(360deg) rotateZ(360deg) scale(0.5);
-        opacity: 0;
-    }
-}
-
-/* 盲盒類型特定顏色 */
-.mysterybox-bronze .box-front { background: linear-gradient(135deg, #CD7F32 0%, #A0522D 50%, #8B4513 100%); }
-.mysterybox-bronze .box-back { background: linear-gradient(135deg, #B8722D 0%, #965C2A 50%, #7A4513 100%); }
-.mysterybox-bronze .box-right { background: linear-gradient(135deg, #D4863A 0%, #A85F2E 50%, #8F4A15 100%); }
-.mysterybox-bronze .box-left { background: linear-gradient(135deg, #C27A30 0%, #9E572B 50%, #854315 100%); }
-.mysterybox-bronze .box-bottom { background: linear-gradient(135deg, #CE8033 0%, #A45A2C 50%, #8A4614 100%); }
-
-.mysterybox-silver .box-front { background: linear-gradient(135deg, #C0C0C0 0%, #A8A9AD 50%, #708090 100%); }
-.mysterybox-silver .box-back { background: linear-gradient(135deg, #B5B5B5 0%, #9D9EA2 50%, #6B7280 100%); }
-.mysterybox-silver .box-right { background: linear-gradient(135deg, #CACACA 0%, #B2B3B7 50%, #757C8A 100%); }
-.mysterybox-silver .box-left { background: linear-gradient(135deg, #BABABA 0%, #A2A3A7 50%, #6F7685 100%); }
-.mysterybox-silver .box-bottom { background: linear-gradient(135deg, #C5C5C5 0%, #ACADB1 50%, #737A88 100%); }
-
-.mysterybox-gold .box-front { background: linear-gradient(135deg, #FFD700 0%, #DAA520 50%, #B8860B 100%); }
-.mysterybox-gold .box-back { background: linear-gradient(135deg, #F5D12D 0%, #CF9F1F 50%, #AD800A 100%); }
-.mysterybox-gold .box-right { background: linear-gradient(135deg, #FFDC33 0%, #DFA823 50%, #BD890C 100%); }
-.mysterybox-gold .box-left { background: linear-gradient(135deg, #FFD11A 0%, #D4A221 50%, #B2830A 100%); }
-.mysterybox-gold .box-bottom { background: linear-gradient(135deg, #FFD926 0%, #D9A522 50%, #B7860B 100%); }
-
-
-.mysterybox-canvas-container {
-    position: relative;
-    text-align: center;
-}
-
-#mysteryboxCanvas {
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
-
-.mysterybox-result-container {
-    position: absolute;
-    bottom: -120px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 15px;
-    padding: 20px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-    border: 3px solid #FFD700;
-    min-width: 300px;
-    opacity: 0;
-    transition: all 0.8s ease;
-}
-
-.mysterybox-result-container.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(-20px);
-}
-
-.mysterybox-result-icon {
-    font-size: 3rem;
-    margin-bottom: 10px;
-    display: block;
-    animation: resultPulse 2s infinite alternate;
-}
-
-.mysterybox-result-text {
-    font-size: 1.3rem;
-    font-weight: bold;
-    color: #333;
-    margin: 0;
-    text-align: center;
-    line-height: 1.4;
-}
-
-@keyframes resultPulse {
-    0% { transform: scale(1); }
-    100% { transform: scale(1.1); }
-}
-
-
-       .gift-box {
-    width: 200px;
-    height: 200px;
-    position: relative;
-    transform: scale(0);
-    animation: appear 0.8s forwards, float 2s 0.8s infinite ease-in-out;
-    perspective: 1000px;
-    transform-style: preserve-3d;
-}
-
-@keyframes appear {
-    to { 
-        transform: scale(1) rotateY(0deg); 
-    }
-}
-
-@keyframes float {
-    0%, 100% { 
-        transform: scale(1) rotateY(0deg) translateY(0px); 
-    }
-    50% { 
-        transform: scale(1.05) rotateY(10deg) translateY(-10px); 
-    }
-}
-
-.gift-box-top {
-    position: absolute;
-    top: -30px;
-    left: 0;
-    width: 200px;
-    height: 50px;
-    background: linear-gradient(135deg, var(--mysterybox-gold), #B8860B);
-    border: 3px solid #8B4513;
-    border-radius: 8px 8px 4px 4px;
-    z-index: 3;
-    transform-origin: bottom center;
-    transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    box-shadow: 
-        0 5px 15px rgba(0,0,0,0.3),
-        inset 0 2px 0 rgba(255,255,255,0.3),
-        inset 0 -2px 0 rgba(0,0,0,0.2);
-    transform-style: preserve-3d;
-}
-
-.gift-box-top::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
-    border-radius: inherit;
-    animation: shine 2s infinite;
-}
-
-@keyframes shine {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
-}
-
-.gift-box-body {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 200px;
-    height: 150px;
-    background: linear-gradient(135deg, var(--mysterybox-silver), #A8A9AD);
-    border: 3px solid #8B4513;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 
-        0 10px 25px rgba(0,0,0,0.4),
-        inset 0 3px 0 rgba(255,255,255,0.2),
-        inset 0 -3px 0 rgba(0,0,0,0.2);
-    transform-style: preserve-3d;
-}
-
-.gift-box-body::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: 
-        radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3) 0%, transparent 50%),
-        radial-gradient(circle at 70% 70%, rgba(0,0,0,0.1) 0%, transparent 50%);
-}
-
-.gift-box.bronze .gift-box-top {
-    background: linear-gradient(135deg, var(--mysterybox-bronze), #8B4513);
-}
-
-.gift-box.bronze .gift-box-body {
-    background: linear-gradient(135deg, #CE955B, #A0522D);
-}
-
-.gift-box.silver .gift-box-top {
-    background: linear-gradient(135deg, var(--mysterybox-silver), #708090);
-}
-
-.gift-box.silver .gift-box-body {
-    background: linear-gradient(135deg, #D9D9D9, #A8A9AD);
-}
-
-.gift-box.gold .gift-box-top {
-    background: linear-gradient(135deg, var(--mysterybox-gold), #DAA520);
-}
-
-.gift-box.gold .gift-box-body {
-    background: linear-gradient(135deg, #FFE873, #F0E68C);
-}
-
-.gift-bow {
-    position: absolute;
-    top: -25px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 50px;
-    height: 30px;
-    z-index: 4;
-}
-
-.gift-bow::before, .gift-bow::after {
-    content: '';
-    position: absolute;
-    width: 25px;
-    height: 35px;
-    background: linear-gradient(135deg, #FF0000, #CC0000);
-    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-    box-shadow: 
-        0 3px 8px rgba(0,0,0,0.3),
-        inset 1px 1px 0 rgba(255,255,255,0.3);
-}
-
-.gift-bow::before {
-    top: 0;
-    left: 0;
-    transform: rotate(-25deg);
-}
-
-.gift-bow::after {
-    top: 0;
-    right: 0;
-    transform: rotate(25deg);
-}
-
-.gift-ribbon {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 15px;
-    height: 150px;
-    background: linear-gradient(90deg, #CC0000, #FF0000, #CC0000);
-    z-index: 2;
-    box-shadow: 
-        inset 2px 0 0 rgba(255,255,255,0.3),
-        inset -2px 0 0 rgba(0,0,0,0.3);
-}
-
-.gift-ribbon::before {
-    content: '';
-    position: absolute;
-    top: -30px;
-    left: -25px;
-    width: 65px;
-    height: 15px;
-    background: linear-gradient(90deg, #CC0000, #FF0000, #CC0000);
-    border-radius: 3px;
-    box-shadow: 
-        inset 0 2px 0 rgba(255,255,255,0.3),
-        inset 0 -2px 0 rgba(0,0,0,0.3);
-}
-
-.gift-box.opening .gift-box-top {
-    transform: translateY(-80px) rotateX(-120deg) scale(0.9);
-    box-shadow: 0 15px 30px rgba(0,0,0,0.5);
-}
-
-.gift-content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, 150%);
-    opacity: 0;
-    transition: all 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    z-index: 2;
-    text-align: center;
-}
-
-.gift-box.opened .gift-content {
-    transform: translate(-50%, -50%) scale(1.1);
-    opacity: 1;
-}
-
-.gift-icon {
-    font-size: 4.5rem;
-    margin-bottom: 20px;
-    display: inline-block;
-    animation: iconGlow 2s infinite alternate;
-    text-shadow: 0 0 20px rgba(255,255,255,0.8);
-}
-
-@keyframes iconGlow {
-    0% { 
-        transform: scale(1) rotate(0deg);
-        filter: drop-shadow(0 0 10px rgba(255,215,0,0.8));
-    }
-    100% { 
-        transform: scale(1.1) rotate(5deg);
-        filter: drop-shadow(0 0 20px rgba(255,215,0,1));
-    }
-}
-
-.gift-text {
-    color: white;
-    font-size: 1.6rem;
-    font-weight: bold;
-    text-shadow: 
-        0 0 10px rgba(0,0,0,0.8),
-        0 2px 4px rgba(0,0,0,0.5);
-    background: linear-gradient(45deg, #FFD700, #FFA500);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    animation: textPulse 1.5s infinite alternate;
-}
-
-@keyframes textPulse {
-    0% { transform: scale(1); }
-    100% { transform: scale(1.05); }
-}
-
-.confetti {
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    opacity: 0;
-    border-radius: 50%;
-    animation: confetti-3d 4s ease-out forwards;
-}
-
-@keyframes confetti-3d {
-    0% {
-        transform: translateY(-100vh) translateX(0) rotateZ(0deg) scale(1);
-        opacity: 1;
-    }
-    50% {
-        transform: translateY(-50vh) translateX(var(--random-x, 0)) rotateZ(180deg) scale(1.2);
-        opacity: 0.8;
-    }
-    100% {
-        transform: translateY(100vh) translateX(var(--random-x, 0)) rotateZ(360deg) scale(0.5);
-        opacity: 0;
-    }
-}
-
+        .mysterybox-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 300;
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .gift-box {
+            width: 200px;
+            height: 200px;
+            position: relative;
+            transform: scale(0);
+            animation: appear 0.5s forwards, shake 0.5s 0.5s infinite alternate;
+        }
+
+        @keyframes appear {
+            to { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            from { transform: rotate(-5deg); }
+            to { transform: rotate(5deg); }
+        }
+
+        .gift-box-top {
+            position: absolute;
+            top: -30px;
+            left: 0;
+            width: 200px;
+            height: 50px;
+            background: var(--mysterybox-gold);
+            border: 5px solid #8B4513;
+            z-index: 2;
+            transform-origin: bottom center;
+            transition: transform 0.5s ease;
+        }
+
+        .gift-box-body {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 200px;
+            height: 150px;
+            background: var(--mysterybox-silver);
+            border: 5px solid #8B4513;
+            overflow: hidden;
+        }
+
+        .gift-box.bronze .gift-box-top {
+            background: var(--mysterybox-bronze);
+        }
+
+        .gift-box.bronze .gift-box-body {
+            background: #CE955B;
+        }
+
+        .gift-box.silver .gift-box-top {
+            background: var(--mysterybox-silver);
+        }
+
+        .gift-box.silver .gift-box-body {
+            background: #D9D9D9;
+        }
+
+        .gift-box.gold .gift-box-top {
+            background: var(--mysterybox-gold);
+        }
+
+        .gift-box.gold .gift-box-body {
+            background: #FFE873;
+        }
+
+        .gift-bow {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            background: #FF0000;
+            border-radius: 50%;
+            z-index: 3;
+        }
+
+        .gift-bow::before, .gift-bow::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 50px;
+            background: #FF0000;
+            border-radius: 50%;
+        }
+
+        .gift-bow::before {
+            top: -10px;
+            left: -15px;
+            transform: rotate(-30deg);
+        }
+
+        .gift-bow::after {
+            top: -10px;
+            right: -15px;
+            transform: rotate(30deg);
+        }
+
+        .gift-ribbon {
+            position: absolute;
+            top: 0;
+            left: 95px;
+            width: 10px;
+            height: 150px;
+            background: #FF0000;
+            z-index: 1;
+        }
+
+        .gift-box.opening .gift-box-top {
+            transform: translateY(-50px) rotateX(60deg);
+        }
+
+        .gift-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, 100%);
+            opacity: 0;
+            transition: all 0.5s ease 0.5s;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .gift-box.opened .gift-content {
+            transform: translate(-50%, -50%);
+            opacity: 1;
+        }
+
+        .gift-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .gift-text {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
 
         .confetti {
             position: absolute;
@@ -2253,10 +1770,6 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
-#notification-text {
-    white-space: nowrap;
-}
-        
         .notification.show {
             opacity: 1;
         }
@@ -2434,446 +1947,6 @@
             }
         }
 
-
-/* 在現有CSS中添加以下樣式 */
-
-/* 認證界面樣式 */
-#auth-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.auth-modal {
-    background: white;
-    padding: 40px;
-    border-radius: 20px;
-    box-shadow: var(--shadow);
-    max-width: 400px;
-    width: 90%;
-}
-
-.auth-content h2 {
-    text-align: center;
-    color: var(--primary);
-    margin-bottom: 30px;
-}
-
-.auth-content input {
-    width: 100%;
-    padding: 15px;
-    margin: 10px 0;
-    border: 2px solid #e2e8f0;
-    border-radius: 10px;
-    font-size: 1rem;
-    outline: none;
-}
-
-.auth-content input:focus {
-    border-color: var(--primary);
-}
-
-.auth-content button {
-    width: 100%;
-    padding: 15px;
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    margin: 10px 0;
-}
-
-.auth-content button:hover {
-    background: var(--primary-dark);
-}
-
-.auth-content a {
-    color: var(--primary);
-    text-decoration: none;
-}
-
-/* 好友按鈕樣式 */
-.friends-button {
-    background: #3498db;
-    color: white;
-    padding: 12px 15px;
-    border-radius: 30px;
-    font-weight: bold;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.3s ease;
-    border: none;
-}
-
-.friends-button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-}
-
-.logout-button {
-    background: #e74c3c;
-    color: white;
-    padding: 12px 15px;
-    border-radius: 30px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.logout-button:hover {
-    background: #c0392b;
-}
-
-/* 好友系統樣式 */
-.friends-tabs {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-}
-
-.friends-tab-content {
-    min-height: 300px;
-}
-
-.add-friend-form {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.add-friend-form input {
-    flex: 1;
-    padding: 12px;
-    border: 2px solid #e2e8f0;
-    border-radius: 8px;
-}
-
-.add-friend-form button {
-    padding: 12px 20px;
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-
-/* 送禮界面好友項目懸停效果 */
-.gift-modal .friend-item:hover {
-    border-color: #ff6b9d !important;
-    background-color: #fff5f8 !important;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255, 107, 157, 0.2);
-}
-
-.gift-modal .select-friend-btn:hover {
-    background: #357abd !important;
-    transform: translateY(-1px);
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-}
-
-.gift-modal .select-friend-btn.active {
-    background: #ff6b9d !important;
-    color: white !important;
-}
-
-.gift-modal .select-friend-btn.active:hover {
-    background: #e55a87 !important;
-}
-
-
-
-.friend-item {
-    display: flex;
-    align-items: center;
-    padding: 15px;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    margin-bottom: 10px;
-}
-
-.friend-avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: var(--primary);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    margin-right: 15px;
-}
-
-.friend-info {
-    flex: 1;
-}
-
-.friend-actions {
-    display: flex;
-    gap: 10px;
-}
-
-.friend-actions button {
-    padding: 8px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 0.9rem;
-}
-
-.chat-btn {
-    background: var(--secondary);
-    color: white;
-}
-
-.accept-btn {
-    background: var(--secondary);
-    color: white;
-}
-
-.reject-btn {
-    background: #e74c3c;
-    color: white;
-}
-
-/* 在現有CSS中添加 */
-.gift-btn {
-    background: #ff6b9d;
-    color: white;
-    padding: 8px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 0.9rem;
-}
-
-.gift-btn:hover {
-    background: #e55a87;
-}
-
-.gift-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    z-index: 300;
-    justify-content: center;
-    align-items: center;
-}
-
-.gift-modal-content {
-    background: white;
-    border-radius: 15px;
-    padding: 25px;
-    max-width: 500px;
-    width: 90%;
-    max-height: 80vh;
-    overflow-y: auto;
-}
-
-.gift-items {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 15px;
-    margin-top: 20px;
-}
-
-.gift-item {
-    background: #f9f9f9;
-    border-radius: 10px;
-    padding: 15px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
-}
-
-.gift-item:hover {
-    border-color: #ff6b9d;
-    transform: translateY(-2px);
-}
-
-.gift-item.selected {
-    border-color: #ff6b9d;
-    background: #ffe8f0;
-}
-
-.received-gifts {
-    background: #e8f5e8;
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 20px;
-}
-
-.received-gift-item {
-    display: flex;
-    align-items: center;
-    padding: 15px;
-    background: white;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    border-left: 4px solid #ff6b9d;
-    min-width: 400px;
-    gap: 15px;
-    flex-wrap: nowrap;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.received-gift-item > div:first-child {
-    flex: 1;
-    min-width: 250px;
-    white-space: normal;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-}
-
-.received-gift-item .item-preview {
-    flex-shrink: 0;
-    margin-right: 15px;
-}
-
-.received-gift-item button {
-    flex-shrink: 0;
-    min-width: 80px;
-    white-space: nowrap;
-}
-
-
-
-.gift-notification {
-    position: fixed;
-    top: 100px;
-    right: 20px;
-    background: white;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    z-index: 500;
-    max-width: 300px;
-}
-
-.gift-notification-content {
-    padding: 20px;
-    text-align: center;
-}
-
-.gift-notification-content h3 {
-    color: #ff6b9d;
-    margin-bottom: 10px;
-}
-
-.gift-notification-content button {
-    background: #ff6b9d;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 20px;
-    cursor: pointer;
-    margin-top: 10px;
-}
-
-
-.gift-icon {
-    color: #ff6b9d;
-    font-size: 1rem;
-    transition: transform 0.2s ease;
-}
-.gift-icon:hover {
-    transform: scale(1.2);
-}
-
-
-/* 好友選擇按鈕樣式改進 */
-#friend-select-list .friend-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    margin-bottom: 10px;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    transition: all 0.3s ease;
-}
-
-#friend-select-list .friend-item:hover {
-    border-color: #ff6b9d;
-    background-color: #ffe8f0;
-}
-
-#friend-select-list button.active {
-    background: #ff6b9d !important;
-    color: white !important;
-}
-
-#confirm-gift-btn:disabled {
-    background: #a0aec0 !important;
-    cursor: not-allowed;
-}
-
-/* 送禮界面優化樣式 */
-.gift-modal-content {
-    max-width: 500px;
-    width: 95%;
-}
-
-#friend-select-list .friend-item {
-    transition: all 0.3s ease;
-}
-
-#friend-select-list .friend-item:hover {
-    border-color: #ff6b9d;
-    background-color: #fff5f8;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.select-friend-btn {
-    transition: all 0.3s ease;
-}
-
-.select-friend-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-}
-
-.select-friend-btn.active {
-    background: #ff6b9d !important;
-    color: white !important;
-}
-
-/* 禮物圖標改進 */
-.gift-icon {
-    z-index: 5;
-    transition: all 0.2s ease;
-}
-
-.gift-icon:hover {
-    transform: scale(1.3);
-    color: #ff6b9d !important;
-}
-
-/* 商品項目相對定位確保禮物圖標正確顯示 */
-.shop-item {
-    position: relative;
-}
-
-
-
         /* 垂直滾動軸樣式 */
         ::-webkit-scrollbar {
             width: 8px;
@@ -2893,59 +1966,22 @@
         }
     </style>
 </head>
-    <!-- 登入界面 -->
-    <div id="auth-container" style="display: none;">
-        <div class="auth-modal">
-            <div class="auth-content">
-                <h2>喻蛋教室</h2>
-                <div id="login-form">
-                    <h3>登入</h3>
-                    <input type="email" id="login-email" placeholder="電子郵件">
-                    <input type="password" id="login-password" placeholder="密碼">
-                    <button id="login-btn">登入</button>
-                    <p>還沒有帳號？<a href="#" id="show-register">註冊</a></p>
-                </div>
-                <div id="register-form" style="display: none;">
-                    <h3>註冊</h3>
-                    <input type="email" id="register-email" placeholder="電子郵件">
-                    <input type="password" id="register-password" placeholder="密碼">
-                    <input type="text" id="register-character-name" placeholder="角色名稱">
-
-                    <button id="register-btn">註冊</button>
-                    <p>已有帳號？<a href="#" id="show-login">登入</a></p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-
+<body>
     <!-- 頂部控制區域 -->
     <div class="top-controls">
         <div class="left-controls">
               <button class="settings-button" id="settings-button">
                 <i class="fas fa-cog"></i>
           
-
-<!-- 新增好友按鈕 -->
-            <button class="friends-button" id="friends-button">
-                <i class="fas fa-users"></i>
-            </button>
-
-
             </button>
             <button class="shop-button" id="shop-button">
                 <i class="fas fa-store"></i>
            
-                <span class="points" id="points-display">0 </span>
+                <span class="points" id="points-display">0 點</span>
             </button>
             
           
         </div>
-
-
-
- 
 
         <div class="hunger-bar-container" id="hunger-bar-container">
             <i class="fas fa-drumstick-bite hunger-icon" id="hunger-icon"></i>
@@ -2954,13 +1990,6 @@
             </div>
             <span class="hunger-percentage" id="hunger-percentage">100%</span>
         </div>
-
-
-<!-- 添加登出按鈕 -->
-        <button class="logout-button" id="logout-button">
-            <i class="fas fa-sign-out-alt"></i>
-        </button>
-
     </div>
 
     <!-- 商店彈窗 -->
@@ -2990,46 +2019,6 @@
         </div>
     </div>
 
-<!-- 好友系統彈窗 -->
-<div class="modal" id="friends-modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2><i class="fas fa-users"></i> 好友系統</h2>
-            <button class="close-modal" id="close-friends">×</button>
-        </div>
-        
-        <div class="friends-tabs">
-    <button class="tab active" data-tab="friends-list">好友列表</button>
-    <button class="tab" data-tab="add-friend">添加好友</button>
-    <button class="tab" data-tab="friend-requests">好友申請</button>
-</div>
-        
-        <div id="friends-content">
-            <!-- 好友列表 -->
-            <div id="friends-list" class="friends-tab-content">
-                <div id="friends-list-container"></div>
-            </div>
-            
-            <!-- 添加好友 -->
-            <div id="add-friend" class="friends-tab-content" style="display: none;">
-                <div class="add-friend-form">
-                    <input type="email" id="friend-email" placeholder="輸入好友的電子郵件">
-                     <button id="send-friend-request"><i class="fas fa-user-plus"></i></button>
-                </div>
-            </div>
-            
-            <!-- 好友申請 -->
-            <div id="friend-requests" class="friends-tab-content" style="display: none;">
-                <div id="friend-requests-container"></div>
-            </div>
-            
-           
-        </div>
-    </div>
-</div>
-
-
-
     <!-- 設置彈窗 -->
     <div class="modal" id="settings-modal">
     <div class="modal-content">
@@ -3049,8 +2038,6 @@
             </div>
         </div>
         
-
-
         <div class="settings-section">
             <h3><i class="fas fa-volume-up"></i> 語音設置</h3>
             <div class="tts-toggle">
@@ -3061,39 +2048,19 @@
     </div>
 </div>
 
-<!-- 3D立體盲盒動畫容器 -->
-<div class="mysterybox-animation" id="mysterybox-animation" style="display: none;">
-    <div class="mysterybox-3d-container">
-        <div class="gift-box-3d" id="gift-box-3d">
-            <!-- 禮物盒六個面 -->
-            <div class="box-face box-front"></div>
-            <div class="box-face box-back"></div>
-            <div class="box-face box-right"></div>
-            <div class="box-face box-left"></div>
-            <div class="box-face box-top" id="box-top"></div>
-            <div class="box-face box-bottom"></div>
-            
-            <!-- 裝飾絲帶 -->
-            <div class="ribbon-vertical"></div>
-            <div class="ribbon-horizontal"></div>
-            
-            <!-- 蝴蝶結 -->
-            <div class="bow-3d">
-                <div class="bow-left"></div>
-                <div class="bow-right"></div>
-                <div class="bow-center"></div>
+    <!-- 盲盒動畫容器 -->
+    <div class="mysterybox-animation" id="mysterybox-animation" style="display: none;">
+        <div class="gift-box" id="gift-box">
+            <div class="gift-box-top"></div>
+            <div class="gift-box-body"></div>
+            <div class="gift-ribbon"></div>
+            <div class="gift-bow"></div>
+            <div class="gift-content" id="gift-content">
+                <div class="gift-icon" id="gift-icon"></div>
+                <div class="gift-text" id="gift-text"></div>
             </div>
         </div>
-        
-        <!-- 抽獎結果顯示 -->
-        <div class="mysterybox-result-container" id="mysterybox-result-container">
-            <span class="mysterybox-result-icon" id="mysterybox-result-icon"></span>
-            <p class="mysterybox-result-text" id="mysterybox-result-text"></p>
-        </div>
     </div>
-</div>
-
-
 
     <!-- 通知提示 -->
     <div class="notification" id="notification">
@@ -3179,30 +2146,6 @@ const firebaseConfig = {
 // 初始化 Firebase
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
-
-// 在現有Firebase初始化後添加
-const auth = firebase.auth();
-let currentUser = null;
-let userProfile = null;
-let currentGiftReceiver = null;
-let selectedGiftItem = null;
-
-
-// 添加認證相關變量
-const authContainer = document.getElementById('auth-container');
-const loginForm = document.getElementById('login-form');
-const registerForm = document.getElementById('register-form');
-const showRegisterLink = document.getElementById('show-register');
-const showLoginLink = document.getElementById('show-login');
-const loginBtn = document.getElementById('login-btn');
-const registerBtn = document.getElementById('register-btn');
-const logoutBtn = document.getElementById('logout-button');
-
-// 好友系統相關元素
-const friendsButton = document.getElementById('friends-button');
-const friendsModal = document.getElementById('friends-modal');
-const closeFriends = document.getElementById('close-friends');
-const friendsTabs = document.querySelectorAll('.friends-tabs .tab');
 
 
 
@@ -3305,52 +2248,130 @@ const friendsTabs = document.querySelectorAll('.friends-tabs .tab');
         }
         
         // 表情、髮型、食物和性格商店數據
-      const expressions = [
-    { id: 'default', name: '默認表情', price: 0, className: '', type: 'expression' },
-    { id: 'happy', name: '無奈', price: 20, className: 'happy', type: 'expression' },
-    { id: 'angry', name: '生氣', price: 50, className: 'angry', type: 'expression' },
-    { id: 'surprised', name: '驚訝', price: 100, className: 'surprised', type: 'expression' },
-    { id: 'sad', name: '發呆', price: 150, className: 'sad', type: 'expression' },
-    { id: 'wink', name: '反白眼', price: 200, className: 'wink', type: 'expression' },
-    { id: 'hidden-emoji-1', name: '惺忪', price: 300, className: 'hidden-sleepy', isHidden: true, type: 'expression' },
-    { id: 'hidden-emoji-2', name: '震驚', price: 300, className: 'hidden-shock-eyes', isHidden: true, type: 'expression' },
-    { id: 'hidden-emoji-3', name: '冷酷', price: 300, className: 'hidden-cold', isHidden: true, type: 'expression' }
+       const expressions = [
+    { id: 'default', name: '默認表情', price: 0, className: '' },
+    { id: 'happy', name: '無奈', price: 20, className: 'happy' },
+    { id: 'angry', name: '生氣', price: 50, className: 'angry' },
+    { id: 'surprised', name: '驚訝', price: 100, className: 'surprised' },
+    { id: 'sad', name: '發呆', price: 150, className: 'sad' },
+    { id: 'wink', name: '反白眼', price: 200, className: 'wink' },
+   // 隱藏版表情
+{ id: 'hidden-emoji-1', name: '惺忪', price: 300, className: 'hidden-sleepy', isHidden: true },
+{ id: 'hidden-emoji-2', name: '震驚', price: 300, className: 'hidden-shock-eyes', isHidden: true },
+    { id: 'hidden-emoji-3', name: '冷酷', price: 300, className: 'hidden-cold', isHidden: true }
 ];
 
 const hairstyles = [
-    { id: 'default', name: '默認髮型', price: 0, className: '', type: 'hairstyle' },
-    { id: 'hair-1', name: '短棕髮', price: 30, className: 'hair-1', type: 'hairstyle' },
-    { id: 'hair-2', name: '金色波浪', price: 60, className: 'hair-2', type: 'hairstyle' },
-    { id: 'hair-3', name: '橙色平頂', price: 90, className: 'hair-3', type: 'hairstyle' },
-    { id: 'hair-4', name: '藍色尖髮', price: 120, className: 'hair-4', type: 'hairstyle' },
-    { id: 'hair-5', name: '綠色層次', price: 150, className: 'hair-5', type: 'hairstyle' },
-    { id: 'hair-6', name: '紫色弧形', price: 180, className: 'hair-6', type: 'hairstyle' },
-    { id: 'hidden-hair-1', name: '彩虹流光髮', price: 400, className: 'hidden-hair-1', isHidden: true, type: 'hairstyle' },
-    { id: 'hidden-hair-2', name: '星空銀河髮', price: 400, className: 'hidden-hair-2', isHidden: true, type: 'hairstyle' },
-    { id: 'hidden-hair-3', name: '極光幻彩髮', price: 400, className: 'hidden-hair-3', isHidden: true, type: 'hairstyle' }
+    { id: 'default', name: '默認髮型', price: 0, className: '' },
+    { id: 'hair-1', name: '短棕髮', price: 30, className: 'hair-1' },
+    { id: 'hair-2', name: '金色波浪', price: 60, className: 'hair-2' },
+    { id: 'hair-3', name: '橙色平頂', price: 90, className: 'hair-3' },
+    { id: 'hair-4', name: '藍色尖髮', price: 120, className: 'hair-4' },
+    { id: 'hair-5', name: '綠色層次', price: 150, className: 'hair-5' },
+    { id: 'hair-6', name: '紫色弧形', price: 180, className: 'hair-6' },
+    // 隱藏版髮型
+    // 隱藏版髮型
+{ id: 'hidden-hair-1', name: '彩虹流光髮', price: 400, className: 'hidden-hair-1', isHidden: true },
+{ id: 'hidden-hair-2', name: '星空銀河髮', price: 400, className: 'hidden-hair-2', isHidden: true },
+{ id: 'hidden-hair-3', name: '極光幻彩髮', price: 400, className: 'hidden-hair-3', isHidden: true }
 ];
 
+// 新增性格系統
 const personalities = [
-    { id: 'default', name: '默認形象', price: 0, icon: '😐', className: 'personality-default', prompt: '', type: 'personality' },
-    { id: 'gentle', name: '溫和親切', price: 30, icon: '😊', className: 'personality-gentle', prompt: '你要用非常溫和、親切、鼓勵的語氣回應，多用正面詞語，語調要溫柔體貼，像一個慈祥的長者。', type: 'personality' },
-    { id: 'serious', name: '嚴肅認真', price: 50, icon: '😤', className: 'personality-serious', prompt: '你要用嚴肅、認真、專業的語氣回應，語調要正式，重視學術準確性，像一個嚴格的教授。', type: 'personality' },
-    { id: 'cheerful', name: '開朗活潑', price: 80, icon: '😄', className: 'personality-cheerful', prompt: '你要用非常開朗、活潑、充滿活力的語氣回應，多用感嘆詞和積極詞語，語調要輕快愉悅。', type: 'personality' },
-    { id: 'sarcastic', name: '諷刺毒舌', price: 120, icon: '😏', className: 'personality-sarcastic', prompt: '你要用諷刺、毒舌但不過分的語氣回應，可以適度調侃學生，但要保持教育意義，語調要略帶挖苦。要用日常生活的語言，不要用文言。', type: 'personality' },
-    { id: 'wise', name: '睿智哲理', price: 150, icon: '🧙‍♂️', className: 'personality-wise', prompt: '你要用充滿智慧、哲理性的語氣回應，多引用名言警句和深刻見解，語調要深沉有內涵。', type: 'personality' },
-    { id: 'humorous', name: '幽默搞笑', price: 200, icon: '🤣', className: 'personality-humorous', prompt: '你要用非常幽默、搞笑的語氣回應，多用比喻和笑話，但要與教學內容相關，語調要輕鬆風趣。', type: 'personality' },
-    { id: 'hidden-wuxia', name: '武俠高手', price: 500, icon: '🗡️', className: 'personality-hidden-wuxia', isHidden: true, prompt: '你要用武俠小說的大俠語氣回應，如金庸小說中的大俠風格，使用江湖俠義用語，稱呼學生為「少俠」，讓學生感受大俠風範，語調要剛勁有力，充滿正義感。', type: 'personality' },
-    { id: 'hidden-poet', name: '詩人雅士', price: 500, icon: '🖋️', className: 'personality-hidden-poet', isHidden: true, prompt: '你要用詩人的語氣回應，文辭優美，富有詩意，可適當引用古詩詞，稱呼學生為「足下」，語調要柔和飽含感情，表達要有意境。', type: 'personality' },
-    { id: 'hidden-sage', name: '福爾摩斯', price: 500, icon: '📜', className: 'personality-hidden-sage', isHidden: true, prompt: '用1930年代黑色電影腔調說話，把每個問題當成案件。開場彈打火機音效[咔嚓]，稱對方"老兄"。關鍵線索用「係煙頭話我聽...」等現場證據比喻，結尾必說「呢個城市需要更加多好似你咁樣嘅的腦袋」', type: 'personality' }
+    { 
+        id: 'default', 
+        name: '默認形象', 
+        price: 0, 
+        icon: '😐',
+        className: 'personality-default',
+        prompt: '' 
+    },
+    { 
+        id: 'gentle', 
+        name: '溫和親切', 
+        price: 30, 
+        icon: '😊',
+        className: 'personality-gentle',
+        prompt: '你要用非常溫和、親切、鼓勵的語氣回應，多用正面詞語，語調要溫柔體貼，像一個慈祥的長者。' 
+    },
+    { 
+        id: 'serious', 
+        name: '嚴肅認真', 
+        price: 50, 
+        icon: '😤',
+        className: 'personality-serious',
+        prompt: '你要用嚴肅、認真、專業的語氣回應，語調要正式，重視學術準確性，像一個嚴格的教授。' 
+    },
+    { 
+        id: 'cheerful', 
+        name: '開朗活潑', 
+        price: 80, 
+        icon: '😄',
+        className: 'personality-cheerful',
+        prompt: '你要用非常開朗、活潑、充滿活力的語氣回應，多用感嘆詞和積極詞語，語調要輕快愉悅。' 
+    },
+    { 
+        id: 'sarcastic', 
+        name: '諷刺毒舌', 
+        price: 120, 
+        icon: '😏',
+        className: 'personality-sarcastic',
+        prompt: '你要用諷刺、毒舌但不過分的語氣回應，喜歡在回應時揶揄學生，毒舌，喜歡在回應問題時揶揄學生，但不會傷學生自尊心，語調要略帶挖苦。要用日常生活的語言，不要用文言。' 
+    },
+    { 
+        id: 'wise', 
+        name: '睿智哲理', 
+        price: 150, 
+        icon: '🧙‍♂️',
+        className: 'personality-wise',
+        prompt: '你要用充滿智慧、哲理性的語氣回應，多引用名言警句和深刻見解，語調要深沉有內涵。' 
+    },
+    { 
+        id: 'humorous', 
+        name: '幽默搞笑', 
+        price: 200, 
+        icon: '🤣',
+        className: 'personality-humorous',
+        prompt: '你要用非常幽默、搞笑的語氣回應，多用比喻和笑話，但要與教學內容相關，語調要輕鬆風趣。' 
+    },
+    // 隱藏版性格
+    { 
+        id: 'hidden-wuxia', 
+        name: '武俠高手', 
+        price: 500, 
+        icon: '🗡️',
+        className: 'personality-hidden-wuxia',
+        isHidden: true,
+        prompt: '你要用武俠小說的大俠語氣回應，如金庸小說中的大俠風格，使用江湖俠義用語，稱呼學生為「少俠」，讓學生感受大俠風範，語調要剛勁有力，充滿正義感。' 
+    },
+    { 
+        id: 'hidden-poet', 
+        name: '詩人雅士', 
+        price: 500, 
+        icon: '🖋️',
+        className: 'personality-hidden-poet',
+        isHidden: true,
+        prompt: '你要用詩人的語氣回應，文辭優美，富有詩意，可適當引用古詩詞，稱呼學生為「足下」，語調要柔和飽含感情，表達要有意境。' 
+    },
+    { 
+        id: 'hidden-sage', 
+        name: '福爾摩斯', 
+        price: 500, 
+        icon: '📜',
+        className: 'personality-hidden-sage',
+        isHidden: true,
+        prompt: '用1930年代黑色電影腔調說話，把每個問題當成案件。開場彈打火機音效[咔嚓]，稱對方"老兄"。關鍵線索用「係煙頭話我聽...」等現場證據比喻，結尾必說「呢個城市需要更加多好似你咁樣嘅的腦袋」' 
+    }
 ];
-
+        
 const foods = [
-    { id: 'apple', name: '蘋果', price: 3, nutrition: 15, emoji: '🍎', type: 'food' },
-    { id: 'sandwich', name: '三明治', price: 5, nutrition: 30, emoji: '🥪', type: 'food' },
-    { id: 'pizza', name: '披薩', price: 7, nutrition: 50, emoji: '🍕', type: 'food' },
-    { id: 'burger', name: '漢堡', price: 10, nutrition: 65, emoji: '🍔', type: 'food' },
-    { id: 'steak', name: '牛排', price: 12, nutrition: 80, emoji: '🥩', type: 'food' },
-    { id: 'cake', name: '蛋糕', price: 15, nutrition: 100, emoji: '🎂', type: 'food' }
-];
+            { id: 'apple', name: '蘋果', price: 3, nutrition: 15, emoji: '🍎' },
+            { id: 'sandwich', name: '三明治', price: 5, nutrition: 30, emoji: '🥪' },
+            { id: 'pizza', name: '披薩', price: 7, nutrition: 50, emoji: '🍕' },
+            { id: 'burger', name: '漢堡', price: 10, nutrition: 65, emoji: '🍔' },
+            { id: 'steak', name: '牛排', price: 12, nutrition: 80, emoji: '🥩' },
+            { id: 'cake', name: '蛋糕', price: 15, nutrition: 100, emoji: '🎂' }
+        ];
 
         // 新增盲盒系統
 const mysteryboxes = [
@@ -3405,7 +2426,7 @@ const mysteryboxes = [
         
        // 用戶數據
 let userData = {
-    points: 20,
+    points: 0,
     purchasedExpressions: ['default'],
     purchasedHairstyles: ['default'],
     purchasedFoods: [],
@@ -3425,79 +2446,25 @@ let userData = {
 
        // 初始化用戶數據
 function initUserData() {
-    if (currentUser) {
-        database.ref('users/' + currentUser.uid).once('value').then((snapshot) => {
-            const firebaseData = snapshot.val();
-            if (firebaseData) {
-                userData = { ...userData, ...firebaseData };
-                localStorage.setItem('vtuberUserData', JSON.stringify(userData));
-            } else {
-                // 新用戶，初始化數據
-                initializeNewUserData();
-            }
-            updatePointsDisplay();
-            updateHungerDisplay();
-            updateVtuberAppearance();
-            syncUserAppearance();
-            updateVtuberName();
-        }).catch((error) => {
-            console.error('從Firebase載入數據失敗:', error);
-            // 失敗時使用本地數據
-            const savedData = localStorage.getItem('vtuberUserData');
-            if (savedData) {
-                userData = { ...userData, ...JSON.parse(savedData) };
-            }
-            updatePointsDisplay();
-            updateHungerDisplay();
-            updateVtuberAppearance();
-            syncUserAppearance();
-            updateVtuberName();
-        });
-    } else {
-        // 訪客模式，使用本地數據
-        const savedData = localStorage.getItem('vtuberUserData');
-        if (savedData) {
-            userData = JSON.parse(savedData);
+    const savedData = localStorage.getItem('vtuberUserData');
+    if (savedData) {
+        const parsedData = JSON.parse(savedData);
+        // 確保添加新屬性
+        if (!parsedData.hiddenCodesUsed) {
+            parsedData.hiddenCodesUsed = [];
         }
-        updatePointsDisplay();
-        updateHungerDisplay();
-        updateVtuberAppearance();
-        syncUserAppearance();
-        updateVtuberName();
+        userData = { ...userData, ...parsedData };
+        // 計算飽腹值衰減
+        updateHungerLevel();
     }
+    updatePointsDisplay();
+    updateHungerDisplay();
+    updateVtuberAppearance();
+    updateVtuberName();
+    
     // 開始飽腹值定時更新
     setInterval(updateHungerLevel, 60000); // 每分鐘檢查一次
 }
-
-
-function initializeNewUserData(characterName) {
-    const defaultUserData = {
-        points: 20,
-        purchasedExpressions: ['default'],
-        purchasedHairstyles: ['default'],
-        purchasedFoods: [],
-        purchasedPersonalities: ['default'],
-        currentExpression: 'default',
-        currentHairstyle: 'default',
-        currentPersonality: 'default',
-        hungerLevel: 100,
-        lastFeedTime: Date.now(),
-        vtuberName: characterName,  // 使用傳入的角色名稱
-        hiddenCodesUsed: [],
-        freeMysteryboxDraws: {}
-    };
-    userData = defaultUserData;
-    localStorage.setItem('vtuberUserData', JSON.stringify(userData));
-    if (currentUser) {
-        database.ref('users/' + currentUser.uid).set(defaultUserData)
-            .catch((error) => {
-                console.error('初始化新用戶數據失敗:', error);
-            });
-    }
-}
-
-
-
 
         // 更新VTuber名稱顯示
         function updateVtuberName() {
@@ -3530,51 +2497,26 @@ function initializeNewUserData(characterName) {
         finalName = trimmedName + "蛋";
     }
     
-   userData.vtuberName = finalName;
-saveUserData();
-updateVtuberName();
-
-// 同步到Firebase
-if (currentUser) {
-    database.ref('users/' + currentUser.uid + '/characterName').set(finalName)
-        .catch((error) => {
-            console.error('同步角色名稱到Firebase失敗:', error);
-        });
-}
-
-// 顯示成功消息
-showNameSuccess(`名稱已更改為：${finalName}`);
-vtuberNameInput.value = '';
-
-return true;
+    userData.vtuberName = finalName;
+    saveUserData();
+    updateVtuberName();
+    
+    // 顯示成功消息
+    showNameSuccess(`名稱已更改為：${finalName}`);
+    vtuberNameInput.value = '';
+    
+    return true;
 }
 
 // 打開盲盒動畫和獎勵系統
-// 3D盲盒動畫系統
-let canvas, ctx;
-let boxParts = {
-    lid: { rotationX: 0, y: 0, opened: false },
-    body: { y: 0 },
-    confetti: []
-};
-let animationStartTime = 0;
-let isBoxOpened = false;
-
-
-// 3D立體盲盒動畫系統
 function openMysteryBox(boxData) {
+    // 設置盲盒樣式
+    giftBox.className = `gift-box ${boxData.id}`;
+    
     // 顯示動畫容器
     mysteryboxAnimation.style.display = 'flex';
     
-    // 設置盒子類型樣式
-    const giftBox3d = document.getElementById('gift-box-3d');
-    giftBox3d.className = `gift-box-3d mysterybox-${boxData.id}`;
-    
-    // 重置結果容器
-    const resultContainer = document.getElementById('mysterybox-result-container');
-    resultContainer.classList.remove('show');
-    
-    // 抽獎邏輯
+    // 抽獎邏輯 - 根據機率決定獎品類型
     const randomValue = Math.random();
     let accumulatedOdds = 0;
     let rewardType = 'nothing';
@@ -3587,472 +2529,159 @@ function openMysteryBox(boxData) {
         }
     }
     
-    // 開始動畫序列
+    // 添加搖晃動畫
     setTimeout(() => {
-        startMysteryBoxAnimation(rewardType);
-    }, 1000);
-}
-
-function startMysteryBoxAnimation(rewardType) {
-    const giftBox3d = document.getElementById('gift-box-3d');
-    
-    // 第一階段：搖晃動畫
-    giftBox3d.style.animation = 'mysteryboxShake 2s ease-in-out';
-    
-    setTimeout(() => {
-        // 第二階段：打開盒蓋
-        giftBox3d.classList.add('opening');
-        giftBox3d.style.animation = 'mysteryboxFloat 3s ease-in-out infinite';
+        // 3秒後打開盒子
+        giftBox.classList.add('opening');
         
         setTimeout(() => {
-            // 盒子打開後立即消失
-            giftBox3d.style.display = 'none';
+            // 0.5秒後顯示獎品
+            giftBox.classList.add('opened');
             
-            // 創建3D紙屑效果
-            create3DConfetti();
+            // 根據獎品類型設置內容
+            let reward = null;
+            let rewardText = '';
+            let rewardIcon = '';
             
-            // 第三階段：顯示結果
-            showMysteryBoxResult(rewardType);
-        }, 1000);
+            if (rewardType === 'nothing') {
+                rewardText = '什麼都沒抽到...';
+                rewardIcon = '❌';
+            } else if (rewardType === 'hidden') {
+                // 隱藏商品處理邏輯
+                const hiddenExpressions = expressions.filter(item => item.isHidden);
+                const hiddenHairstyles = hairstyles.filter(item => item.isHidden);
+                const hiddenPersonalities = personalities.filter(item => item.isHidden);
+                
+                // 合併所有隱藏商品
+                const allHiddenItems = [...hiddenExpressions, ...hiddenHairstyles, ...hiddenPersonalities];
+                
+                // 過濾出未擁有的隱藏商品
+                const unownedHiddenItems = allHiddenItems.filter(item => {
+                    if (item.id.includes('hidden-emoji')) {
+                        return !userData.purchasedExpressions.includes(item.id);
+                    } else if (item.id.includes('hidden-hair')) {
+                        return !userData.purchasedHairstyles.includes(item.id);
+                    } else {
+                        return !userData.purchasedPersonalities.includes(item.id);
+                    }
+                });
+                
+                if (unownedHiddenItems.length > 0) {
+                    // 隨機選擇一個未擁有的隱藏商品
+                    reward = unownedHiddenItems[Math.floor(Math.random() * unownedHiddenItems.length)];
+                    
+                    // 根據商品類型添加到對應的購買列表
+                    if (reward.id.includes('hidden-emoji')) {
+                        userData.purchasedExpressions.push(reward.id);
+                        rewardText = `獲得了隱藏表情：${reward.name}！`;
+                    } else if (reward.id.includes('hidden-hair')) {
+                        userData.purchasedHairstyles.push(reward.id);
+                        rewardText = `獲得了隱藏髮型：${reward.name}！`;
+                    } else {
+                        userData.purchasedPersonalities.push(reward.id);
+                        rewardText = `獲得了隱藏性格：${reward.name}！`;
+                    }
+                    
+                    rewardIcon = reward.icon || '🌟';
+                } else {
+                    // 如果已經擁有所有隱藏商品，改為獲得食物
+                    reward = getRandomItem(foods);
+                    if (reward) {
+                        userData.purchasedFoods.push(reward.id);
+                        rewardText = `已擁有所有隱藏商品！獲得了食物：${reward.name}！`;
+                        rewardIcon = reward.emoji;
+                    }
+                }
+            } else {
+                // 原有的普通獎品邏輯
+                switch (rewardType) {
+                    case 'food':
+                        reward = getRandomItem(foods);
+                        if (reward) {
+                            userData.purchasedFoods.push(reward.id);
+                            rewardText = `獲得了食物：${reward.name}！`;
+                            rewardIcon = reward.emoji;
+                        }
+                        break;
+                        
+                    case 'expression':
+                        reward = getRandomUnownedItem(expressions.filter(e => !e.isHidden), userData.purchasedExpressions);
+                        if (reward) {
+                            userData.purchasedExpressions.push(reward.id);
+                            rewardText = `獲得了表情：${reward.name}！`;
+                            rewardIcon = '😊';
+                        } else {
+                            // 如果全部表情已擁有，改為獲得食物
+                            reward = getRandomItem(foods);
+                            if (reward) {
+                                userData.purchasedFoods.push(reward.id);
+                                rewardText = `表情全部已擁有！獲得了食物：${reward.name}！`;
+                                rewardIcon = reward.emoji;
+                            }
+                        }
+                        break;
+                        
+                    case 'hairstyle':
+                        reward = getRandomUnownedItem(hairstyles.filter(h => !h.isHidden), userData.purchasedHairstyles);
+                        if (reward) {
+                            userData.purchasedHairstyles.push(reward.id);
+                            rewardText = `獲得了髮型：${reward.name}！`;
+                            rewardIcon = '💇';
+                        } else {
+                            // 如果全部髮型已擁有，改為獲得食物
+                            reward = getRandomItem(foods);
+                            if (reward) {
+                                userData.purchasedFoods.push(reward.id);
+                                rewardText = `髮型全部已擁有！獲得了食物：${reward.name}！`;
+                                rewardIcon = reward.emoji;
+                            }
+                        }
+                        break;
+                        
+                    case 'personality':
+                        reward = getRandomUnownedItem(personalities.filter(p => !p.isHidden), userData.purchasedPersonalities);
+                        if (reward) {
+                            userData.purchasedPersonalities.push(reward.id);
+                            rewardText = `獲得了性格：${reward.name}！`;
+                            rewardIcon = reward.icon;
+                        } else {
+                            // 如果全部性格已擁有，改為獲得食物
+                            reward = getRandomItem(foods);
+                            if (reward) {
+                                userData.purchasedFoods.push(reward.id);
+                                rewardText = `性格全部已擁有！獲得了食物：${reward.name}！`;
+                                rewardIcon = reward.emoji;
+                            }
+                        }
+                        break;
+                }
+            }
+            
+            // 設置獎勵顯示
+            giftIcon.textContent = rewardIcon;
+            giftText.textContent = rewardText;
+            
+            // 如果獲得了獎品，創建紙屑效果
+            if (rewardType !== 'nothing') {
+                createConfetti();
+            }
+            
+            // 保存用戶數據
+            saveUserData();
+            
+            // 3秒後關閉動畫
+            setTimeout(() => {
+                mysteryboxAnimation.style.display = 'none';
+                giftBox.classList.remove('opening', 'opened');
+                
+                // 顯示獲得的獎勵通知
+                showNotification(rewardText);
+            }, 3000);
+            
+        }, 500);
+        
     }, 2000);
 }
-
-
-// 創建3D紙屑效果
-function create3DConfetti() {
-    const colors = ['#FF6B9D', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F', '#FFD700', '#FF69B4'];
-    const confettiCount = 80;
-    
-    for (let i = 0; i < confettiCount; i++) {
-        const confetti = document.createElement('div');
-        confetti.className = 'confetti-3d';
-        confetti.style.left = `${Math.random() * 100}%`;
-        confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
-        confetti.style.animationDelay = `${Math.random() * 1}s`;
-        confetti.style.animationDuration = `${Math.random() * 2 + 3}s`;
-        
-        // 隨機形狀
-        if (Math.random() > 0.5) {
-            confetti.style.borderRadius = '0';
-            confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
-        }
-        
-        mysteryboxAnimation.appendChild(confetti);
-        
-        // 動畫結束後移除
-        setTimeout(() => {
-            if (confetti.parentNode) {
-                confetti.parentNode.removeChild(confetti);
-            }
-        }, 6000);
-    }
-}
-
-
-
-function createRewardPreview(reward, rewardType, container) {
-    container.innerHTML = '';
-    container.style.display = 'flex';
-    container.style.alignItems = 'center';
-    container.style.justifyContent = 'center';
-    container.style.width = '100px';
-    container.style.height = '100px';
-    container.style.margin = '0 auto 15px';
-    container.style.position = 'relative';
-    container.style.overflow = 'hidden';
-    container.style.borderRadius = '15px';
-    container.style.background = 'linear-gradient(135deg, #FFD700, #FFA500)';
-    container.style.boxShadow = '0 0 20px rgba(255,215,0,0.6)';
-    
-    if (rewardType === 'expression' || rewardType === 'hidden') {
-        // 表情預覽
-        container.style.background = 'linear-gradient(135deg, #fde2e4, #fbb6ce)';
-        container.style.borderRadius = '50%';
-        
-        const eyesDiv = document.createElement('div');
-        eyesDiv.className = 'expression-eyes';
-        eyesDiv.style.cssText = `
-            position: absolute;
-            top: 40%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 60px;
-            height: 15px;
-            display: flex;
-            justify-content: space-between;
-            z-index: 2;
-        `;
-        
-        for (let i = 0; i < 2; i++) {
-            const eyeDiv = document.createElement('div');
-            eyeDiv.className = 'expression-eye';
-            eyeDiv.style.cssText = `
-                width: 20px;
-                height: 12px;
-                background: #fff;
-                border-radius: 50%;
-                position: relative;
-            `;
-            const pupilDiv = document.createElement('div');
-            pupilDiv.className = 'expression-pupil';
-            pupilDiv.style.cssText = `
-                width: 8px;
-                height: 8px;
-                background: #333;
-                border-radius: 50%;
-                position: absolute;
-                top: 2px;
-                left: 6px;
-            `;
-            eyeDiv.appendChild(pupilDiv);
-            eyesDiv.appendChild(eyeDiv);
-        }
-        
-        const mouthDiv = document.createElement('div');
-        mouthDiv.className = 'expression-mouth';
-        mouthDiv.style.cssText = `
-            position: absolute;
-            bottom: 15px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 30px;
-            height: 10px;
-            background: #ff9aa2;
-            border-radius: 0 0 15px 15px;
-            overflow: hidden;
-            z-index: 2;
-        `;
-        
-        const mouthInnerDiv = document.createElement('div');
-        mouthInnerDiv.className = 'expression-mouth-inner';
-        mouthInnerDiv.style.cssText = `
-            width: 100%;
-            height: 6px;
-            background: #990000;
-            border-radius: 50% / 100%;
-            position: absolute;
-            bottom: 0;
-        `;
-        mouthDiv.appendChild(mouthInnerDiv);
-        
-        if (reward.className) {
-            container.classList.add(reward.className);
-        }
-        
-        container.appendChild(eyesDiv);
-        container.appendChild(mouthDiv);
-        
-    } else if (rewardType === 'hairstyle') {
-        // 髮型預覽
-        container.style.background = 'linear-gradient(135deg, #fde2e4, #fbb6ce)';
-        container.style.borderRadius = '50%';
-        
-        const hairDiv = document.createElement('div');
-        hairDiv.className = 'vtuber-hair';
-        hairDiv.style.cssText = `
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 60%;
-            z-index: 2;
-        `;
-        
-        if (reward.className) {
-            hairDiv.classList.add(reward.className);
-        }
-        
-        container.appendChild(hairDiv);
-        
-    } else if (rewardType === 'personality') {
-        // 性格預覽
-        container.style.borderRadius = '20px';
-        container.style.display = 'flex';
-        container.style.alignItems = 'center';
-        container.style.justifyContent = 'center';
-        container.style.fontSize = '3rem';
-        container.style.color = 'white';
-        
-        if (reward.className) {
-            container.classList.add(reward.className);
-        }
-        
-        container.textContent = reward.icon;
-    }
-}
-
-
-
-
-
-
-
-function showMysteryBoxResult(rewardType) {
-    const resultContainer = document.getElementById('mysterybox-result-container');
-    const resultIcon = document.getElementById('mysterybox-result-icon');
-    const resultText = document.getElementById('mysterybox-result-text');
-    
-    let reward = null;
-    let rewardText = '';
-    
-    if (rewardType === 'nothing') {
-        rewardText = '什麼都沒抽到...';
-        resultIcon.textContent = '❌';
-    } else if (rewardType === 'hidden') {
-        const hiddenExpressions = expressions.filter(item => item.isHidden);
-        const hiddenHairstyles = hairstyles.filter(item => item.isHidden);
-        const hiddenPersonalities = personalities.filter(item => item.isHidden);
-        
-        const allHiddenItems = [...hiddenExpressions, ...hiddenHairstyles, ...hiddenPersonalities];
-        
-        const unownedHiddenItems = allHiddenItems.filter(item => {
-            if (item.type === 'expression') {
-                return !userData.purchasedExpressions.includes(item.id);
-            } else if (item.type === 'hairstyle') {
-                return !userData.purchasedHairstyles.includes(item.id);
-            } else if (item.type === 'personality') {
-                return !userData.purchasedPersonalities.includes(item.id);
-            }
-        });
-        
-        if (unownedHiddenItems.length > 0) {
-            reward = unownedHiddenItems[Math.floor(Math.random() * unownedHiddenItems.length)];
-            if (reward.type === 'expression') {
-                userData.purchasedExpressions.push(reward.id);
-                rewardText = `獲得隱藏表情：${reward.name}！`;
-            } else if (reward.type === 'hairstyle') {
-                userData.purchasedHairstyles.push(reward.id);
-                rewardText = `獲得隱藏髮型：${reward.name}！`;
-            } else if (reward.type === 'personality') {
-                userData.purchasedPersonalities.push(reward.id);
-                rewardText = `獲得隱藏性格：${reward.name}！`;
-            }
-        } else {
-            reward = getRandomItem(foods);
-            if (reward) {
-                userData.purchasedFoods.push(reward.id);
-                rewardText = `獲得食物：${reward.name}！`;
-            }
-        }
-    } else {
-        switch (rewardType) {
-            case 'food':
-                reward = getRandomItem(foods);
-                if (reward) {
-                    userData.purchasedFoods.push(reward.id);
-                    rewardText = `獲得食物：${reward.name}！`;
-                }
-                break;
-            case 'expression':
-                reward = getRandomUnownedItem(expressions.filter(e => !e.isHidden), userData.purchasedExpressions);
-                if (reward) {
-                    userData.purchasedExpressions.push(reward.id);
-                    rewardText = `獲得表情：${reward.name}！`;
-                } else {
-                    reward = getRandomItem(foods);
-                    if (reward) {
-                        userData.purchasedFoods.push(reward.id);
-                        rewardText = `獲得食物：${reward.name}！`;
-                    }
-                }
-                break;
-            case 'hairstyle':
-                reward = getRandomUnownedItem(hairstyles.filter(h => !h.isHidden), userData.purchasedHairstyles);
-                if (reward) {
-                    userData.purchasedHairstyles.push(reward.id);
-                    rewardText = `獲得髮型：${reward.name}！`;
-                } else {
-                    reward = getRandomItem(foods);
-                    if (reward) {
-                        userData.purchasedFoods.push(reward.id);
-                        rewardText = `獲得食物：${reward.name}！`;
-                    }
-                }
-                break;
-            case 'personality':
-                reward = getRandomUnownedItem(personalities.filter(p => !p.isHidden), userData.purchasedPersonalities);
-                if (reward) {
-                    userData.purchasedPersonalities.push(reward.id);
-                    rewardText = `獲得性格：${reward.name}！`;
-                } else {
-                    reward = getRandomItem(foods);
-                    if (reward) {
-                        userData.purchasedFoods.push(reward.id);
-                        rewardText = `獲得食物：${reward.name}！`;
-                    }
-                }
-                break;
-        }
-    }
-    
-    // 如果有獎勵，根據實際獲得的reward更新rewardType
-    if (reward) {
-        rewardType = reward.type;
-    }
-    
-    // 設置獎勵顯示
-    if (reward && (rewardType === 'expression' || rewardType === 'hairstyle' || rewardType === 'personality')) {
-        createRewardPreview(reward, rewardType, resultIcon);
-    } else if (rewardType === 'food') {
-        resultIcon.textContent = reward.emoji;
-    } else {
-        resultIcon.textContent = '❌';
-    }
-    
-    resultText.innerHTML = `<div style="text-align: center; line-height: 1.6; font-weight: bold; color: #333; font-size: 1.2rem;">${rewardText}</div>`;
-    
-    // 顯示結果容器
-    setTimeout(() => {
-        resultContainer.classList.add('show');
-    }, 500);
-    
-    // 保存用戶數據
-    saveUserData();
-    
-    // 顯示獲得的獎勵通知
-    showNotification(rewardText);
-    
-    // 3秒後自動關閉動畫
-    setTimeout(() => {
-        mysteryboxAnimation.style.display = 'none';
-        resultContainer.classList.remove('show');
-        const giftBox3d = document.getElementById('gift-box-3d');
-        giftBox3d.classList.remove('opening');
-        giftBox3d.style.display = 'flex';
-        
-        const confettiElements = mysteryboxAnimation.querySelectorAll('.confetti-3d');
-        confettiElements.forEach(el => el.remove());
-    }, 3000);
-}
-
-function createRewardPreview(reward, rewardType, container) {
-    container.innerHTML = '';
-    container.style.display = 'flex';
-    container.style.alignItems = 'center';
-    container.style.justifyContent = 'center';
-    container.style.width = '80px';
-    container.style.height = '80px';
-    container.style.margin = '0 auto 15px';
-    container.style.position = 'relative';
-    container.style.overflow = 'hidden';
-    
-    if (rewardType === 'expression' || rewardType === 'hidden') {
-        // 表情預覽
-        container.style.background = '#fde2e4';
-        container.style.borderRadius = '50%';
-        
-        const eyesDiv = document.createElement('div');
-        eyesDiv.className = 'expression-eyes';
-        eyesDiv.style.cssText = `
-            position: absolute;
-            top: 40%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 60px;
-            height: 15px;
-            display: flex;
-            justify-content: space-between;
-            z-index: 2;
-        `;
-        
-        for (let i = 0; i < 2; i++) {
-            const eyeDiv = document.createElement('div');
-            eyeDiv.className = 'expression-eye';
-            eyeDiv.style.cssText = `
-                width: 20px;
-                height: 12px;
-                background: #fff;
-                border-radius: 50%;
-                position: relative;
-            `;
-            const pupilDiv = document.createElement('div');
-            pupilDiv.className = 'expression-pupil';
-            pupilDiv.style.cssText = `
-                width: 8px;
-                height: 8px;
-                background: #333;
-                border-radius: 50%;
-                position: absolute;
-                top: 2px;
-                left: 6px;
-            `;
-            eyeDiv.appendChild(pupilDiv);
-            eyesDiv.appendChild(eyeDiv);
-        }
-        
-        const mouthDiv = document.createElement('div');
-        mouthDiv.className = 'expression-mouth';
-        mouthDiv.style.cssText = `
-            position: absolute;
-            bottom: 15px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 30px;
-            height: 10px;
-            background: #ff9aa2;
-            border-radius: 0 0 15px 15px;
-            overflow: hidden;
-            z-index: 2;
-        `;
-        
-        const mouthInnerDiv = document.createElement('div');
-        mouthInnerDiv.className = 'expression-mouth-inner';
-        mouthInnerDiv.style.cssText = `
-            width: 100%;
-            height: 6px;
-            background: #990000;
-            border-radius: 50% / 100%;
-            position: absolute;
-            bottom: 0;
-        `;
-        mouthDiv.appendChild(mouthInnerDiv);
-        
-        if (reward.className) {
-            container.classList.add(reward.className);
-        }
-        
-        container.appendChild(eyesDiv);
-        container.appendChild(mouthDiv);
-        
-    } else if (rewardType === 'hairstyle') {
-        // 髮型預覽
-        container.style.background = '#fde2e4';
-        container.style.borderRadius = '50%';
-        
-        const hairDiv = document.createElement('div');
-        hairDiv.className = 'vtuber-hair';
-        hairDiv.style.cssText = `
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 60%;
-            z-index: 2;
-        `;
-        
-        if (reward.className) {
-            hairDiv.classList.add(reward.className);
-        }
-        
-        container.appendChild(hairDiv);
-        
-    } else if (rewardType === 'personality') {
-        // 性格預覽
-        container.style.borderRadius = '15px';
-        container.style.display = 'flex';
-        container.style.alignItems = 'center';
-        container.style.justifyContent = 'center';
-        container.style.fontSize = '2.5rem';
-        container.style.color = 'white';
-        
-        if (reward.className) {
-            container.classList.add(reward.className);
-        }
-        
-        container.textContent = reward.icon;
-    }
-}
-
 
 
 
@@ -4115,7 +2744,6 @@ function createRewardPreview(reward, rewardType, container) {
             
             updateHungerDisplay();
             updateVtuberAppearance();
-syncUserAppearance();
         }
 
         // 更新飽腹值顯示
@@ -4137,120 +2765,14 @@ syncUserAppearance();
             }
         }
 
-        // 保存用戶數據到localStorage和Firebase
-function saveUserData() {
-    if (currentUser) {
-        database.ref('users/' + currentUser.uid).set(userData)
-            .then(() => {
-                localStorage.setItem('vtuberUserData', JSON.stringify(userData));
-            })
-            .catch((error) => {
-                console.error('保存數據到Firebase失敗:', error);
-                localStorage.setItem('vtuberUserData', JSON.stringify(userData)); // 失敗時仍保存本地
-            });
-    } else {
-        localStorage.setItem('vtuberUserData', JSON.stringify(userData));
-    }
-}
-
-// 同步當前用戶的外觀信息供其他用戶查看
-function syncUserAppearance() {
-    if (currentUser) {
-        const appearanceData = {
-            currentExpression: userData.currentExpression,
-            currentHairstyle: userData.currentHairstyle,
-            lastUpdated: Date.now()
-        };
-        database.ref('users/' + currentUser.uid + '/vtuberAppearance').set(appearanceData)
-            .then(() => {
-                localStorage.setItem('vtuberUserData', JSON.stringify(userData));
-            })
-            .catch((error) => {
-                console.error('同步VTUBER外觀到Firebase失敗:', error);
-            });
-    } else {
-        localStorage.setItem('vtuberUserData', JSON.stringify(userData));
-    }
-}
-
-// 同步Firebase數據到本地
-function syncFirebaseDataToLocal() {
-    database.ref('users/' + currentUser.uid).on('value', (snapshot) => {
-        const firebaseData = snapshot.val();
-        if (firebaseData) {
-            // 同步點數
-            if (firebaseData.points !== undefined) {
-                userData.points = firebaseData.points;
-                updatePointsDisplay();
-            }
-            
-            // 同步飽腹值
-            if (firebaseData.hungerLevel !== undefined) {
-                userData.hungerLevel = firebaseData.hungerLevel;
-                updateHungerDisplay();
-            }
-            
-            // 同步購買記錄
-            if (firebaseData.purchasedExpressions) {
-                userData.purchasedExpressions = firebaseData.purchasedExpressions;
-            }
-            if (firebaseData.purchasedHairstyles) {
-                userData.purchasedHairstyles = firebaseData.purchasedHairstyles;
-            }
-            if (firebaseData.purchasedPersonalities) {
-                userData.purchasedPersonalities = firebaseData.purchasedPersonalities;
-            }
-            if (firebaseData.purchasedFoods) {
-                userData.purchasedFoods = firebaseData.purchasedFoods;
-            }
-            
-            // 同步當前使用的外觀
-            if (firebaseData.vtuberAppearance) {
-                userData.currentExpression = firebaseData.vtuberAppearance.currentExpression || 'default';
-                userData.currentHairstyle = firebaseData.vtuberAppearance.currentHairstyle || 'default';
-            }
-            
-            // 同步角色名稱
-            if (firebaseData.characterName) {
-                userData.vtuberName = firebaseData.characterName;
-                updateVtuberName();
-            }
-            
-            saveUserData();
-            updateVtuberAppearance();
+        // 保存用戶數據到localStorage
+        function saveUserData() {
+            localStorage.setItem('vtuberUserData', JSON.stringify(userData));
         }
-    });
-}
-
-// 同步本地數據到Firebase
-function syncLocalDataToFirebase() {
-    if (currentUser) {
-        const syncData = {
-            points: userData.points,
-            hungerLevel: userData.hungerLevel,
-            purchasedExpressions: userData.purchasedExpressions,
-            purchasedHairstyles: userData.purchasedHairstyles,
-            purchasedPersonalities: userData.purchasedPersonalities,
-            purchasedFoods: userData.purchasedFoods,
-            characterName: userData.vtuberName,
-            vtuberAppearance: {
-                currentExpression: userData.currentExpression,
-                currentHairstyle: userData.currentHairstyle,
-                lastUpdated: Date.now()
-            }
-        };
-        
-        database.ref('users/' + currentUser.uid).update(syncData)
-            .catch((error) => {
-                console.error('同步數據到Firebase失敗:', error);
-            });
-    }
-}
-
 
         // 更新點數顯示
         function updatePointsDisplay() {
-            pointsDisplay.textContent = userData.points + ' ';
+            pointsDisplay.textContent = userData.points + ' 點';
             shopPoints.textContent = userData.points;
         }
 
@@ -4305,31 +2827,18 @@ function syncLocalDataToFirebase() {
                 items = personalities;
                 purchasedArray = userData.purchasedPersonalities;
             } else if (type === 'mysterybox') {
-    items = mysteryboxes;
-    const mysterybox = items.find(i => i.id === itemId);
-    if (mysterybox) {
-        // 檢查是否有免費抽獎次數
-        const freeDraws = userData.freeMysteryboxDraws || {};
-        const availableFreeDraws = freeDraws[itemId] || 0;
-        
-        if (availableFreeDraws > 0) {
-            // 使用免費抽獎次數
-            userData.freeMysteryboxDraws[itemId] = availableFreeDraws - 1;
-            saveUserData();
-            openMysteryBox(mysterybox);
-            return true;
-        } else if (userData.points >= mysterybox.price) {
-            // 正常購買
-            userData.points -= mysterybox.price;
-            updatePointsDisplay();
-            saveUserData();
-            openMysteryBox(mysterybox);
-            return true;
-        }
-    }
-    return false;
-}
-
+                items = mysteryboxes;
+                // 盲盒不需要購買記錄，直接使用
+                const mysterybox = items.find(i => i.id === itemId);
+                if (mysterybox && userData.points >= mysterybox.price) {
+                    userData.points -= mysterybox.price;
+                    updatePointsDisplay();
+                    saveUserData();
+                    openMysteryBox(mysterybox);
+                    return true;
+                }
+                return false;
+            }
             
             const item = items.find(i => i.id === itemId);
             if (!item) return false;
@@ -4353,7 +2862,6 @@ function syncLocalDataToFirebase() {
                     userData.currentExpression = itemId;
                     saveUserData();
                     updateVtuberAppearance();
-syncUserAppearance();
                     return true;
                 }
             } else if (type === 'hairstyle') {
@@ -4387,7 +2895,6 @@ syncUserAppearance();
                         saveUserData();
                         updateHungerDisplay();
                         updateVtuberAppearance();
-syncUserAppearance();
                         return true;
                     }
                 }
@@ -4428,127 +2935,6 @@ function getAllHiddenItems() {
 // 渲染商店商品
 function renderShopItems(tab = 'expressions') {
     shopItems.innerHTML = '';
-    if (!shopTabs[0].parentElement.querySelector('[data-tab="gifts"]')) {
-    const giftTab = document.createElement('button');
-    giftTab.className = 'tab';
-    giftTab.dataset.tab = 'gifts';
-    giftTab.textContent = '禮物';
-    shopTabs[0].parentElement.appendChild(giftTab);
-    
-    // 修復：正確處理標籤切換邏輯
-giftTab.addEventListener('click', () => {
-    // 移除所有標籤的active狀態，包括原有和新添加的標籤
-    const allTabs = giftTab.parentElement.querySelectorAll('.tab');
-    allTabs.forEach(t => t.classList.remove('active'));
-    giftTab.classList.add('active');
-    renderShopItems('gifts');
-});
-
-}
-
-
- // 處理禮物標籤內容
-    if (tab === 'gifts') {
-        if (!currentUser) {
-            shopItems.innerHTML = '<p>請先登入查看禮物！</p>';
-            return;
-        }
-        
-        database.ref('users/' + currentUser.uid + '/gifts').once('value').then((snapshot) => {
-            shopItems.innerHTML = '';
-            if (snapshot.exists()) {
-                const gifts = snapshot.val();
-                Object.entries(gifts).forEach(([giftId, gift]) => {
-                    const giftDiv = document.createElement('div');
-                    giftDiv.className = 'received-gift-item';
-                    giftDiv.style.cssText = `
-                        padding: 15px;
-                        margin-bottom: 10px;
-                        background: white;
-                        border-radius: 10px;
-                        border-left: 4px solid #ff6b9d;
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-                    `;
-                    // 獲取商品圖片
-// 獲取商品實際預覽圖片
-let itemPreviewElement = '';
-if (gift.itemType === 'expression') {
-    const expressionItem = expressions.find(e => e.id === gift.itemId);
-    if (expressionItem) {
-        itemPreviewElement = `
-            <div class="item-preview expression-preview ${expressionItem.className || ''}" style="width: 60px; height: 60px; margin: 0;">
-                <div class="expression-eyes">
-                    <div class="expression-eye"><div class="expression-pupil"></div></div>
-                    <div class="expression-eye"><div class="expression-pupil"></div></div>
-                </div>
-                <div class="expression-mouth"><div class="expression-mouth-inner"></div></div>
-            </div>
-        `;
-    } else {
-        itemPreviewElement = '<div style="font-size: 2.5rem;">😊</div>';
-    }
-} else if (gift.itemType === 'hairstyle') {
-    const hairstyleItem = hairstyles.find(h => h.id === gift.itemId);
-    if (hairstyleItem) {
-        itemPreviewElement = `
-            <div class="item-preview" style="width: 60px; height: 60px; margin: 0; position: relative; background: #fde2e4; border-radius: 50%;">
-                <div class="vtuber-hair ${hairstyleItem.className || ''}" style="width: 100%; height: 60%;"></div>
-            </div>
-        `;
-    } else {
-        itemPreviewElement = '<div style="font-size: 2.5rem;">💇</div>';
-    }
-} else if (gift.itemType === 'personality') {
-    const personalityItem = personalities.find(p => p.id === gift.itemId);
-    if (personalityItem) {
-        itemPreviewElement = `
-            <div class="item-preview personality-preview ${personalityItem.className}" style="width: 60px; height: 60px; margin: 0; font-size: 2rem; color: white;">
-                ${personalityItem.icon}
-            </div>
-        `;
-    } else {
-        itemPreviewElement = '<div style="font-size: 2.5rem;">🎭</div>';
-    }
-} else {
-    itemPreviewElement = '<div style="font-size: 2.5rem;">🎁</div>';
-}
-
-giftDiv.innerHTML = `
-    <div style="display: flex; align-items: center; gap: 15px;">
-        ${itemPreviewElement}
-        <div style="flex: 1;">
-            <strong>${gift.itemName}</strong><br>
-            <small>來自: ${gift.fromName}</small>
-        </div>
-    </div>
-    <button class="shop-btn use-btn" onclick="claimGift('${giftId}', '${gift.itemId}', '${gift.itemType}')">領取</button>
-`;
-
-                    shopItems.appendChild(giftDiv);
-                });
-            } else {
-                const emptyDiv = document.createElement('div');
-                emptyDiv.style.cssText = `
-                    text-align: center;
-                    padding: 40px;
-                    color: #666;
-                `;
-                emptyDiv.innerHTML = `
-                    <i class="fas fa-gift" style="font-size: 3rem; margin-bottom: 20px; color: #ddd;"></i>
-                    <p>你還沒有收到任何禮物！</p>
-                `;
-                shopItems.appendChild(emptyDiv);
-            }
-        }).catch((error) => {
-            console.error('載入禮物失敗:', error);
-            shopItems.innerHTML = '<p>載入禮物時發生錯誤，請稍後再試。</p>';
-        });
-        return;
-    }
-
-
     let items, purchasedArray, currentItem;
     
     if (tab === 'expressions') {
@@ -4572,11 +2958,7 @@ giftDiv.innerHTML = `
         purchasedArray = [];
         currentItem = null;
         
-
-
-
-
-// 為盲盒創建特殊渲染邏輯
+        // 為盲盒創建特殊渲染邏輯
         items.forEach(item => {
             const itemDiv = document.createElement('div');
             itemDiv.className = 'shop-item';
@@ -4592,23 +2974,12 @@ giftDiv.innerHTML = `
             priceElement.className = 'price';
             priceElement.textContent = `${item.price} 點`;
             
-           const buttonElement = document.createElement('button');
-const freeDraws = (userData.freeMysteryboxDraws && userData.freeMysteryboxDraws[item.id]) || 0;
-
-if (freeDraws > 0) {
-    buttonElement.className = 'shop-btn use-btn';
-    buttonElement.disabled = false;
-    buttonElement.textContent = `免費抽獎 (${freeDraws})`;
-    buttonElement.style.background = '#50c878';
-} else {
-    buttonElement.className = 'shop-btn buy-btn';
-    buttonElement.disabled = userData.points < item.price;
-    buttonElement.textContent = '抽獎';
-}
-
-            buttonElement.onclick = (e) => {
-    e.stopPropagation(); // 阻止事件冒泡
-    if (purchaseItem(item.id, 'mysterybox')) {
+            const buttonElement = document.createElement('button');
+            buttonElement.className = 'shop-btn buy-btn';
+            buttonElement.disabled = userData.points < item.price;
+            buttonElement.textContent = '抽獎';
+            buttonElement.onclick = () => {
+                if (purchaseItem(item.id, 'mysterybox')) {
                     // 抽盲盒邏輯在 purchaseItem 中處理
                 }
             };
@@ -4630,23 +3001,8 @@ if (freeDraws > 0) {
             itemDiv.appendChild(priceElement);
             itemDiv.appendChild(buttonElement);
             itemDiv.appendChild(descElement);
-
-// 修改盲盒的送禮圖標
-const giftIcon = document.createElement('i');
-giftIcon.className = 'fas fa-gift gift-icon';
-giftIcon.style.position = 'absolute';
-giftIcon.style.top = '5px';
-giftIcon.style.left = '5px';
-giftIcon.style.cursor = 'pointer';
-giftIcon.onclick = (e) => {
-    e.stopPropagation();
-    openMysteryboxGiftModal(item);
-};
-itemDiv.appendChild(giftIcon);
-
             shopItems.appendChild(itemDiv);
         });
-
         
         // 添加隱藏商品換領區
         const redeemDiv = document.createElement('div');
@@ -4895,20 +3251,10 @@ itemDiv.appendChild(giftIcon);
         }
         
         itemDiv.appendChild(previewDiv);
-if (!item.isHidden) {
-    const giftIcon = document.createElement('i');
-    giftIcon.className = 'fas fa-gift gift-icon';
-    giftIcon.style.position = 'absolute';
-    giftIcon.style.top = '5px';
-    giftIcon.style.left = '5px';
-    giftIcon.style.cursor = 'pointer';
-    giftIcon.onclick = () => openGiftSendModal(item);
-    itemDiv.appendChild(giftIcon);
-}
-itemDiv.appendChild(nameElement);
-itemDiv.appendChild(priceElement);
-itemDiv.appendChild(buttonElement);
-shopItems.appendChild(itemDiv);
+        itemDiv.appendChild(nameElement);
+        itemDiv.appendChild(priceElement);
+        itemDiv.appendChild(buttonElement);
+        shopItems.appendChild(itemDiv);
     });
 }
 
@@ -4928,38 +3274,29 @@ shopItems.appendChild(itemDiv);
 
         // 創建紙屑效果
         function createConfetti() {
-    const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffa500', '#ff69b4'];
-    const confettiCount = 150;
-    
-    for (let i = 0; i < confettiCount; i++) {
-        const confetti = document.createElement('div');
-        confetti.className = 'confetti';
-        confetti.style.left = `${Math.random() * 100}%`;
-        confetti.style.top = `${Math.random() * 20}%`;
-        confetti.style.width = `${Math.random() * 15 + 8}px`;
-        confetti.style.height = `${Math.random() * 15 + 8}px`;
-        confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
-        confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
-        confetti.style.setProperty('--random-x', `${(Math.random() - 0.5) * 400}px`);
-        confetti.style.animationDelay = `${Math.random() * 2}s`;
-        confetti.style.animationDuration = `${Math.random() * 2 + 3}s`;
-        confetti.style.zIndex = '10';
-        
-        // 添加3D旋轉效果
-        const randomRotate = Math.random() * 360;
-        confetti.style.transform = `rotateZ(${randomRotate}deg)`;
-        
-        mysteryboxAnimation.appendChild(confetti);
-        
-        // 動畫結束後移除紙屑元素
-        setTimeout(() => {
-            if (confetti.parentNode) {
-                confetti.parentNode.removeChild(confetti);
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+            const confettiCount = 100;
+            
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.width = `${Math.random() * 10 + 5}px`;
+                confetti.style.height = `${Math.random() * 10 + 5}px`;
+                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                confetti.style.animation = `confetti-fall ${Math.random() * 2 + 3}s ease forwards`;
+                
+                mysteryboxAnimation.appendChild(confetti);
+                
+                // 動畫結束後移除紙屑元素
+                setTimeout(() => {
+                    if (confetti.parentNode) {
+                        confetti.parentNode.removeChild(confetti);
+                    }
+                }, 5000);
             }
-        }, 6000);
-    }
-}
-
+        }
 
         // 顯示通知
         function showNotification(text) {
@@ -5018,16 +3355,14 @@ shopItems.appendChild(itemDiv);
             }
         });
 
-     // 商店標籤事件（包含動態添加的禮物標籤）
-document.addEventListener('click', (e) => {
-    if (e.target.classList.contains('tab') && e.target.closest('.shop-tabs')) {
-        // 移除所有商店標籤的active狀態
-        e.target.closest('.shop-tabs').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        e.target.classList.add('active');
-        renderShopItems(e.target.dataset.tab);
-    }
-});
-
+        // 商店標籤事件
+        shopTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                shopTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                renderShopItems(tab.dataset.tab);
+            });
+        });
 
         // VTUBER 嘴型動畫控制
         function startTalking() {
@@ -5394,7 +3729,7 @@ document.addEventListener('click', (e) => {
                 
                 let systemPrompt = '';
                 if (mode === 'comfort') {
-                    systemPrompt = `你係一個中學DSE中文老師，非常風趣幽默、毒舌，喜歡在回應問題時揶揄學生（但不會傷學生自尊心），但又有正經嚴肅的一面。你的語文知識豐富。請用繁體中文同香港粵語回應，說話要貼近日常生活，但不要市井粗俗，要顯得有文化。${personalityPrompt} 
+                    systemPrompt = `你係一個中學DSE中文老師，非常風趣幽默，但又有正經嚴肅的一面。你的語文知識豐富。請用繁體中文同香港粵語回應，說話要貼近日常生活，但不要市井粗俗，要顯得有文化。${personalityPrompt} 
 
 重要規則：你的回應必須是純淨的文字格式，絕對不可以包含任何格式符號，包括但不限於：
 - 絕對不可以使用星號，如「**文字**」或「*文字*」
@@ -5411,7 +3746,7 @@ document.addEventListener('click', (e) => {
 
 以下是閱讀卷筆記需評估答題方向是否合理、文本依據是否充實具體、闡釋推論是否嚴謹、主題句是否清晰。文本依據應概括歸納而非直接引用原文，除非題目中有『摘錄』字眼。改寫範例應使答案更圓足，但若學生答題方向錯誤，則不跟從錯誤方向改寫。在「改寫範例」前，加入答題步驟及思路，描述各部分方向，步驟因題制宜，可能包括【鋪墊】、【回應】、【文本依據】、【闡釋】，靈活運用。`;
                 } else {
-                    systemPrompt = `你係一個中學DSE中文老師，非常風趣幽默、毒舌，喜歡在回應問題時揶揄學生（但不會傷學生自尊心），但又有正經嚴肅的一面。你的語文知識豐富。請用繁體中文同香港粵語回應，說話要貼近日常生活，但不要市井粗俗，要顯得有文化。${personalityPrompt} 
+                    systemPrompt = `你係一個中學DSE中文老師，非常風趣幽默，但又有正經嚴肅的一面。你的語文知識豐富。請用繁體中文同香港粵語回應，說話要貼近日常生活，但不要市井粗俗，要顯得有文化。${personalityPrompt} 
 
 重要規則：你的回應必須是純淨的文字格式，絕對不可以包含任何格式符號，包括但不限於：
 - 絕對不可以使用星號，如「**文字**」或「*文字*」
@@ -5575,17 +3910,8 @@ document.addEventListener('click', (e) => {
         vtuberContainer.addEventListener('mousedown', handleDragStart);
         vtuberContainer.addEventListener('touchstart', handleDragStart);
 
-        // 替換現有的DOMContentLoaded事件
-document.addEventListener('DOMContentLoaded', () => {
-    // 檢查用戶登入狀態
-    auth.onAuthStateChanged((user) => {
-        if (user) {
-            currentUser = user;
-            loadUserProfile();
-            showMainInterface();
-            initUserData();
-            
-            // 原有的問候語代碼
+        // 初始問候語
+        document.addEventListener('DOMContentLoaded', () => {
             const greetings = [
                 "最近你又好似變蠢咗咁。點啊？有咩分享呀？",
                 "喂，你今日心情點呀？唔好話我知你又喺度發呆呀。",
@@ -5617,14 +3943,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!isSpeechRecognitionSupported()) {
                 addMessage("提示：您的瀏覽器不支援語音輸入功能，請使用最新版Chrome或Edge瀏覽器", 'error');
             }
-        } else {
-            showAuthInterface();
-        }
-    });
-    
-    initAuthEvents();
-    initFriendsEvents();
-});
+            
+            initUserData();
+        });
 
         // 開發者工具：調整飽腹值衰減速度
         // 在瀏覽器控制台中使用以下命令進行測試：
@@ -5636,1484 +3957,6 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('重置飽腹值: userData.hungerLevel = 100; updateHungerDisplay(); updateVtuberAppearance();');
         console.log('測試名稱功能: setVtuberName("新名稱");');
         console.log('文本清理修復已完成！現在所有輸出都將是純淨格式。');
-
-
-// 認證相關函數
-function showAuthInterface() {
-    authContainer.style.display = 'flex';
-    document.querySelector('.top-controls').style.display = 'none';
-    document.getElementById('chat-container').style.display = 'none';
-    document.querySelector('.vtuber-container').style.display = 'none';
-}
-
-function showMainInterface() {
-    authContainer.style.display = 'none';
-    document.querySelector('.top-controls').style.display = 'flex';
-    document.getElementById('chat-container').style.display = 'flex';
-    document.querySelector('.vtuber-container').style.display = 'flex';
-}
-
-function initAuthEvents() {
-    showRegisterLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        loginForm.style.display = 'none';
-        registerForm.style.display = 'block';
-    });
-    
-    showLoginLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        registerForm.style.display = 'none';
-        loginForm.style.display = 'block';
-    });
-    
-    loginBtn.addEventListener('click', () => {
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-password').value;
-        
-        auth.signInWithEmailAndPassword(email, password)
-            .catch((error) => {
-                alert('登入失敗: ' + error.message);
-            });
-    });
-    
-    registerBtn.addEventListener('click', () => {
-    const email = document.getElementById('register-email').value;
-    const password = document.getElementById('register-password').value;
-    const characterName = document.getElementById('register-character-name').value.trim();
-    
-    // 處理角色名稱，如果沒有以「蛋」結尾則自動添加
-    let finalCharacterName = characterName || email.split('@')[0];
-    if (!finalCharacterName.endsWith("蛋")) {
-        finalCharacterName = finalCharacterName + "蛋";
-    }
-    
-    auth.createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            currentUser = userCredential.user; // 設置當前用戶
-            // 初始化新用戶數據，傳入角色名稱
-            initializeNewUserData(finalCharacterName);
-            // 創建用戶基本資料
-            return database.ref('users/' + userCredential.user.uid).update({
-                characterName: finalCharacterName,
-                email: email,
-                avatar: finalCharacterName.charAt(0).toUpperCase(),
-                createdAt: firebase.database.ServerValue.TIMESTAMP
-            });
-        })
-        .then(() => {
-            alert('註冊成功，已初始化用戶數據！');
-        })
-        .catch((error) => {
-            alert('註冊失敗: ' + error.message);
-        });
-});
-    
-    logoutBtn.addEventListener('click', () => {
-        auth.signOut();
-    });
-}
-
-function loadUserProfile() {
-    database.ref('users/' + currentUser.uid).once('value')
-        .then((snapshot) => {
-            userProfile = snapshot.val();
-            if (!userProfile) {
-                // 如果沒有用戶資料，創建默認資料
-                let defaultName = currentUser.email.split('@')[0];
-                if (!defaultName.endsWith("蛋")) {
-                    defaultName = defaultName + "蛋";
-                }
-                userProfile = {
-                    characterName: defaultName,
-                    email: currentUser.email,
-                    avatar: defaultName.charAt(0).toUpperCase()
-                };
-                database.ref('users/' + currentUser.uid).set(userProfile);
-            }
-            
-            // 同步角色名稱到本地userData
-
-            if (userProfile.characterName) {
-                userData.vtuberName = userProfile.characterName;
-
-// 同步VTUBER外觀設置
-if (userProfile.vtuberAppearance) {
-    userData.currentExpression = userProfile.vtuberAppearance.currentExpression || 'default';
-    userData.currentHairstyle = userProfile.vtuberAppearance.currentHairstyle || 'default';
-} else {
-    userData.currentExpression = 'default';
-    userData.currentHairstyle = 'default';
-}
-
-                updateVtuberName();
-                saveUserData();
-            }
-        });
-}
-
-function checkNewGifts() {
-    database.ref('users/' + currentUser.uid + '/gifts').on('child_added', (snapshot) => {
-        const notification = document.getElementById('gift-notification');
-        notification.style.display = 'block';
-    });
-}
-
-auth.onAuthStateChanged((user) => {
-    if (user) {
-        checkNewGifts();
-    }
-});
-
-
-
-
-
-function showGiftNotification() {
-    const notification = document.getElementById('gift-notification');
-    notification.style.display = 'block';
-    setTimeout(() => {
-        notification.style.display = 'none';
-    }, 5000);
-}
-
-function closeGiftNotification() {
-    document.getElementById('gift-notification').style.display = 'none';
-}
-
-
-
-// 好友系統函數
-function initFriendsEvents() {
-    friendsButton.addEventListener('click', () => {
-        friendsModal.style.display = 'flex';
-        loadFriendsList();
-    });
-    
-    closeFriends.addEventListener('click', () => {
-        friendsModal.style.display = 'none';
-    });
-    
-    friendsTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            friendsTabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            
-            document.querySelectorAll('.friends-tab-content').forEach(content => {
-                content.style.display = 'none';
-            });
-            document.getElementById(tab.dataset.tab).style.display = 'block';
-            
-            if (tab.dataset.tab === 'friends-list') {
-                loadFriendsList();
-            } else if (tab.dataset.tab === 'friend-requests') {
-                loadFriendRequests();
-            }
-        });
-    });
-    
-    document.getElementById('send-friend-request').addEventListener('click', sendFriendRequest);
-    document.getElementById('friend-email').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            sendFriendRequest();
-        }
-    });
-}
-
-function sendFriendRequest() {
-    const email = document.getElementById('friend-email').value.trim();
-    if (!email) {
-        alert('請輸入電子郵件地址');
-        return;
-    }
-    
-    // 根據email查找用戶
-    database.ref('users').orderByChild('email').equalTo(email).once('value')
-        .then((snapshot) => {
-            if (snapshot.exists()) {
-                const userData = Object.entries(snapshot.val())[0];
-                const friendId = userData[0];
-                
-                if (friendId === currentUser.uid) {
-                    alert('不能添加自己為好友');
-                    return;
-                }
-                
-                // 檢查是否已經是好友
-                return database.ref('friends/' + currentUser.uid + '/' + friendId).once('value');
-            } else {
-                throw new Error('找不到此電子郵件的用戶');
-            }
-        })
-        .then((friendSnapshot) => {
-            if (friendSnapshot.exists()) {
-                alert('該用戶已經是您的好友');
-                return;
-            }
-            
-            // 檢查是否已經發送過申請
-            return database.ref('friendRequests').orderByChild('from').equalTo(currentUser.uid).once('value');
-        })
-        .then((requestsSnapshot) => {
-            if (requestsSnapshot.exists()) {
-                const requests = requestsSnapshot.val();
-                const userData = Object.entries(database.ref('users').orderByChild('email').equalTo(document.getElementById('friend-email').value.trim()))[0];
-                const friendId = userData ? userData[0] : null;
-                
-                const existingRequest = Object.values(requests).find(req => 
-                    req.to === friendId && req.status === 'pending'
-                );
-                
-                if (existingRequest) {
-                    alert('已經向該用戶發送過好友申請');
-                    return;
-                }
-            }
-            
-            // 重新獲取朋友ID用於發送申請
-            return database.ref('users').orderByChild('email').equalTo(document.getElementById('friend-email').value.trim()).once('value');
-        })
-        .then((snapshot) => {
-            if (snapshot && snapshot.exists()) {
-                const userData = Object.entries(snapshot.val())[0];
-                const friendId = userData[0];
-                
-                // 發送好友申請
-                const requestData = {
-                    from: currentUser.uid,
-                    to: friendId,
-                    status: 'pending',
-                    timestamp: firebase.database.ServerValue.TIMESTAMP
-                };
-                
-                return database.ref('friendRequests').push(requestData);
-            }
-        })
-        .then(() => {
-            alert('好友申請已發送');
-            document.getElementById('friend-email').value = '';
-        })
-        .catch((error) => {
-            console.error('發送好友申請失敗:', error);
-            alert('發送好友申請失敗: ' + error.message);
-        });
-}
-
-function loadFriendsList() {
-    const container = document.getElementById('friends-list-container');
-    container.innerHTML = '';
-    
-    database.ref('friends/' + currentUser.uid).once('value')
-        .then((snapshot) => {
-            if (snapshot.exists()) {
-                const friends = snapshot.val();
-                Object.keys(friends).forEach(friendId => {
-                    loadFriendInfo(friendId, container);
-                });
-            } else {
-                container.innerHTML = '<p>還沒有好友，快去添加吧！</p>';
-            }
-        });
-}
-
-function loadFriendInfo(friendId, container) {
-    const friendRef = database.ref('users/' + friendId);
-    friendRef.on('value', (snapshot) => {
-        const friendData = snapshot.val();
-        if (friendData) {
-            const appearance = friendData.vtuberAppearance || {
-                currentExpression: 'default',
-                currentHairstyle: 'default'
-            };
-            updateFriendAvatar(friendId, appearance, container);
-        }
-    });
-}
-
-function updateFriendAvatar(friendId, appearance, container, isRequest = false, requestId = null) {
-    let friendItem = container.querySelector(`[data-friend-id="${friendId}"]`);
-    if (!friendItem) {
-        friendItem = document.createElement('div');
-        friendItem.className = 'friend-item';
-        friendItem.dataset.friendId = friendId;
-        container.appendChild(friendItem);
-    }
-
-    friendItem.innerHTML = '';
-    const avatarElement = createVtuberAvatar(appearance, 50);
-    avatarElement.className = 'friend-avatar';
-    avatarElement.style.marginRight = '15px';
-
-    database.ref('users/' + friendId).once('value').then((snapshot) => {
-        const friendData = snapshot.val();
-        const infoDiv = document.createElement('div');
-        infoDiv.className = 'friend-info';
-        infoDiv.innerHTML = `
-            <div><strong>${friendData.characterName || friendData.username || '未命名'}</strong></div>
-            <div>${friendData.email}</div>
-        `;
-
-        const actionsDiv = document.createElement('div');
-    actionsDiv.className = 'friend-actions';
-    if (isRequest) {
-        actionsDiv.innerHTML = `
-            <button class="accept-btn" onclick="acceptFriendRequest('${requestId}', '${friendId}')">接受</button>
-            <button class="reject-btn" onclick="rejectFriendRequest('${requestId}')">拒絕</button>
-        `;
-    } else {
-       actionsDiv.innerHTML = '';
-    }
-
-        friendItem.appendChild(avatarElement);
-        friendItem.appendChild(infoDiv);
-        friendItem.appendChild(actionsDiv);
-    });
-}
-
-function loadFriendRequests() {
-    const container = document.getElementById('friend-requests-container');
-    container.innerHTML = '';
-    
-    database.ref('friendRequests').orderByChild('to').equalTo(currentUser.uid).once('value')
-        .then((snapshot) => {
-            if (snapshot.exists()) {
-                const requests = snapshot.val();
-                Object.entries(requests).forEach(([requestId, request]) => {
-                    if (request.status === 'pending') {
-                        loadRequestInfo(requestId, request, container);
-                    }
-                });
-            } else {
-                container.innerHTML = '<p>沒有待處理的好友申請</p>';
-            }
-        });
-}
-
-function loadRequestInfo(requestId, request, container) {
-    const userRef = database.ref('users/' + request.from);
-    userRef.on('value', (snapshot) => {
-        const userData = snapshot.val();
-        if (userData) {
-            const appearance = userData.vtuberAppearance || {
-                currentExpression: 'default',
-                currentHairstyle: 'default'
-            };
-            updateFriendAvatar(request.from, appearance, container, true, requestId);
-        }
-    });
-}
-
-function acceptFriendRequest(requestId, friendId) {
-    // 更新好友申請狀態
-    database.ref('friendRequests/' + requestId).update({ status: 'accepted' })
-        .then(() => {
-            // 添加雙向好友關係
-            const updates = {};
-            updates['friends/' + currentUser.uid + '/' + friendId] = true;
-            updates['friends/' + friendId + '/' + currentUser.uid] = true;
-            
-            return database.ref().update(updates);
-        })
-        .then(() => {
-            alert('已接受好友申請');
-            loadFriendRequests();
-            loadFriendsList(); // 添加這一行來刷新好友列表
-        })
-        .catch((error) => {
-            console.error('接受好友申請失敗:', error);
-            alert('操作失敗: ' + error.message);
-        });
-}
-
-
-function rejectFriendRequest(requestId) {
-    database.ref('friendRequests/' + requestId).update({ status: 'rejected' })
-        .then(() => {
-            alert('已拒絕好友申請');
-            loadFriendRequests();
-        })
-        .catch((error) => {
-            console.error('拒絕好友申請失敗:', error);
-            alert('操作失敗: ' + error.message);
-        });
-}
-
-
-function loadChatList() {
-    const container = document.getElementById('friends-chat-list');
-    container.innerHTML = '';
-    
-    database.ref('friends/' + currentUser.uid).once('value')
-        .then((snapshot) => {
-            if (snapshot.exists()) {
-                const friends = snapshot.val();
-                Object.keys(friends).forEach(friendId => {
-                    loadChatFriendInfo(friendId, container);
-                });
-            } else {
-                container.innerHTML = '<p>還沒有好友可以聊天</p>';
-            }
-        });
-}
-
-function loadChatFriendInfo(friendId, container) {
-    database.ref('users/' + friendId).once('value')
-        .then((snapshot) => {
-            const friendData = snapshot.val();
-            if (friendData) {
-                getUserVtuberAppearance(friendId, (appearance) => {
-                    const friendItem = document.createElement('div');
-                    friendItem.className = 'friend-item';
-                    friendItem.style.cursor = 'pointer';
-                    friendItem.onclick = () => openChat(friendId, friendData.characterName || friendData.username);
-                    
-                    const avatarElement = createVtuberAvatar(appearance, 50);
-                    avatarElement.className = 'friend-avatar';
-                    avatarElement.style.marginRight = '15px';
-                    
-                    const infoDiv = document.createElement('div');
-                    infoDiv.className = 'friend-info';
-                    infoDiv.innerHTML = `
-                        <div><strong>${friendData.characterName || friendData.username || '未命名'}</strong></div>
-                        <div>點擊開始聊天</div>
-                    `;
-                    
-                    friendItem.appendChild(avatarElement);
-                    friendItem.appendChild(infoDiv);
-                    container.appendChild(friendItem);
-                });
-            }
-        });
-}
-
-// 獲取用戶的VTUBER外觀信息
-function getUserVtuberAppearance(userId, callback) {
-    database.ref('users/' + userId + '/vtuberAppearance').once('value')
-        .then((snapshot) => {
-            const appearanceData = snapshot.val();
-            if (appearanceData) {
-                callback(appearanceData);
-            } else {
-                callback({
-                    currentExpression: 'default',
-                    currentHairstyle: 'default'
-                });
-            }
-        })
-        .catch((error) => {
-            console.error('獲取VTUBER外觀失敗:', error);
-            callback({
-                currentExpression: 'default',
-                currentHairstyle: 'default'
-            });
-        });
-}
-
-// 創建VTUBER頭像元素
-function createVtuberAvatar(appearance, size = 50) {
-    const avatarContainer = document.createElement('div');
-    avatarContainer.style.cssText = `
-        width: ${size}px;
-        height: ${size}px;
-        border-radius: 50%;
-        background: #fde2e4;
-        position: relative;
-        overflow: hidden;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: 2px solid var(--primary);
-    `;
-    
-    const face = document.createElement('div');
-    face.style.cssText = `
-        width: ${size * 0.8}px;
-        height: ${size * 0.8}px;
-        border-radius: 50%;
-        background: #fde2e4;
-        position: relative;
-        overflow: hidden;
-    `;
-    
-    // 添加髮型
-    const expression = expressions.find(e => e.id === appearance.currentExpression) || expressions[0];
-    const hairstyle = hairstyles.find(h => h.id === appearance.currentHairstyle) || hairstyles[0];
-    
-    if (expression.className) {
-        face.classList.add(expression.className);
-    }
-    
-    const hair = document.createElement('div');
-    hair.style.cssText = `
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 60%;
-        z-index: 2;
-    `;
-    if (hairstyle.className) {
-        hair.classList.add(hairstyle.className);
-    }
-    
-    // 添加眼睛
-    const eyes = document.createElement('div');
-    eyes.style.cssText = `
-        position: absolute;
-        top: 40%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: ${size * 0.6}px;
-        height: ${size * 0.2}px;
-        display: flex;
-        justify-content: space-between;
-        z-index: 3;
-    `;
-    
-    for (let i = 0; i < 2; i++) {
-        const eye = document.createElement('div');
-        eye.style.cssText = `
-            width: ${size * 0.2}px;
-            height: ${size * 0.15}px;
-            background: #fff;
-            border-radius: 50%;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        `;
-        
-        const pupil = document.createElement('div');
-        pupil.style.cssText = `
-            width: ${size * 0.08}px;
-            height: ${size * 0.08}px;
-            background: #333;
-            border-radius: 50%;
-        `;
-        
-        eye.appendChild(pupil);
-        eyes.appendChild(eye);
-    }
-    
-    // 添加嘴巴
-    const mouth = document.createElement('div');
-    mouth.style.cssText = `
-        position: absolute;
-        bottom: ${size * 0.2}px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: ${size * 0.25}px;
-        height: ${size * 0.1}px;
-        background: #ff9aa2;
-        border-radius: 0 0 ${size * 0.15}px ${size * 0.15}px;
-        z-index: 3;
-    `;
-    
-    face.appendChild(hair);
-    face.appendChild(eyes);
-    face.appendChild(mouth);
-    avatarContainer.appendChild(face);
-    
-    return avatarContainer;
-}
-
-
-function openChat(friendId, friendName) {
-    currentChatFriend = friendId;
-    document.getElementById('friends-chat-list').style.display = 'none';
-    document.getElementById('chat-window').style.display = 'block';
-    document.getElementById('current-friend-name').textContent = friendName;
-    
-    loadChatMessages();
-    
-    document.getElementById('back-to-chat-list').onclick = () => {
-        document.getElementById('chat-window').style.display = 'none';
-        document.getElementById('friends-chat-list').style.display = 'block';
-        currentChatFriend = null;
-    };
-}
-
-function loadChatMessages() {
-    const chatId = [currentUser.uid, currentChatFriend].sort().join('_');
-    const container = document.getElementById('chat-messages');
-    container.innerHTML = '';
-    
-    // 先設置參與者
-    const updates = {};
-    updates[`chats/${chatId}/participants/${currentUser.uid}`] = true;
-    updates[`chats/${chatId}/participants/${currentChatFriend}`] = true;
-    
-    database.ref().update(updates).then(() => {
-        // 然後監聽消息
-        database.ref('chats/' + chatId + '/messages').orderByChild('timestamp').on('value', (snapshot) => {
-            container.innerHTML = '';
-            if (snapshot.exists()) {
-                const messages = snapshot.val();
-                Object.values(messages).forEach(message => {
-                    const messageDiv = document.createElement('div');
-                    messageDiv.className = `chat-message ${message.from === currentUser.uid ? 'sent' : 'received'}`;
-                    messageDiv.innerHTML = `
-                        <div>${message.text}</div>
-                        <small>${new Date(message.timestamp).toLocaleString()}</small>
-                    `;
-                    container.appendChild(messageDiv);
-                });
-                container.scrollTop = container.scrollHeight;
-            }
-        });
-    }).catch((error) => {
-        console.error('設置聊天室參與者失敗:', error);
-    });
-}
-
-function sendChatMessage() {
-    const input = document.getElementById('chat-message-input');
-    const message = input.value.trim();
-    if (!message || !currentChatFriend) return;
-    
-    const chatId = [currentUser.uid, currentChatFriend].sort().join('_');
-    const messageData = {
-        from: currentUser.uid,
-        text: message,
-        timestamp: firebase.database.ServerValue.TIMESTAMP
-    };
-    
-    // 同時設置參與者信息以符合安全規則
-    const updates = {};
-    updates[`chats/${chatId}/messages`] = firebase.database().ref(`chats/${chatId}/messages`).push().key;
-    updates[`chats/${chatId}/messages/${updates[`chats/${chatId}/messages`]}`] = messageData;
-    updates[`chats/${chatId}/participants/${currentUser.uid}`] = true;
-    updates[`chats/${chatId}/participants/${currentChatFriend}`] = true;
-    
-    database.ref().update(updates)
-        .then(() => {
-            input.value = '';
-        })
-        .catch((error) => {
-            console.error('發送消息失敗:', error);
-        });
-}
-
-// 添加Enter鍵發送消息
-document.getElementById('chat-message-input').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        sendChatMessage();
-    }
-});
-
-
-
-function openGiftModal(friendId, friendName) {
-    currentGiftReceiver = friendId;
-    
-    // 創建送禮彈窗
-    const modal = document.createElement('div');
-    modal.className = 'gift-modal';
-    modal.innerHTML = `
-    <div class="gift-modal-content">
-        <div class="modal-header">
-            <h2><i class="fas fa-gift"></i> 送出 ${item.name}</h2>
-            <button class="close-modal" onclick="closeGiftModal()">×</button>
-        </div>
-        <div class="points-display">
-            <i class="fas fa-coins"></i>
-            <span>我的點數: ${userData.points}</span>
-        </div>
-        <p>選擇一位好友送出此商品：</p>
-        <div id="friend-select-list" style="max-height: 300px; overflow-y: auto;"></div>
-        <div style="text-align: center; margin-top: 20px;">
-            <button class="shop-btn buy-btn" id="confirm-gift-btn" disabled>確認送禮</button>
-        </div>
-    </div>
-`;
-
-    
-    document.body.appendChild(modal);
-    modal.style.display = 'flex';
-    
-    renderGiftItems();
-    loadReceivedGifts();
-}
-
-function closeGiftModal() {
-    const modal = document.querySelector('.gift-modal');
-    if (modal) {
-        modal.remove();
-    }
-    // 重置全局變量
-    currentGiftReceiver = null;
-    selectedGiftItem = null;
-}
-
-// 新增：盲盒送禮專用彈窗
-function openMysteryboxGiftModal(mysteryboxItem) {
-    currentGiftReceiver = null;
-    selectedGiftItem = mysteryboxItem;
-    
-    const modal = document.createElement('div');
-    modal.className = 'gift-modal';
-    modal.innerHTML = `
-        <div class="gift-modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-gift"></i> 送出 ${mysteryboxItem.name}</h2>
-                <button class="close-modal" onclick="closeGiftModal()">×</button>
-            </div>
-            <div class="points-display">
-                <i class="fas fa-coins"></i>
-                <span>我的點數: ${userData.points}</span>
-            </div>
-            <p>選擇一位好友送出盲盒，對方領取時將立即進行抽獎：</p>
-            <div id="friend-select-list"></div>
-            <div style="text-align: center; margin-top: 20px;">
-                <button class="shop-btn buy-btn" id="confirm-mysterybox-gift-btn" disabled>確認送禮</button>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
-    modal.style.display = 'flex';
-
-    loadFriendsForMysteryboxGift(mysteryboxItem);
-}
-
-// 新增：為盲盒送禮載入好友列表
-function loadFriendsForMysteryboxGift(mysteryboxItem) {
-    const friendList = document.getElementById('friend-select-list');
-    
-    if (!currentUser) {
-        friendList.innerHTML = '<p>請先登入！</p>';
-        return;
-    }
-    
-    database.ref('friends/' + currentUser.uid).once('value').then((snapshot) => {
-        if (snapshot.exists()) {
-            const friends = snapshot.val();
-            const friendPromises = Object.keys(friends).map(friendId => {
-                return database.ref('users/' + friendId).once('value').then((friendSnapshot) => {
-                    return { id: friendId, data: friendSnapshot.val() };
-                });
-            });
-            
-            Promise.all(friendPromises).then((friendsData) => {
-                friendList.innerHTML = '';
-                friendList.style.cssText = `
-                    max-height: 400px;
-                    overflow-y: auto;
-                    padding: 10px 0;
-                `;
-                
-                friendsData.forEach(({ id: friendId, data: friendData }) => {
-                    if (friendData) {
-                        const friendDiv = document.createElement('div');
-                        friendDiv.className = 'friend-item';
-                        friendDiv.style.cssText = `
-                            display: flex;
-                            align-items: center;
-                            padding: 15px;
-                            margin-bottom: 10px;
-                            border: 1px solid #e2e8f0;
-                            border-radius: 10px;
-                            background: white;
-                            transition: all 0.3s ease;
-                            justify-content: space-between;
-                            min-width: 400px;
-                        `;
-
-                        const avatarElement = createVtuberAvatar(
-                            friendData.vtuberAppearance || { currentExpression: 'default', currentHairstyle: 'default' }, 
-                            50
-                        );
-                        avatarElement.style.marginRight = '15px';
-
-                        const leftSection = document.createElement('div');
-                        leftSection.style.cssText = `
-                            display: flex;
-                            align-items: center;
-                            flex: 1;
-                            min-width: 0;
-                            margin-right: 15px;
-                        `;
-
-                        const infoDiv = document.createElement('div');
-                        infoDiv.className = 'friend-info';
-                        infoDiv.innerHTML = `<strong>${friendData.characterName || friendData.email}</strong>`;
-
-                        const selectBtn = document.createElement('button');
-                        selectBtn.className = 'shop-btn buy-btn select-mysterybox-friend-btn';
-                        selectBtn.setAttribute('data-friend-id', friendId);
-                        selectBtn.style.cssText = `
-                            background: #4a90e2;
-                            padding: 10px 16px;
-                            border-radius: 8px;
-                            font-size: 0.9rem;
-                            min-width: 80px;
-                            max-width: 100px;
-                            font-weight: bold;
-                            transition: all 0.3s ease;
-                            flex-shrink: 0;
-                        `;
-                        selectBtn.textContent = '選擇';
-
-                        leftSection.appendChild(avatarElement);
-                        leftSection.appendChild(infoDiv);
-
-                        friendDiv.appendChild(leftSection);
-                        friendDiv.appendChild(selectBtn);
-                        friendList.appendChild(friendDiv);
-                    }
-                });
-                
-                bindMysteryboxGiftSelectionEvents(mysteryboxItem);
-            });
-        } else {
-            friendList.innerHTML = '<p style="text-align: center; padding: 40px; color: #666;">你還沒有好友可以送禮！</p>';
-        }
-    }).catch((error) => {
-        console.error('載入好友列表失敗:', error);
-        friendList.innerHTML = '<p style="text-align: center; padding: 40px; color: #e74c3c;">載入好友列表失敗，請重試。</p>';
-    });
-}
-
-// 新增：綁定盲盒送禮選擇事件
-function bindMysteryboxGiftSelectionEvents(mysteryboxItem) {
-    const selectButtons = document.querySelectorAll('.select-mysterybox-friend-btn');
-    const confirmBtn = document.getElementById('confirm-mysterybox-gift-btn');
-    
-    selectButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            const friendId = this.getAttribute('data-friend-id');
-            
-            currentGiftReceiver = friendId;
-            selectedGiftItem = mysteryboxItem;
-            
-            // 重置所有按鈕狀態
-            selectButtons.forEach(btn => {
-                btn.classList.remove('active');
-                btn.style.background = '#4a90e2';
-                btn.textContent = '選擇';
-            });
-            
-            // 設置當前選中按鈕狀態
-            this.classList.add('active');
-            this.style.background = '#ff6b9d';
-            this.textContent = '已選擇';
-            
-            // 啟用確認按鈕
-            confirmBtn.disabled = false;
-            confirmBtn.style.background = '#ff6b9d';
-            
-            // 綁定確認按鈕事件
-            confirmBtn.onclick = function() {
-                if (currentGiftReceiver && selectedGiftItem) {
-                    sendMysteryboxGiftToFriend(selectedGiftItem, currentGiftReceiver);
-                } else {
-                    alert('送禮信息不完整，請重新選擇！');
-                }
-            };
-        });
-    });
-}
-
-// 新增：發送盲盒禮物給好友
-function sendMysteryboxGiftToFriend(mysteryboxItem, friendId) {
-    if (!mysteryboxItem || !friendId) {
-        alert('送禮信息不完整，請重新選擇！');
-        return;
-    }
-    
-    if (userData.points < mysteryboxItem.price) {
-        alert('點數不足！');
-        return;
-    }
-    
-    // 扣除點數
-    userData.points -= mysteryboxItem.price;
-    updatePointsDisplay();
-    saveUserData();
-    
-    // 準備盲盒禮物數據
-    const mysteryboxGiftData = {
-        from: currentUser.uid,
-        fromName: userProfile ? (userProfile.characterName || userProfile.email.split('@')[0]) : '未知用戶',
-        boxType: mysteryboxItem.id,
-        boxName: mysteryboxItem.name,
-        timestamp: firebase.database.ServerValue.TIMESTAMP
-    };
-    
-    // 發送盲盒禮物到 Firebase
-    database.ref('mysteryboxGifts').push(mysteryboxGiftData)
-        .then((ref) => {
-            // 將盲盒禮物ID記錄到接收者的禮物列表
-            const giftNotificationData = {
-                from: currentUser.uid,
-                fromName: userProfile ? (userProfile.characterName || userProfile.email.split('@')[0]) : '未知用戶',
-                itemId: ref.key,
-                itemType: 'mysteryboxGift',
-                itemName: `${mysteryboxItem.name}`,
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            };
-            
-            return database.ref('users/' + friendId + '/gifts').push(giftNotificationData);
-        })
-        .then(() => {
-            alert(`成功送出 ${mysteryboxItem.name} 給好友！`);
-            closeGiftModal();
-        })
-        .catch((error) => {
-            console.error('送禮失敗:', error);
-            alert('送禮失敗: ' + error.message);
-            // 回滾點數
-            userData.points += mysteryboxItem.price;
-            updatePointsDisplay();
-            saveUserData();
-        });
-}
-
-
-
-
-function renderGiftItems() {
-    const container = document.getElementById('gift-items');
-    container.innerHTML = '';
-    
-    // 只顯示商店中的商品（排除食物，因為食物是消耗品）
-    const allItems = [...expressions, ...hairstyles, ...personalities].filter(item => !item.isHidden);
-    
-    allItems.forEach(item => {
-        const itemDiv = document.createElement('div');
-        itemDiv.className = 'gift-item';
-        itemDiv.onclick = () => selectGiftItem(item, itemDiv);
-    console.log('點擊了禮物項目：', item);
-        
-        let previewContent = '';
-        if (expressions.includes(item)) {
-            previewContent = '😊';
-        } else if (hairstyles.includes(item)) {
-            previewContent = '💇';
-        } else if (personalities.includes(item)) {
-            previewContent = item.icon;
-        }
-        
-        itemDiv.innerHTML = `
-            <div style="font-size: 2rem; margin-bottom: 10px;">${previewContent}</div>
-            <h4>${item.name}</h4>
-            <div class="price">${item.price} 點</div>
-        `;
-        
-        container.appendChild(itemDiv);
-    });
-}
-
-function openGiftSendModal(item) {
-    // 先重置變量
-    currentGiftReceiver = null;
-    selectedGiftItem = null;
-    
-    const modal = document.createElement('div');
-    modal.className = 'gift-modal';
-    modal.innerHTML = `
-        <div class="gift-modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-gift"></i> 送出 ${item.name}</h2>
-                <button class="close-modal" onclick="closeGiftModal()">×</button>
-            </div>
-            <div class="points-display">
-                <i class="fas fa-coins"></i>
-                <span>我的點數: ${userData.points}</span>
-            </div>
-            <p>選擇一位好友送出此商品：</p>
-            <div id="friend-select-list"></div>
-            <div style="text-align: center; margin-top: 20px;">
-                <button class="shop-btn buy-btn" id="confirm-gift-btn" disabled>確認送禮</button>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
-    modal.style.display = 'flex';
-
-    // 載入好友列表
-    loadFriendsForGift(item);
-    
-    // 在 openGiftSendModal 函數中，找到並替換好友列表生成部分
-const friendList = document.getElementById('friend-select-list');
-database.ref('friends/' + currentUser.uid).once('value').then((snapshot) => {
-    if (snapshot.exists()) {
-        const friends = snapshot.val();
-        Object.keys(friends).forEach(friendId => {
-            database.ref('users/' + friendId).once('value').then((friendSnapshot) => {
-                const friendData = friendSnapshot.val();
-                const friendDiv = document.createElement('div');
-friendDiv.className = 'friend-item';
-friendDiv.style.cssText = `
-    display: flex;
-    align-items: center;
-    padding: 12px;
-    margin-bottom: 8px;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    background: white;
-    transition: all 0.3s ease;
-`;
-
-// 創建好友頭像
-const avatar = createVtuberAvatar(
-    friendData.vtuberAppearance || { currentExpression: 'default', currentHairstyle: 'default' }, 
-    40
-);
-avatar.style.marginRight = '12px';
-
-const infoDiv = document.createElement('div');
-infoDiv.className = 'friend-info';
-infoDiv.style.flex = '1';
-infoDiv.innerHTML = `<strong>${friendData.characterName || friendData.email}</strong>`;
-
-const selectBtn = document.createElement('button');
-selectBtn.className = 'shop-btn buy-btn select-friend-btn';
-selectBtn.setAttribute('data-friend-id', friendId);
-selectBtn.style.cssText = `
-    background: #4a90e2;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    min-width: 80px;
-`;
-selectBtn.textContent = '選擇';
-
-friendDiv.appendChild(avatar);
-friendDiv.appendChild(infoDiv);
-friendDiv.appendChild(selectBtn);
-
-                friendList.appendChild(friendDiv);
-            });
-        });
-        
-        // 添加事件監聽器
-        setTimeout(() => {
-            const selectButtons = friendList.querySelectorAll('.select-friend-btn');
-            selectButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const friendId = this.getAttribute('data-friend-id');
-  
-                });
-            });
-        }, 1000);
-        
-    } else {
-        friendList.innerHTML = '<p>你還沒有好友可以送禮！</p>';
-    }
-});
-
-function loadFriendsForGift(item) {
-    const friendList = document.getElementById('friend-select-list');
-    
-    if (!currentUser) {
-        friendList.innerHTML = '<p>請先登入！</p>';
-        return;
-    }
-    
-   database.ref('friends/' + currentUser.uid).once('value').then((snapshot) => {
-    if (snapshot.exists()) {
-        const friends = snapshot.val();
-        const friendPromises = Object.keys(friends).map(friendId => {
-            return database.ref('users/' + friendId).once('value').then((friendSnapshot) => {
-                return { id: friendId, data: friendSnapshot.val() };
-            });
-        });
-        
-        Promise.all(friendPromises).then((friendsData) => {
-            const friendList = document.getElementById('friend-select-list');
-            friendList.innerHTML = '';
-            friendList.style.cssText = `
-                max-height: 400px;
-                overflow-y: auto;
-                padding: 10px 0;
-            `;
-            
-            friendsData.forEach(({ id: friendId, data: friendData }) => {
-                if (friendData) {
-                    const friendDiv = document.createElement('div');
-                    friendDiv.className = 'friend-item';
-                    friendDiv.style.cssText = `
-    display: flex;
-    align-items: center;
-    padding: 15px;
-    margin-bottom: 10px;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    background: white;
-    transition: all 0.3s ease;
-    justify-content: space-between;
-    min-width: 400px; /* 增加容器最小寬度 */
-`;
-
-
-                    const avatarElement = createVtuberAvatar(
-                        friendData.vtuberAppearance || { currentExpression: 'default', currentHairstyle: 'default' }, 
-                        50
-                    );
-                    avatarElement.style.marginRight = '15px';
-
-                    const leftSection = document.createElement('div');
-                    leftSection.style.cssText = `
-    display: flex;
-    align-items: center;
-    flex: 1;
-    min-width: 0; /* 允許縮小 */
-    margin-right: 15px; /* 增加與按鈕的間距 */
-`;
-
-
-                    const infoDiv = document.createElement('div');
-                    infoDiv.className = 'friend-info';
-                    infoDiv.innerHTML = `<strong>${friendData.characterName || friendData.email}</strong>`;
-
-                    const selectBtn = document.createElement('button');
-                    selectBtn.className = 'shop-btn buy-btn select-friend-btn';
-                    selectBtn.setAttribute('data-friend-id', friendId);
-                    selectBtn.style.cssText = `
-    background: #4a90e2;
-    padding: 10px 16px; /* 減少左右內邊距 */
-    border-radius: 8px;
-    font-size: 0.9rem; /* 稍微減小字體 */
-    min-width: 80px; /* 減少按鈕最小寬度 */
-    max-width: 100px; /* 限制按鈕最大寬度 */
-    font-weight: bold;
-    transition: all 0.3s ease;
-    flex-shrink: 0; /* 防止按鈕被壓縮 */
-`;
-
-                    selectBtn.textContent = '選擇';
-
-                    leftSection.appendChild(avatarElement);
-                    leftSection.appendChild(infoDiv);
-
-                    friendDiv.appendChild(leftSection);
-                    friendDiv.appendChild(selectBtn);
-                    friendList.appendChild(friendDiv);
-                }
-            });
-            
-            // 重新綁定事件監聽器
-            bindGiftSelectionEvents(item);
-        });
-    } else {
-        const friendList = document.getElementById('friend-select-list');
-        friendList.innerHTML = '<p style="text-align: center; padding: 40px; color: #666;">你還沒有好友可以送禮！</p>';
-    }
-}).catch((error) => {
-    console.error('載入好友列表失敗:', error);
-    const friendList = document.getElementById('friend-select-list');
-    friendList.innerHTML = '<p style="text-align: center; padding: 40px; color: #e74c3c;">載入好友列表失敗，請重試。</p>';
-});
-
-}
-
-function bindGiftSelectionEvents(item) {
-    const selectButtons = document.querySelectorAll('.select-friend-btn');
-    const confirmBtn = document.getElementById('confirm-gift-btn');
-    
-    selectButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            const friendId = this.getAttribute('data-friend-id');
-            
-            // 設置全局變量
-            currentGiftReceiver = friendId;
-            selectedGiftItem = item;
-            
-            // 重置所有按鈕狀態
-            selectButtons.forEach(btn => {
-                btn.classList.remove('active');
-                btn.style.background = '#4a90e2';
-                btn.textContent = '選擇';
-            });
-            
-            // 設置當前選中按鈕狀態
-            this.classList.add('active');
-            this.style.background = '#ff6b9d';
-            this.textContent = '已選擇';
-            
-            // 啟用確認按鈕
-            confirmBtn.disabled = false;
-            confirmBtn.style.background = '#ff6b9d';
-            
-            // 綁定確認按鈕事件
-            confirmBtn.onclick = function() {
-                if (currentGiftReceiver && selectedGiftItem) {
-                    sendGiftToFriend(selectedGiftItem, currentGiftReceiver);
-                } else {
-                    alert('送禮信息不完整，請重新選擇！');
-                }
-            };
-        });
-    });
-}
-
-
-    
-function selectGiftReceiver(friendId, button, item) {
-    console.log('選擇好友:', friendId, '商品:', item);
-    currentGiftReceiver = friendId;
-    selectedGiftItem = item;
-    
-    // 重置所有按鈕狀態
-    document.querySelectorAll('.select-friend-btn').forEach(btn => {
-        btn.classList.remove('active');
-        btn.style.background = '#4a90e2';
-        btn.textContent = '選擇';
-    });
-    
-    // 設置當前選中按鈕狀態
-    button.classList.add('active');
-    button.style.background = '#ff6b9d';
-    button.textContent = '已選擇';
-    
-    // 啟用確認按鈕
-    const confirmBtn = document.getElementById('confirm-gift-btn');
-    confirmBtn.disabled = false;
-    confirmBtn.style.background = '#ff6b9d';
-    
-    // 設置確認按鈕點擊事件
-    confirmBtn.onclick = () => {
-        sendGiftToFriend(item, friendId);
-    };
-}
-
-
-}
-
-
-
-
-
-function selectGiftItem(item, element) {
-    // 移除其他選中狀態
-    document.querySelectorAll('.gift-item').forEach(el => el.classList.remove('selected'));
-    
-    // 選中當前項目
-    element.classList.add('selected');
-    selectedGiftItem = item;
-    
-    // 啟用送禮按鈕
-    document.getElementById('send-gift-btn').disabled = false;
-}
-
-function sendGiftToFriend(item, friendId) {
-    if (!item || !friendId) {
-        alert('送禮信息不完整，請重新選擇！');
-        return;
-    }
-    
-    if (userData.points < item.price) {
-        alert('點數不足！');
-        return;
-    }
-    
-    // 扣除點數
-    userData.points -= item.price;
-    updatePointsDisplay();
-    saveUserData();
-    
-    // 準備禮物數據，確保符合Firebase規則
-    const giftData = {
-        from: currentUser.uid,
-        fromName: userProfile ? (userProfile.characterName || userProfile.email.split('@')[0]) : '未知用戶',
-        itemId: item.id,
-        itemType: getItemTypeForGift(item),
-        itemName: item.name,
-        timestamp: firebase.database.ServerValue.TIMESTAMP
-    };
-    
-    // 發送禮物到 Firebase
-    database.ref('users/' + friendId + '/gifts').push(giftData)
-        .then(() => {
-            alert(`成功送出 ${item.name} 給好友！`);
-            closeGiftModal();
-        })
-        .catch((error) => {
-            console.error('送禮失敗:', error);
-            alert('送禮失敗: ' + error.message);
-            // 回滾點數
-            userData.points += item.price;
-            updatePointsDisplay();
-            saveUserData();
-        });
-}
-
-
-
-
-
-
-
-
-
-function getItemTypeForGift(item) {
-    // 根據item的id前綴或在哪個數組中來判斷類型
-    const expressionItem = expressions.find(e => e.id === item.id);
-    if (expressionItem) return 'expression';
-    
-    const hairstyleItem = hairstyles.find(h => h.id === item.id);
-    if (hairstyleItem) return 'hairstyle';
-    
-    const personalityItem = personalities.find(p => p.id === item.id);
-    if (personalityItem) return 'personality';
-    
-    return 'unknown';
-}
-
-function loadReceivedGifts() {
-    database.ref('users/' + currentUser.uid + '/gifts').once('value')
-        .then((snapshot) => {
-            if (snapshot.exists()) {
-                const gifts = snapshot.val();
-                const container = document.querySelector('.gift-modal-content');
-                
-                // 創建已收到禮物區域
-                const receivedDiv = document.createElement('div');
-                receivedDiv.className = 'received-gifts';
-                receivedDiv.innerHTML = '<h3><i class="fas fa-gift"></i> 收到的禮物</h3>';
-                
-                Object.entries(gifts).forEach(([giftId, gift]) => {
-                    const giftItem = document.createElement('div');
-                    giftItem.className = 'received-gift-item';
-                    giftItem.innerHTML = `
-                        <div style="margin-right: 15px;">
-                            <strong>${gift.itemName}</strong><br>
-                            <small>來自: ${gift.fromName}</small>
-                        </div>
-                        <button class="shop-btn use-btn" onclick="claimGift('${giftId}', '${gift.itemId}', '${gift.itemType}')">
-                            領取
-                        </button>
-                    `;
-                    receivedDiv.appendChild(giftItem);
-                });
-                
-                // 插入到點數顯示後面
-                const pointsDisplay = container.querySelector('.points-display');
-                pointsDisplay.parentNode.insertBefore(receivedDiv, pointsDisplay.nextSibling);
-            }
-        });
-}
-
-function claimGift(giftId, itemId, itemType) {
-    // 立即隱藏該禮物項目
-    const giftElement = document.querySelector(`[onclick*="${giftId}"]`).closest('.received-gift-item');
-    if (giftElement) {
-        giftElement.style.display = 'none';
-    }
-    
-    // 處理盲盒禮物
-    if (itemType === 'mysteryboxGift') {
-        // 從Firebase獲取盲盒禮物數據
-        database.ref('mysteryboxGifts/' + itemId).once('value')
-            .then((snapshot) => {
-                const mysteryboxGiftData = snapshot.val();
-                if (mysteryboxGiftData) {
-                    // 找到對應的盲盒類型
-                    const mysteryboxType = mysteryboxes.find(box => box.id === mysteryboxGiftData.boxType);
-                    if (mysteryboxType) {
-                        // 立即打開盲盒動畫
-                        openMysteryBox(mysteryboxType);
-                        
-                        // 刪除盲盒禮物數據
-                        database.ref('mysteryboxGifts/' + itemId).remove();
-                        
-                        // 從接收者的禮物列表中刪除
-                        database.ref('users/' + currentUser.uid + '/gifts/' + giftId).remove()
-                            .then(() => {
-                                // 重新渲染禮物列表
-                                renderShopItems('gifts');
-                            });
-                    }
-                }
-            })
-            .catch((error) => {
-                console.error('處理盲盒禮物失敗:', error);
-                alert('領取失敗: ' + error.message);
-                if (giftElement) {
-                    giftElement.style.display = 'flex';
-                }
-            });
-        return;
-    }
-    
-    // 原有的普通禮物處理邏輯
-    if (itemType === 'expression' && !userData.purchasedExpressions.includes(itemId)) {
-        userData.purchasedExpressions.push(itemId);
-    } else if (itemType === 'hairstyle' && !userData.purchasedHairstyles.includes(itemId)) {
-        userData.purchasedHairstyles.push(itemId);
-    } else if (itemType === 'personality' && !userData.purchasedPersonalities.includes(itemId)) {
-        userData.purchasedPersonalities.push(itemId);
-    }
-
-    // 如果領取的是盲盒，添加免費抽獎次數
-    if (itemType === 'mysterybox') {
-        if (!userData.freeMysteryboxDraws) {
-            userData.freeMysteryboxDraws = {};
-        }
-        
-        // 根據盲盒等級給予免費抽獎次數
-        if (itemId === 'bronze') {
-            userData.freeMysteryboxDraws.bronze = (userData.freeMysteryboxDraws.bronze || 0) + 1;
-        } else if (itemId === 'silver') {
-            userData.freeMysteryboxDraws.silver = (userData.freeMysteryboxDraws.silver || 0) + 1;
-        } else if (itemId === 'gold') {
-            userData.freeMysteryboxDraws.gold = (userData.freeMysteryboxDraws.gold || 0) + 1;
-        }
-    }
-    
-    saveUserData();
-    
-    // 從 Firebase 中刪除該禮物
-    database.ref('users/' + currentUser.uid + '/gifts/' + giftId).remove()
-        .then(() => {
-            alert('禮物領取成功！');
-            // 重新渲染禮物列表
-            renderShopItems('gifts');
-        })
-        .catch((error) => {
-            console.error('領取禮物失敗:', error);
-            alert('領取失敗: ' + error.message);
-            // 如果失敗，重新顯示禮物項目
-            if (giftElement) {
-                giftElement.style.display = 'flex';
-            }
-        });
-}
-
-// 點擊模態框外部關閉 - 更新現有代碼
-window.addEventListener('click', (e) => {
-    if (e.target === shopModal) {
-        shopModal.style.display = 'none';
-    }
-    if (e.target === settingsModal) {
-        settingsModal.style.display = 'none';
-    }
-    if (e.target === friendsModal) {
-        friendsModal.style.display = 'none';
-    }
-    if (e.target.classList.contains('gift-modal')) {
-        closeGiftModal();
-    }
-    if (e.target === mysteryboxAnimation) {
-        // 不允許點擊關閉盲盒動畫
-    }
-});
-
-
     </script>
-
-
-
-<!-- 禮物提醒通知 -->
-<div class="gift-notification" id="gift-notification" style="display: none;">
-    <div class="gift-notification-content">
-        <h3>🎁 收到新禮物！</h3>
-        <p>你有新的禮物待領取，快去好友系統查看吧！</p>
-        <button onclick="closeGiftNotification()">知道了</button>
-    </div>
-</div>
-
-
 </body>
 </html>
