@@ -3425,14 +3425,7 @@ function initUserData() {
         database.ref('users/' + currentUser.uid).once('value').then((snapshot) => {
             const firebaseData = snapshot.val();
             if (firebaseData) {
-                userData = { ...userData, ...firebaseData };
-                // 確保添加新屬性
-                if (!userData.hiddenCodesUsed) {
-                    userData.hiddenCodesUsed = [];
-                }
-                if (!userData.freeMysteryboxDraws) {
-                    userData.freeMysteryboxDraws = {};
-                }
+                userData = { ...firebaseData };
                 // 保存到 localStorage
                 localStorage.setItem('vtuberUserData', JSON.stringify(userData));
             } else {
@@ -4115,8 +4108,34 @@ syncUserAppearance();
 
         // 保存用戶數據到localStorage和Firebase
 function saveUserData() {
-    localStorage.setItem('vtuberUserData', JSON.stringify(userData));
-    syncLocalDataToFirebase();
+    if (currentUser) {
+        database.ref('users/' + currentUser.uid).set(userData)
+            .then(() => {
+                localStorage.setItem('vtuberUserData', JSON.stringify(userData));
+            })
+            .catch((error) => {
+                console.error('保存到 Firebase 失敗:', error);
+            });
+    } else {
+        localStorage.setItem('vtuberUserData', JSON.stringify(userData));
+    }
+}
+
+        function initRealTimeListener() {
+    if (currentUser) {
+        database.ref('users/' + currentUser.uid).on('value', (snapshot) => {
+            const firebaseData = snapshot.val();
+            if (firebaseData) {
+                userData = { ...firebaseData };
+                localStorage.setItem('vtuberUserData', JSON.stringify(userData));
+                updatePointsDisplay();
+                updateHungerDisplay();
+                updateVtuberAppearance();
+                syncUserAppearance();
+                updateVtuberName();
+            }
+        });
+    }
 }
 
 // 同步當前用戶的外觀信息供其他用戶查看
@@ -5547,6 +5566,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loadUserProfile();
             showMainInterface();
             initUserData();
+            initRealTimeListener(); // 啟動實時監聽
             
             // 原有的問候語代碼
             const greetings = [
