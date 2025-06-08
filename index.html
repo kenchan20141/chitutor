@@ -3416,38 +3416,109 @@ let userData = {
 
        // 初始化用戶數據
 function initUserData() {
-    const savedData = localStorage.getItem('vtuberUserData');
-    if (savedData) {
-        const parsedData = JSON.parse(savedData);
-        // 確保添加新屬性
-        if (!parsedData.hiddenCodesUsed) {
-            parsedData.hiddenCodesUsed = [];
-        }
-if (!parsedData.freeMysteryboxDraws) {
-    parsedData.freeMysteryboxDraws = {};
-}
-
-        userData = { ...userData, ...parsedData };
-        // 計算飽腹值衰減
-        updateHungerLevel();
+    if (currentUser) {
+        database.ref('users/' + currentUser.uid).once('value').then((snapshot) => {
+            const firebaseData = snapshot.val();
+            if (firebaseData) {
+                // 確保所有必要屬性存在
+                userData = {
+                    points: firebaseData.points || 20,
+                    purchasedExpressions: firebaseData.purchasedExpressions || ['default'],
+                    purchasedHairstyles: firebaseData.purchasedHairstyles || ['default'],
+                    purchasedFoods: firebaseData.purchasedFoods || [],
+                    purchasedPersonalities: firebaseData.purchasedPersonalities || ['default'],
+                    currentExpression: firebaseData.currentExpression || 'default',
+                    currentHairstyle: firebaseData.currentHairstyle || 'default',
+                    currentPersonality: firebaseData.currentPersonality || 'default',
+                    hungerLevel: firebaseData.hungerLevel || 100,
+                    lastFeedTime: firebaseData.lastFeedTime || Date.now(),
+                    vtuberName: firebaseData.vtuberName || firebaseData.characterName || '喻蛋',
+                    hiddenCodesUsed: firebaseData.hiddenCodesUsed || [],
+                    freeMysteryboxDraws: firebaseData.freeMysteryboxDraws || {}
+                };
+            } else {
+                // 新用戶，初始化數據
+                let defaultName = currentUser.email.split('@')[0];
+                if (!defaultName.endsWith("蛋")) {
+                    defaultName += "蛋";
+                }
+                initializeNewUserData(defaultName);
+            }
+            updatePointsDisplay();
+            updateHungerDisplay();
+            updateVtuberAppearance();
+            syncUserAppearance();
+            updateVtuberName();
+        }).catch((error) => {
+            console.error('從Firebase載入數據失敗:', error);
+            // 創建默認數據
+            let defaultName = currentUser.email.split('@')[0];
+            if (!defaultName.endsWith("蛋")) {
+                defaultName += "蛋";
+            }
+            initializeNewUserData(defaultName);
+            updatePointsDisplay();
+            updateHungerDisplay();
+            updateVtuberAppearance();
+            syncUserAppearance();
+            updateVtuberName();
+        });
+    } else {
+        // 未登入狀態，使用預設數據
+        userData = {
+            points: 20,
+            purchasedExpressions: ['default'],
+            purchasedHairstyles: ['default'],
+            purchasedFoods: [],
+            purchasedPersonalities: ['default'],
+            currentExpression: 'default',
+            currentHairstyle: 'default',
+            currentPersonality: 'default',
+            hungerLevel: 100,
+            lastFeedTime: Date.now(),
+            vtuberName: '喻蛋',
+            hiddenCodesUsed: [],
+            freeMysteryboxDraws: {}
+        };
+        updatePointsDisplay();
+        updateHungerDisplay();
+        updateVtuberAppearance();
+        syncUserAppearance();
+        updateVtuberName();
     }
-    updatePointsDisplay();
-    updateHungerDisplay();
-    updateVtuberAppearance();
-syncUserAppearance();
-    updateVtuberName();
-    
-
-// 同步Firebase數據到本地
-if (currentUser) {
-    syncFirebaseDataToLocal();
-}
-
-
-
     // 開始飽腹值定時更新
     setInterval(updateHungerLevel, 60000); // 每分鐘檢查一次
 }
+
+
+function initializeNewUserData(characterName) {
+    const defaultUserData = {
+        points: 20,
+        purchasedExpressions: ['default'],
+        purchasedHairstyles: ['default'],
+        purchasedFoods: [],
+        purchasedPersonalities: ['default'],
+        currentExpression: 'default',
+        currentHairstyle: 'default',
+        currentPersonality: 'default',
+        hungerLevel: 100,
+        lastFeedTime: Date.now(),
+        vtuberName: characterName,
+        hiddenCodesUsed: [],
+        freeMysteryboxDraws: {}
+    };
+    userData = defaultUserData;
+    if (currentUser) {
+        database.ref('users/' + currentUser.uid).update(defaultUserData)
+            .catch((error) => {
+                console.error('初始化新用戶數據失敗:', error);
+            });
+    }
+}
+
+
+
+
 
         // 更新VTuber名稱顯示
         function updateVtuberName() {
@@ -3481,7 +3552,6 @@ if (currentUser) {
     }
     
    userData.vtuberName = finalName;
-saveUserData();
 updateVtuberName();
 
 // 同步到Firebase
@@ -4089,9 +4159,30 @@ syncUserAppearance();
 
         // 保存用戶數據到localStorage和Firebase
 function saveUserData() {
-    localStorage.setItem('vtuberUserData', JSON.stringify(userData));
-    syncLocalDataToFirebase();
+    if (currentUser) {
+        const dataToSave = {
+            points: userData.points,
+            purchasedExpressions: userData.purchasedExpressions,
+            purchasedHairstyles: userData.purchasedHairstyles,
+            purchasedFoods: userData.purchasedFoods,
+            purchasedPersonalities: userData.purchasedPersonalities,
+            currentExpression: userData.currentExpression,
+            currentHairstyle: userData.currentHairstyle,
+            currentPersonality: userData.currentPersonality,
+            hungerLevel: userData.hungerLevel,
+            lastFeedTime: userData.lastFeedTime,
+            hiddenCodesUsed: userData.hiddenCodesUsed || [],
+            freeMysteryboxDraws: userData.freeMysteryboxDraws || {},
+            vtuberName: userData.vtuberName
+        };
+        
+        database.ref('users/' + currentUser.uid).update(dataToSave)
+            .catch((error) => {
+                console.error('保存數據到Firebase失敗:', error);
+            });
+    }
 }
+
 
 // 同步當前用戶的外觀信息供其他用戶查看
 function syncUserAppearance() {
@@ -4107,6 +4198,7 @@ function syncUserAppearance() {
             });
     }
 }
+
 
 
 
@@ -5515,49 +5607,50 @@ document.addEventListener('click', (e) => {
         // 替換現有的DOMContentLoaded事件
 document.addEventListener('DOMContentLoaded', () => {
     // 檢查用戶登入狀態
-    auth.onAuthStateChanged((user) => {
-        if (user) {
-            currentUser = user;
-            loadUserProfile();
-            showMainInterface();
-            initUserData();
-            
-            // 原有的問候語代碼
-            const greetings = [
-                "最近你又好似變蠢咗咁。點啊？有咩分享呀？",
-                "喂，你今日心情點呀？唔好話我知你又喺度發呆呀。",
-                "哎呀，你又嚟啦。準備好俾我笑未？",
-                "哇！你個樣殘到咁，一定係尋晚掛住煲劇。",
-                "係唔係地球重力突然加大？你個頭耷到貼地喎。",
-                "今日你個髮型好有創意喎，係咪用咗電飯煲剪頭髮呀你？",
-                "喂！你件衫同我阿婆張梳化撞款喎，復古大師？",
-                "睇你個樣似被外星人綁架完放返嚟，分享下經歷啦！",
-                "你對眼瞇到得條線，尋晚去咗做賊啊？",
-                "你個樣似食咗安眠藥但仲要返工，堅強呀兄弟！",
-                "今日你個氣場好特別，似足茶餐廳杯凍檸茶——少甜走冰。",
-                "你個樣愁過考試肥佬，係咪便秘咗三日呀？",
-                "你個頭油到反光，可以借嚟當鏡照啦！",
-                "今日你個氣場頹過淋雨嘅流浪貓，需要熱牛奶嗎？",
-                "你件外套似我屋企張梳化套，有冇親戚關係㗎？",
-                "你個笑容僵過蠟像館展品，需要幫你解凍嗎？",
-                "成個人霉過回南天，你需要抽濕機定太陽燈呀？",
-                "你成身散發咖啡因氣息，今日第幾杯呀？",
-                "你成個人散發怨氣，係撞鬼定撞見老細？",
-                "你個眼袋深過馬里亞納海溝呀，真係嚇死人。",
-                "你個樣呆過未插電嘅機械人，需要充電嗎？"
-            ];
-            const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
-            addMessage(randomGreeting, 'ai');
-            conversationHistory.push({ role: 'assistant', content: randomGreeting });
-            speak(randomGreeting);
-            
-            if (!isSpeechRecognitionSupported()) {
-                addMessage("提示：您的瀏覽器不支援語音輸入功能，請使用最新版Chrome或Edge瀏覽器", 'error');
-            }
-        } else {
-            showAuthInterface();
+   auth.onAuthStateChanged((user) => {
+    if (user) {
+        currentUser = user;
+        loadUserProfile();
+        showMainInterface();
+        initUserData();
+        
+        // 原有的問候語代碼
+        const greetings = [
+            "最近你又好似變蠢咗咁。點啊？有咩分享呀？",
+            "喂，你今日心情點呀？唔好話我知你又喺度發呆呀。",
+            "哎呀，你又嚟啦。準備好俾我笑未？",
+            "哇！你個樣殘到咁，一定係尋晚掛住煲劇。",
+            "係唔係地球重力突然加大？你個頭耷到貼地喎。",
+            "今日你個髮型好有創意喎，係咪用咗電飯煲剪頭髮呀你？",
+            "喂！你件衫同我阿婆張梳化撞款喎，復古大師？",
+            "睇你個樣似被外星人綁架完放返嚟，分享下經歷啦！",
+            "你對眼瞇到得條線，尋晚去咗做賊啊？",
+            "你個樣似食咗安眠藥但仲要返工，堅強呀兄弟！",
+            "今日你個氣場好特別，似足茶餐廳杯凍檸茶——少甜走冰。",
+            "你個樣愁過考試肥佬，係咪便秘咗三日呀？",
+            "你個頭油到反光，可以借嚟當鏡照啦！",
+            "今日你個氣場頹過淋雨嘅流浪貓，需要熱牛奶嗎？",
+            "你件外套似我屋企張梳化套，有冇親戚關係㗎？",
+            "你個笑容僵過蠟像館展品，需要幫你解凍嗎？",
+            "成個人霉過回南天，你需要抽濕機定太陽燈呀？",
+            "你成身散發咖啡因氣息，今日第幾杯呀？",
+            "你成個人散發怨氣，係撞鬼定撞見老細？",
+            "你個眼袋深過馬里亞納海溝呀，真係嚇死人。",
+            "你個樣呆過未插電嘅機械人，需要充電嗎？"
+        ];
+        const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
+        addMessage(randomGreeting, 'ai');
+        conversationHistory.push({ role: 'assistant', content: randomGreeting });
+        speak(randomGreeting);
+        
+        if (!isSpeechRecognitionSupported()) {
+            addMessage("提示：您的瀏覽器不支援語音輸入功能，請使用最新版Chrome或Edge瀏覽器", 'error');
         }
-    });
+    } else {
+        showAuthInterface();
+    }
+});
+
     
     initAuthEvents();
     initFriendsEvents();
@@ -5639,9 +5732,30 @@ function initAuthEvents() {
             });
     });
     
-    logoutBtn.addEventListener('click', () => {
-        auth.signOut();
+   logoutBtn.addEventListener('click', () => {
+    auth.signOut().then(() => {
+        userData = {
+            points: 20,
+            purchasedExpressions: ['default'],
+            purchasedHairstyles: ['default'],
+            purchasedFoods: [],
+            purchasedPersonalities: ['default'],
+            currentExpression: 'default',
+            currentHairstyle: 'default',
+            currentPersonality: 'default',
+            hungerLevel: 100,
+            lastFeedTime: Date.now(),
+            vtuberName: '喻蛋',
+            hiddenCodesUsed: [],
+            freeMysteryboxDraws: {}
+        };
+        showAuthInterface();
+    }).catch((error) => {
+        console.error('登出失敗:', error);
+        addMessage('登出失敗，請重試', 'error');
     });
+});
+
 }
 
 function loadUserProfile() {
