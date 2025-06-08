@@ -3570,10 +3570,13 @@ function initializeNewUserData(characterName) {
 
 
         // 更新VTuber名稱顯示
-        function updateVtuberName() {
-            vtuberDisplayName.textContent = userData.vtuberName;
-            currentNameDisplay.textContent = `當前名稱：${userData.vtuberName}`;
-        }
+       function updateVtuberName() {
+    vtuberDisplayName.textContent = userData.vtuberName;
+    currentNameDisplay.textContent = `當前名稱：${userData.vtuberName}`;
+    // 更新所有聊天記錄中的AI消息名稱
+    updateAllAIMessageNames();
+}
+
 
         // 設置VTuber名稱
         function setVtuberName(name) {
@@ -3602,6 +3605,10 @@ function initializeNewUserData(characterName) {
     
    userData.vtuberName = finalName;
 updateVtuberName();
+
+            // 更新已存在的聊天記錄中的名稱顯示
+updateAllAIMessageNames();
+
 
 // 同步到Firebase
 if (currentUser) {
@@ -5410,10 +5417,11 @@ document.addEventListener('click', (e) => {
 
             const messageHeader = document.createElement('div');
             messageHeader.className = 'message-header';
-            messageHeader.innerHTML = `
-                <i class="fas ${role === 'ai' ? 'fa-robot' : 'fa-user'}"></i>
-                <span>${role === 'ai' ? userData.vtuberName : '你'}</span>
-            `;
+                messageHeader.innerHTML = `
+        <i class="fas ${role === 'ai' ? 'fa-robot' : 'fa-user'}"></i>
+        <span>${role === 'ai' ? (userData.vtuberName || '喻蛋') : '你'}</span>
+    `;
+
 
             const messageContent = document.createElement('div');
             messageContent.className = 'message-content';
@@ -5440,6 +5448,16 @@ document.addEventListener('click', (e) => {
             chatOutput.appendChild(messageDiv);
             chatOutput.scrollTop = chatOutput.scrollHeight;
         }
+
+        // 更新所有AI消息的顯示名稱
+function updateAllAIMessageNames() {
+    const aiMessages = document.querySelectorAll('.ai-message .message-header span');
+    aiMessages.forEach(span => {
+        if (span.textContent !== '你') {
+            span.textContent = userData.vtuberName || '喻蛋';
+        }
+    });
+}
 
         // 發送消息到API
         async function sendMessage() {
@@ -5688,8 +5706,51 @@ document.addEventListener('DOMContentLoaded', () => {
         ];
         const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
         addMessage(randomGreeting, 'ai');
-        conversationHistory.push({ role: 'assistant', content: randomGreeting });
-        speak(randomGreeting);
+conversationHistory.push({ role: 'assistant', content: randomGreeting });
+
+// 延遲播放TTS，等待用戶首次互動
+setTimeout(() => {
+    if (ttsAutoPlay.checked) {
+        // 嘗試播放，如果失敗則提示用戶點擊
+        const testUtterance = new SpeechSynthesisUtterance('');
+        testUtterance.volume = 0;
+        speechSynthesis.speak(testUtterance);
+        
+        testUtterance.onstart = () => {
+            speak(randomGreeting);
+        };
+        
+        testUtterance.onerror = () => {
+            // 如果自動播放失敗，顯示提示
+            const playBtn = document.createElement('button');
+            playBtn.style.cssText = `
+                position: fixed;
+                top: 120px;
+                right: 20px;
+                background: #4a90e2;
+                color: white;
+                border: none;
+                padding: 10px 15px;
+                border-radius: 25px;
+                cursor: pointer;
+                z-index: 1000;
+                font-size: 0.9rem;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            `;
+            playBtn.innerHTML = '<i class="fas fa-volume-up"></i> 點擊聽語音';
+            playBtn.onclick = () => {
+                speak(randomGreeting);
+                playBtn.remove();
+            };
+            document.body.appendChild(playBtn);
+            
+            setTimeout(() => {
+                if (playBtn.parentNode) playBtn.remove();
+            }, 10000);
+        };
+    }
+}, 1000);
+
         
         if (!isSpeechRecognitionSupported()) {
             addMessage("提示：您的瀏覽器不支援語音輸入功能，請使用最新版Chrome或Edge瀏覽器", 'error');
