@@ -4516,17 +4516,33 @@ giftTab.addEventListener('click', () => {
 
 
  // 處理禮物標籤內容
-    if (tab === 'gifts') {
-        if (!currentUser) {
-            shopItems.innerHTML = '<p>請先登入查看禮物！</p>';
-            return;
-        }
-        
-        database.ref('users/' + currentUser.uid + '/gifts').once('value').then((snapshot) => {
-            shopItems.innerHTML = '';
-            if (snapshot.exists()) {
-                const gifts = snapshot.val();
-                Object.entries(gifts).forEach(([giftId, gift]) => {
+   // 處理禮物標籤內容
+if (tab === 'gifts') {
+    if (!currentUser) {
+        shopItems.innerHTML = '<p>請先登入查看禮物！</p>';
+        return;
+    }
+    
+    database.ref('users/' + currentUser.uid + '/gifts').once('value').then((snapshot) => {
+        shopItems.innerHTML = '';
+        if (snapshot.exists()) {
+            const gifts = snapshot.val();
+            const giftEntries = Object.entries(gifts);
+            
+            // 先進行一次清理，移除可能的無效禮物
+            const validGifts = [];
+            giftEntries.forEach(([giftId, gift]) => {
+                if (gift && gift.itemId && gift.itemType && gift.itemName) {
+                    validGifts.push([giftId, gift]);
+                } else {
+                    // 自動清理無效禮物
+                    database.ref('users/' + currentUser.uid + '/gifts/' + giftId).remove()
+                        .catch(error => console.error('清理無效禮物失敗:', error));
+                }
+            });
+            
+            if (validGifts.length > 0) {
+                validGifts.forEach(([giftId, gift]) => {
                     const giftDiv = document.createElement('div');
                     giftDiv.className = 'received-gift-item';
                     giftDiv.style.cssText = `
@@ -4539,60 +4555,60 @@ giftTab.addEventListener('click', () => {
                         align-items: center;
                         justify-content: space-between;
                     `;
-                    // 獲取商品圖片
-// 獲取商品實際預覽圖片
-let itemPreviewElement = '';
-if (gift.itemType === 'expression') {
-    const expressionItem = expressions.find(e => e.id === gift.itemId);
-    if (expressionItem) {
-        itemPreviewElement = `
-            <div class="item-preview expression-preview ${expressionItem.className || ''}" style="width: 60px; height: 60px; margin: 0;">
-                <div class="expression-eyes">
-                    <div class="expression-eye"><div class="expression-pupil"></div></div>
-                    <div class="expression-eye"><div class="expression-pupil"></div></div>
-                </div>
-                <div class="expression-mouth"><div class="expression-mouth-inner"></div></div>
-            </div>
-        `;
-    } else {
-        itemPreviewElement = '<div style="font-size: 2.5rem;">😊</div>';
-    }
-} else if (gift.itemType === 'hairstyle') {
-    const hairstyleItem = hairstyles.find(h => h.id === gift.itemId);
-    if (hairstyleItem) {
-        itemPreviewElement = `
-            <div class="item-preview" style="width: 60px; height: 60px; margin: 0; position: relative; background: #fde2e4; border-radius: 50%;">
-                <div class="vtuber-hair ${hairstyleItem.className || ''}" style="width: 100%; height: 60%;"></div>
-            </div>
-        `;
-    } else {
-        itemPreviewElement = '<div style="font-size: 2.5rem;">💇</div>';
-    }
-} else if (gift.itemType === 'personality') {
-    const personalityItem = personalities.find(p => p.id === gift.itemId);
-    if (personalityItem) {
-        itemPreviewElement = `
-            <div class="item-preview personality-preview ${personalityItem.className}" style="width: 60px; height: 60px; margin: 0; font-size: 2rem; color: white;">
-                ${personalityItem.icon}
-            </div>
-        `;
-    } else {
-        itemPreviewElement = '<div style="font-size: 2.5rem;">🎭</div>';
-    }
-} else {
-    itemPreviewElement = '<div style="font-size: 2.5rem;">🎁</div>';
-}
+                    
+                    // 獲取商品實際預覽圖片
+                    let itemPreviewElement = '';
+                    if (gift.itemType === 'expression') {
+                        const expressionItem = expressions.find(e => e.id === gift.itemId);
+                        if (expressionItem) {
+                            itemPreviewElement = `
+                                <div class="item-preview expression-preview ${expressionItem.className || ''}" style="width: 60px; height: 60px; margin: 0;">
+                                    <div class="expression-eyes">
+                                        <div class="expression-eye"><div class="expression-pupil"></div></div>
+                                        <div class="expression-eye"><div class="expression-pupil"></div></div>
+                                    </div>
+                                    <div class="expression-mouth"><div class="expression-mouth-inner"></div></div>
+                                </div>
+                            `;
+                        } else {
+                            itemPreviewElement = '<div style="font-size: 2.5rem;">😊</div>';
+                        }
+                    } else if (gift.itemType === 'hairstyle') {
+                        const hairstyleItem = hairstyles.find(h => h.id === gift.itemId);
+                        if (hairstyleItem) {
+                            itemPreviewElement = `
+                                <div class="item-preview" style="width: 60px; height: 60px; margin: 0; position: relative; background: #fde2e4; border-radius: 50%;">
+                                    <div class="vtuber-hair ${hairstyleItem.className || ''}" style="width: 100%; height: 60%;"></div>
+                                </div>
+                            `;
+                        } else {
+                            itemPreviewElement = '<div style="font-size: 2.5rem;">💇</div>';
+                        }
+                    } else if (gift.itemType === 'personality') {
+                        const personalityItem = personalities.find(p => p.id === gift.itemId);
+                        if (personalityItem) {
+                            itemPreviewElement = `
+                                <div class="item-preview personality-preview ${personalityItem.className}" style="width: 60px; height: 60px; margin: 0; font-size: 2rem; color: white;">
+                                    ${personalityItem.icon}
+                                </div>
+                            `;
+                        } else {
+                            itemPreviewElement = '<div style="font-size: 2.5rem;">🎭</div>';
+                        }
+                    } else {
+                        itemPreviewElement = '<div style="font-size: 2.5rem;">🎁</div>';
+                    }
 
-giftDiv.innerHTML = `
-    <div style="display: flex; align-items: center; gap: 15px;">
-        ${itemPreviewElement}
-        <div style="flex: 1;">
-            <strong>${gift.itemName}</strong><br>
-            <small>來自: ${gift.fromName}</small>
-        </div>
-    </div>
-    <button class="shop-btn use-btn" onclick="claimGift('${giftId}', '${gift.itemId}', '${gift.itemType}')">領取</button>
-`;
+                    giftDiv.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            ${itemPreviewElement}
+                            <div style="flex: 1;">
+                                <strong>${gift.itemName}</strong><br>
+                                <small>來自: ${gift.fromName}</small>
+                            </div>
+                        </div>
+                        <button class="shop-btn use-btn" onclick="claimGift('${giftId}', '${gift.itemId}', '${gift.itemType}')">領取</button>
+                    `;
 
                     shopItems.appendChild(giftDiv);
                 });
@@ -4609,12 +4625,26 @@ giftDiv.innerHTML = `
                 `;
                 shopItems.appendChild(emptyDiv);
             }
-        }).catch((error) => {
-            console.error('載入禮物失敗:', error);
-            shopItems.innerHTML = '<p>載入禮物時發生錯誤，請稍後再試。</p>';
-        });
-        return;
-    }
+        } else {
+            const emptyDiv = document.createElement('div');
+            emptyDiv.style.cssText = `
+                text-align: center;
+                padding: 40px;
+                color: #666;
+            `;
+            emptyDiv.innerHTML = `
+                <i class="fas fa-gift" style="font-size: 3rem; margin-bottom: 20px; color: #ddd;"></i>
+                <p>你還沒有收到任何禮物！</p>
+            `;
+            shopItems.appendChild(emptyDiv);
+        }
+    }).catch((error) => {
+        console.error('載入禮物失敗:', error);
+        shopItems.innerHTML = '<p>載入禮物時發生錯誤，請稍後再試。</p>';
+    });
+    return;
+}
+
 
 
     let items, purchasedArray, currentItem;
@@ -7114,117 +7144,129 @@ function claimGift(giftId, itemId, itemType) {
         }
     }
     
-    // 處理盲盒禮物
-    if (itemType === 'mysteryboxGift') {
-        // 從Firebase獲取盲盒禮物數據
-        database.ref('mysteryboxGifts/' + itemId).once('value')
-            .then((snapshot) => {
-                const mysteryboxGiftData = snapshot.val();
-                if (mysteryboxGiftData) {
-                    // 找到對應的盲盒類型
-                    const mysteryboxType = mysteryboxes.find(box => box.id === mysteryboxGiftData.boxType);
-                    if (mysteryboxType) {
-                        // 同時刪除兩個節點的數據
-                        const deletePromises = [
-                            database.ref('mysteryboxGifts/' + itemId).remove(),
-                            database.ref('users/' + currentUser.uid + '/gifts/' + giftId).remove()
-                        ];
-                        
-                        Promise.all(deletePromises)
-                            .then(() => {
-                                // 立即打開盲盒動畫
-                                openMysteryBox(mysteryboxType);
-                                
-                                // 重新渲染禮物列表
-                                setTimeout(() => {
-                                    renderShopItems('gifts');
-                                }, 500);
-                            })
-                            .catch((error) => {
-                                console.error('刪除盲盒禮物數據失敗:', error);
-                                alert('領取失敗: ' + error.message);
-                                // 如果失敗，重新顯示禮物項目
-                                if (giftElement) {
-                                    const giftItemElement = giftElement.closest('.received-gift-item');
-                                    if (giftItemElement) {
-                                        giftItemElement.style.display = 'flex';
-                                    }
-                                }
-                            });
-                    } else {
-                        console.error('找不到對應的盲盒類型:', mysteryboxGiftData.boxType);
-                        alert('盲盒類型錯誤，無法領取');
-                    }
-                } else {
-                    console.error('盲盒禮物數據不存在:', itemId);
-                    // 如果盲盒數據不存在，只刪除禮物通知
-                    database.ref('users/' + currentUser.uid + '/gifts/' + giftId).remove()
-                        .then(() => {
-                            alert('該禮物可能已被其他設備領取');
-                            renderShopItems('gifts');
-                        });
-                }
-            })
-            .catch((error) => {
-                console.error('獲取盲盒禮物數據失敗:', error);
-                alert('領取失敗: ' + error.message);
-                // 如果失敗，重新顯示禮物項目
-                if (giftElement) {
-                    const giftItemElement = giftElement.closest('.received-gift-item');
-                    if (giftItemElement) {
-                        giftItemElement.style.display = 'flex';
-                    }
-                }
-            });
-        return;
-    }
+    // 第一次刪除：立即從Firebase刪除禮物記錄
+    const firstDeletePromise = database.ref('users/' + currentUser.uid + '/gifts/' + giftId).remove();
     
-    // 原有的普通禮物處理邏輯
-    if (itemType === 'expression' && !userData.purchasedExpressions.includes(itemId)) {
-        userData.purchasedExpressions.push(itemId);
-    } else if (itemType === 'hairstyle' && !userData.purchasedHairstyles.includes(itemId)) {
-        userData.purchasedHairstyles.push(itemId);
-    } else if (itemType === 'personality' && !userData.purchasedPersonalities.includes(itemId)) {
-        userData.purchasedPersonalities.push(itemId);
-    }
-
-    // 如果領取的是普通盲盒（非禮物盲盒），添加免費抽獎次數
-    if (itemType === 'mysterybox') {
-        if (!userData.freeMysteryboxDraws) {
-            userData.freeMysteryboxDraws = {};
+    firstDeletePromise.then(() => {
+        console.log('第一次刪除成功');
+        
+        // 處理盲盒禮物
+        if (itemType === 'mysteryboxGift') {
+            // 從Firebase獲取盲盒禮物數據
+            database.ref('mysteryboxGifts/' + itemId).once('value')
+                .then((snapshot) => {
+                    const mysteryboxGiftData = snapshot.val();
+                    if (mysteryboxGiftData) {
+                        // 找到對應的盲盒類型
+                        const mysteryboxType = mysteryboxes.find(box => box.id === mysteryboxGiftData.boxType);
+                        if (mysteryboxType) {
+                            // 第二次刪除：刪除盲盒禮物數據
+                            database.ref('mysteryboxGifts/' + itemId).remove()
+                                .then(() => {
+                                    console.log('盲盒禮物數據第二次刪除成功');
+                                    // 立即打開盲盒動畫
+                                    openMysteryBox(mysteryboxType);
+                                    
+                                    // 重新渲染禮物列表
+                                    setTimeout(() => {
+                                        renderShopItems('gifts');
+                                    }, 500);
+                                })
+                                .catch((error) => {
+                                    console.error('第二次刪除盲盒禮物數據失敗:', error);
+                                    // 第三次刪除：再次嘗試刪除
+                                    database.ref('mysteryboxGifts/' + itemId).remove()
+                                        .then(() => {
+                                            console.log('盲盒禮物數據第三次刪除成功');
+                                            openMysteryBox(mysteryboxType);
+                                            setTimeout(() => {
+                                                renderShopItems('gifts');
+                                            }, 500);
+                                        })
+                                        .catch((finalError) => {
+                                            console.error('最終刪除失敗:', finalError);
+                                            openMysteryBox(mysteryboxType);
+                                            renderShopItems('gifts');
+                                        });
+                                });
+                        } else {
+                            console.error('找不到對應的盲盒類型:', mysteryboxGiftData.boxType);
+                            alert('盲盒類型錯誤，無法領取');
+                            renderShopItems('gifts');
+                        }
+                    } else {
+                        console.error('盲盒禮物數據不存在:', itemId);
+                        renderShopItems('gifts');
+                    }
+                })
+                .catch((error) => {
+                    console.error('獲取盲盒禮物數據失敗:', error);
+                    renderShopItems('gifts');
+                });
+            return;
         }
         
-        // 根據盲盒等級給予免費抽獎次數
-        if (itemId === 'bronze') {
-            userData.freeMysteryboxDraws.bronze = (userData.freeMysteryboxDraws.bronze || 0) + 1;
-        } else if (itemId === 'silver') {
-            userData.freeMysteryboxDraws.silver = (userData.freeMysteryboxDraws.silver || 0) + 1;
-        } else if (itemId === 'gold') {
-            userData.freeMysteryboxDraws.gold = (userData.freeMysteryboxDraws.gold || 0) + 1;
+        // 原有的普通禮物處理邏輯
+        if (itemType === 'expression' && !userData.purchasedExpressions.includes(itemId)) {
+            userData.purchasedExpressions.push(itemId);
+        } else if (itemType === 'hairstyle' && !userData.purchasedHairstyles.includes(itemId)) {
+            userData.purchasedHairstyles.push(itemId);
+        } else if (itemType === 'personality' && !userData.purchasedPersonalities.includes(itemId)) {
+            userData.purchasedPersonalities.push(itemId);
         }
-    }
-    
-    saveUserData();
-    
-    // 刪除禮物通知
-    database.ref('users/' + currentUser.uid + '/gifts/' + giftId).remove()
-        .then(() => {
-            const itemName = getItemNameById(itemId, itemType);
-            alert(`禮物「${itemName}」領取成功！`);
-            // 重新渲染禮物列表
-            renderShopItems('gifts');
-        })
-        .catch((error) => {
-            console.error('刪除禮物通知失敗:', error);
-            alert('領取失敗: ' + error.message);
-            // 如果失敗，重新顯示禮物項目
-            if (giftElement) {
-                const giftItemElement = giftElement.closest('.received-gift-item');
-                if (giftItemElement) {
-                    giftItemElement.style.display = 'flex';
-                }
+
+        // 如果領取的是普通盲盒（非禮物盲盒），添加免費抽獎次數
+        if (itemType === 'mysterybox') {
+            if (!userData.freeMysteryboxDraws) {
+                userData.freeMysteryboxDraws = {};
             }
-        });
+            
+            // 根據盲盒等級給予免費抽獎次數
+            if (itemId === 'bronze') {
+                userData.freeMysteryboxDraws.bronze = (userData.freeMysteryboxDraws.bronze || 0) + 1;
+            } else if (itemId === 'silver') {
+                userData.freeMysteryboxDraws.silver = (userData.freeMysteryboxDraws.silver || 0) + 1;
+            } else if (itemId === 'gold') {
+                userData.freeMysteryboxDraws.gold = (userData.freeMysteryboxDraws.gold || 0) + 1;
+            }
+        }
+        
+        saveUserData();
+        
+        // 第二次刪除：確保完全移除
+        database.ref('users/' + currentUser.uid + '/gifts/' + giftId).remove()
+            .then(() => {
+                console.log('第二次刪除成功');
+                const itemName = getItemNameById(itemId, itemType);
+                
+                // 立即重新渲染禮物列表，不顯示任何通知
+                renderShopItems('gifts');
+            })
+            .catch((error) => {
+                console.error('第二次刪除失敗:', error);
+                // 第三次刪除：最後嘗試
+                database.ref('users/' + currentUser.uid + '/gifts/' + giftId).remove()
+                    .then(() => {
+                        console.log('第三次刪除成功');
+                        renderShopItems('gifts');
+                    })
+                    .catch((finalError) => {
+                        console.error('最終刪除失敗:', finalError);
+                        renderShopItems('gifts');
+                    });
+            });
+    })
+    .catch((error) => {
+        console.error('第一次刪除失敗:', error);
+        // 如果第一次刪除失敗，重新顯示禮物項目
+        if (giftElement) {
+            const giftItemElement = giftElement.closest('.received-gift-item');
+            if (giftItemElement) {
+                giftItemElement.style.display = 'flex';
+            }
+        }
+        alert('領取失敗，請重試');
+    });
 }
 
 // 根據ID和類型獲取商品名稱的輔助函數
