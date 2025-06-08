@@ -177,15 +177,10 @@
         
 
 .received-gift-item {
-        min-width: 0; /* 移除固定最小寬度，讓其適應容器 */
-        width: 100%; /* 確保佔滿可用寬度 */
-        flex-direction: row; /* 改回水平佈局，避免過度堆疊 */
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-        padding: 10px; /* 減小內邊距以適應小屏幕 */
-        box-sizing: border-box; /* 確保邊框和內邊距不超出 */
-    }
+    min-width: 100%;
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
 }
 
 .received-gift-item > div:first-child {
@@ -2761,18 +2756,15 @@
     border-radius: 8px;
     margin-bottom: 15px;
     border-left: 4px solid #ff6b9d;
-    min-width: 0; /* 移除固定最小寬度 */
-    width: 100%; /* 適應容器寬度 */
+    min-width: 400px;
     gap: 15px;
-    flex-wrap: wrap; /* 允許換行 */
+    flex-wrap: nowrap;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    box-sizing: border-box; /* 確保計算正確 */
 }
 
 .received-gift-item > div:first-child {
     flex: 1;
-    min-width: 0; /* 移除固定最小寬度 */
-    width: 100%; /* 適應容器 */
+    min-width: 250px;
     white-space: normal;
     word-wrap: break-word;
     overflow-wrap: break-word;
@@ -2788,6 +2780,7 @@
     min-width: 80px;
     white-space: nowrap;
 }
+
 
 
 
