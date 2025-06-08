@@ -1856,10 +1856,6 @@
     text-align: center;
     line-height: 1.5;
     text-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    white-space: nowrap; /* 單行顯示 */
-    overflow: hidden; /* 隱藏溢出 */
-    text-overflow: ellipsis; /* 添加省略號 */
-    max-width: 100%; /* 限制寬度 */
 }
 
 @keyframes resultPulse {
@@ -1937,13 +1933,7 @@
     transition: all 0.8s ease;
 }
 
-@media (max-width: 768px) {
-    .mysterybox-result-container {
-        min-width: 0; /* 移除固定最小寬度 */
-        width: 90%; /* 適應屏幕寬度 */
-        padding: 15px; /* 減小內邊距 */
-    }
-}
+
 
 .mysterybox-result-container.show {
     opacity: 1;
