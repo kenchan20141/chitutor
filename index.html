@@ -2940,10 +2940,7 @@
 
 
 
- <!-- 添加登出按鈕 -->
-        <button class="logout-button" id="logout-button">
-            <i class="fas fa-sign-out-alt"></i>
-        </button>
+
 
         <div class="hunger-bar-container" id="hunger-bar-container">
             <i class="fas fa-drumstick-bite hunger-icon" id="hunger-icon"></i>
@@ -2952,6 +2949,13 @@
             </div>
             <span class="hunger-percentage" id="hunger-percentage">100%</span>
         </div>
+
+ <!-- 添加登出按鈕 -->
+        <button class="logout-button" id="logout-button">
+            <i class="fas fa-sign-out-alt"></i>
+        </button>
+
+        
     </div>
 
     <!-- 商店彈窗 -->
@@ -4279,7 +4283,7 @@ function syncLocalDataToFirebase() {
 
         // 更新點數顯示
         function updatePointsDisplay() {
-            pointsDisplay.textContent = userData.points + ' 點';
+            pointsDisplay.textContent = userData.points + ' ';
             shopPoints.textContent = userData.points;
         }
 
