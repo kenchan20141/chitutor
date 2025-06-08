@@ -177,10 +177,16 @@
         
 
 .received-gift-item {
-    min-width: 100%;
-    flex-direction: column;
-    text-align: center;
-    gap: 10px;
+        min-width: 0; /* 移除固定最小寬度，讓其適應容器 */
+        width: 100%; /* 確保佔滿可用寬度 */
+        flex-direction: row; /* 改回水平佈局，避免過度堆疊 */
+        flex-wrap: wrap; /* 允許換行 */
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px; /* 減小內邊距以適應小屏幕 */
+        box-sizing: border-box; /* 確保邊框和內邊距不超出 */
+    }
 }
 
 .received-gift-item > div:first-child {
@@ -1850,6 +1856,10 @@
     text-align: center;
     line-height: 1.5;
     text-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    white-space: nowrap; /* 單行顯示 */
+    overflow: hidden; /* 隱藏溢出 */
+    text-overflow: ellipsis; /* 添加省略號 */
+    max-width: 100%; /* 限制寬度 */
 }
 
 @keyframes resultPulse {
@@ -1925,6 +1935,14 @@
     min-width: 300px;
     opacity: 0;
     transition: all 0.8s ease;
+}
+
+@media (max-width: 768px) {
+    .mysterybox-result-container {
+        min-width: 0; /* 移除固定最小寬度 */
+        width: 90%; /* 適應屏幕寬度 */
+        padding: 15px; /* 減小內邊距 */
+    }
 }
 
 .mysterybox-result-container.show {
@@ -2629,6 +2647,26 @@
     font-size: 0.9rem;
 }
 
+
+}
+/* 添加以下新樣式 */
+.accept-btn, .reject-btn {
+    padding: 8px; /* 減少內邊距以適應圖示 */
+    width: 40px; /* 固定寬度 */
+    height: 40px; /* 固定高度 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+@media (max-width: 768px) {
+    .accept-btn, .reject-btn {
+        width: 35px; /* 小屏幕調整 */
+        height: 35px;
+        padding: 6px;
+    }
+}
+
+
 .chat-btn {
     background: var(--secondary);
     color: white;
@@ -2724,15 +2762,18 @@
     border-radius: 8px;
     margin-bottom: 15px;
     border-left: 4px solid #ff6b9d;
-    min-width: 400px;
+    min-width: 0; /* 移除固定最小寬度 */
+    width: 100%; /* 適應容器寬度 */
     gap: 15px;
-    flex-wrap: nowrap;
+    flex-wrap: wrap; /* 允許換行 */
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-sizing: border-box; /* 確保計算正確 */
 }
 
 .received-gift-item > div:first-child {
     flex: 1;
-    min-width: 250px;
+    min-width: 0; /* 移除固定最小寬度 */
+    width: 100%; /* 適應容器 */
     white-space: normal;
     word-wrap: break-word;
     overflow-wrap: break-word;
@@ -3587,22 +3628,25 @@ let isBoxOpened = false;
 
 // 3D立體盲盒動畫系統
 function openMysteryBox(boxData) {
-    // 顯示動畫容器
-    mysteryboxAnimation.style.display = 'flex';
-    
-    // 設置盒子類型樣式
+    // 重置動畫狀態
+    const mysteryboxAnimation = document.getElementById('mysterybox-animation');
     const giftBox3d = document.getElementById('gift-box-3d');
-    giftBox3d.className = `gift-box-3d mysterybox-${boxData.id}`;
-    
-    // 重置結果容器
     const resultContainer = document.getElementById('mysterybox-result-container');
+    
+    // 清除之前的動畫和紙屑
+    giftBox3d.style.display = 'flex';
+    giftBox3d.classList.remove('opening');
     resultContainer.classList.remove('show');
+    document.querySelectorAll('.confetti-3d').forEach(el => el.remove());
+    
+    // 設置初始顯示
+    mysteryboxAnimation.style.display = 'flex';
+    giftBox3d.className = `gift-box-3d mysterybox-${boxData.id}`;
     
     // 抽獎邏輯
     const randomValue = Math.random();
     let accumulatedOdds = 0;
     let rewardType = 'nothing';
-    
     for (const [type, odds] of Object.entries(boxData.odds)) {
         accumulatedOdds += odds;
         if (randomValue <= accumulatedOdds) {
@@ -3611,36 +3655,32 @@ function openMysteryBox(boxData) {
         }
     }
     
-    // 開始動畫序列
-    setTimeout(() => {
-        startMysteryBoxAnimation(rewardType);
-    }, 1000);
+    // 使用 Promise 確保動畫順序
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            startMysteryBoxAnimation(rewardType);
+            resolve();
+        }, 1000);
+    });
 }
-
-function startMysteryBoxAnimation(rewardType) {
+async function startMysteryBoxAnimation(rewardType) {
     const giftBox3d = document.getElementById('gift-box-3d');
     
     // 第一階段：搖晃動畫
     giftBox3d.style.animation = 'mysteryboxShake 2s ease-in-out';
+    await new Promise(resolve => setTimeout(resolve, 2000));
     
-    setTimeout(() => {
-        // 第二階段：打開盒蓋
-        giftBox3d.classList.add('opening');
-        giftBox3d.style.animation = 'mysteryboxFloat 3s ease-in-out infinite';
-        
-        setTimeout(() => {
-            // 盒子打開後立即消失
-            giftBox3d.style.display = 'none';
-            
-            // 創建3D紙屑效果
-            create3DConfetti();
-            
-            // 第三階段：顯示結果
-            showMysteryBoxResult(rewardType);
-        }, 1000);
-    }, 2000);
+    // 第二階段：打開動畫
+    giftBox3d.style.animation = 'none'; // 清除搖晃動畫
+    giftBox3d.classList.add('opening');
+    giftBox3d.style.animation = 'mysteryboxFloat 3s ease-in-out infinite';
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // 第三階段：隱藏盒子並顯示結果
+    giftBox3d.style.display = 'none';
+    create3DConfetti();
+    await showMysteryBoxResult(rewardType);
 }
-
 
 // 創建3D紙屑效果
 function create3DConfetti() {
@@ -6005,8 +6045,12 @@ function updateFriendAvatar(friendId, appearance, container, isRequest = false, 
     actionsDiv.className = 'friend-actions';
     if (isRequest) {
         actionsDiv.innerHTML = `
-            <button class="accept-btn" onclick="acceptFriendRequest('${requestId}', '${friendId}')">接受</button>
-            <button class="reject-btn" onclick="rejectFriendRequest('${requestId}')">拒絕</button>
+    <button class="accept-btn" onclick="acceptFriendRequest('${requestId}', '${friendId}')">
+        <i class="fas fa-check"></i>
+    </button>
+    <button class="reject-btn" onclick="rejectFriendRequest('${requestId}')">
+        <i class="fas fa-times"></i>
+    </button>
         `;
     } else {
        actionsDiv.innerHTML = '';
