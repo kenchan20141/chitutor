@@ -1,6 +1,8 @@
 
 
 
+
+
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
@@ -7101,11 +7103,15 @@ function loadReceivedGifts() {
             }
         });
 }
+
 function claimGift(giftId, itemId, itemType) {
-    // 立即隱藏該禮物項目
-    const giftElement = document.querySelector(`[onclick*="${giftId}"]`).closest('.received-gift-item');
+    // 立即隱藏該禮物項目，防止重複點擊
+    const giftElement = document.querySelector(`[onclick*="${giftId}"]`);
     if (giftElement) {
-        giftElement.style.display = 'none';
+        const giftItemElement = giftElement.closest('.received-gift-item');
+        if (giftItemElement) {
+            giftItemElement.style.display = 'none';
+        }
     }
     
     // 處理盲盒禮物
@@ -7118,26 +7124,56 @@ function claimGift(giftId, itemId, itemType) {
                     // 找到對應的盲盒類型
                     const mysteryboxType = mysteryboxes.find(box => box.id === mysteryboxGiftData.boxType);
                     if (mysteryboxType) {
-                        // 立即打開盲盒動畫
-                        openMysteryBox(mysteryboxType);
+                        // 同時刪除兩個節點的數據
+                        const deletePromises = [
+                            database.ref('mysteryboxGifts/' + itemId).remove(),
+                            database.ref('users/' + currentUser.uid + '/gifts/' + giftId).remove()
+                        ];
                         
-                        // 刪除盲盒禮物數據
-                        database.ref('mysteryboxGifts/' + itemId).remove();
-                        
-                        // 從接收者的禮物列表中刪除
-                        database.ref('users/' + currentUser.uid + '/gifts/' + giftId).remove()
+                        Promise.all(deletePromises)
                             .then(() => {
+                                // 立即打開盲盒動畫
+                                openMysteryBox(mysteryboxType);
+                                
                                 // 重新渲染禮物列表
-                                renderShopItems('gifts');
+                                setTimeout(() => {
+                                    renderShopItems('gifts');
+                                }, 500);
+                            })
+                            .catch((error) => {
+                                console.error('刪除盲盒禮物數據失敗:', error);
+                                alert('領取失敗: ' + error.message);
+                                // 如果失敗，重新顯示禮物項目
+                                if (giftElement) {
+                                    const giftItemElement = giftElement.closest('.received-gift-item');
+                                    if (giftItemElement) {
+                                        giftItemElement.style.display = 'flex';
+                                    }
+                                }
                             });
+                    } else {
+                        console.error('找不到對應的盲盒類型:', mysteryboxGiftData.boxType);
+                        alert('盲盒類型錯誤，無法領取');
                     }
+                } else {
+                    console.error('盲盒禮物數據不存在:', itemId);
+                    // 如果盲盒數據不存在，只刪除禮物通知
+                    database.ref('users/' + currentUser.uid + '/gifts/' + giftId).remove()
+                        .then(() => {
+                            alert('該禮物可能已被其他設備領取');
+                            renderShopItems('gifts');
+                        });
                 }
             })
             .catch((error) => {
-                console.error('處理盲盒禮物失敗:', error);
+                console.error('獲取盲盒禮物數據失敗:', error);
                 alert('領取失敗: ' + error.message);
+                // 如果失敗，重新顯示禮物項目
                 if (giftElement) {
-                    giftElement.style.display = 'flex';
+                    const giftItemElement = giftElement.closest('.received-gift-item');
+                    if (giftItemElement) {
+                        giftItemElement.style.display = 'flex';
+                    }
                 }
             });
         return;
@@ -7152,7 +7188,7 @@ function claimGift(giftId, itemId, itemType) {
         userData.purchasedPersonalities.push(itemId);
     }
 
-    // 如果領取的是盲盒，添加免費抽獎次數
+    // 如果領取的是普通盲盒（非禮物盲盒），添加免費抽獎次數
     if (itemType === 'mysterybox') {
         if (!userData.freeMysteryboxDraws) {
             userData.freeMysteryboxDraws = {};
@@ -7170,22 +7206,58 @@ function claimGift(giftId, itemId, itemType) {
     
     saveUserData();
     
-    // 從 Firebase 中刪除該禮物
+    // 刪除禮物通知
     database.ref('users/' + currentUser.uid + '/gifts/' + giftId).remove()
         .then(() => {
-            alert('禮物領取成功！');
+            const itemName = getItemNameById(itemId, itemType);
+            alert(`禮物「${itemName}」領取成功！`);
             // 重新渲染禮物列表
             renderShopItems('gifts');
         })
         .catch((error) => {
-            console.error('領取禮物失敗:', error);
+            console.error('刪除禮物通知失敗:', error);
             alert('領取失敗: ' + error.message);
             // 如果失敗，重新顯示禮物項目
             if (giftElement) {
-                giftElement.style.display = 'flex';
+                const giftItemElement = giftElement.closest('.received-gift-item');
+                if (giftItemElement) {
+                    giftItemElement.style.display = 'flex';
+                }
             }
         });
 }
+
+// 根據ID和類型獲取商品名稱的輔助函數
+function getItemNameById(itemId, itemType) {
+    let items = [];
+    switch (itemType) {
+        case 'expression':
+            items = expressions;
+            break;
+        case 'hairstyle':
+            items = hairstyles;
+            break;
+        case 'personality':
+            items = personalities;
+            break;
+        case 'food':
+            items = foods;
+            break;
+        case 'mysterybox':
+            items = mysteryboxes;
+            break;
+        default:
+            return '未知商品';
+    }
+    
+    const item = items.find(i => i.id === itemId);
+    return item ? item.name : '未知商品';
+}
+
+
+
+
+
 
 // 點擊模態框外部關閉 - 更新現有代碼
 window.addEventListener('click', (e) => {
