@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
@@ -3638,20 +3639,30 @@ let isBoxOpened = false;
 
 
 // 3D立體盲盒動畫系統
-function openMysteryBox(boxData) {
-    // 重置動畫狀態
+async function openMysteryBox(boxData) {
     const mysteryboxAnimation = document.getElementById('mysterybox-animation');
     const giftBox3d = document.getElementById('gift-box-3d');
     const resultContainer = document.getElementById('mysterybox-result-container');
-    
-    // 清除之前的動畫和紙屑
-    giftBox3d.style.display = 'flex';
-    giftBox3d.classList.remove('opening');
-    resultContainer.classList.remove('show');
-    document.querySelectorAll('.confetti-3d').forEach(el => el.remove());
-    
-    // 設置初始顯示
+    const boxTop = document.getElementById('box-top');
+
+    // 1. 準備動畫環境
+    // 確保之前的動畫和狀態被清除
     mysteryboxAnimation.style.display = 'flex';
+    resultContainer.classList.remove('show');
+    resultContainer.style.opacity = '0';
+    giftBox3d.style.display = 'block';
+    giftBox3d.classList.remove('opening');
+    giftBox3d.style.animation = ''; // 清除所有之前的動畫
+    
+    // 重置盒蓋位置，確保動畫能從初始狀態開始
+    boxTop.style.transition = 'none'; // 暫時移除過渡效果以便立即重置
+    await new Promise(resolve => setTimeout(resolve, 0)); // 等待UI更新
+    boxTop.style.transform = 'rotateX(90deg) translateZ(100px)';
+
+    // 清除上次的紙屑
+    document.querySelectorAll('.confetti-3d').forEach(el => el.remove());
+
+    // 設置盲盒類型
     giftBox3d.className = `gift-box-3d mysterybox-${boxData.id}`;
     
     // 抽獎邏輯
@@ -3665,32 +3676,49 @@ function openMysteryBox(boxData) {
             break;
         }
     }
-    
-    // 使用 Promise 確保動畫順序
-    return new Promise((resolve) => {
+
+    try {
+        // 2. 播放搖晃動畫
+        giftBox3d.style.animation = 'mysteryboxShake 1.5s ease-in-out';
+        await new Promise(resolve => setTimeout(resolve, 1500)); // 等待搖晃動畫結束
+
+        // 3. 播放打開動畫
+        giftBox3d.style.animation = 'none'; // 清除搖晃動畫
+        void giftBox3d.offsetWidth; // 強制瀏覽器重繪
+        giftBox3d.style.animation = 'mysteryboxFloat 3s ease-in-out infinite';
+        
+        // 觸發盒蓋打開動畫
+        boxTop.style.transition = 'all 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+        giftBox3d.classList.add('opening');
+        
+        await new Promise(resolve => setTimeout(resolve, 1000)); // 等待盒蓋打開一部分
+
+        // 4. 產生紙屑並顯示結果
+        create3DConfetti();
+        
+        // 處理獎勵邏輯，並更新UI
+        await showMysteryBoxResult(rewardType);
+        
+        // 5. 盒子消失，結果完全顯示
+        resultContainer.classList.add('show');
+        giftBox3d.style.animation = 'mysteryboxDisappear 1s forwards';
+        
+        await new Promise(resolve => setTimeout(resolve, 1000)); // 等待盒子消失動畫
+        
+        // 6. 清理並關閉動畫
         setTimeout(() => {
-            startMysteryBoxAnimation(rewardType);
-            resolve();
-        }, 1000);
-    });
-}
-async function startMysteryBoxAnimation(rewardType) {
-    const giftBox3d = document.getElementById('gift-box-3d');
-    
-    // 第一階段：搖晃動畫
-    giftBox3d.style.animation = 'mysteryboxShake 2s ease-in-out';
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // 第二階段：打開動畫
-    giftBox3d.style.animation = 'none'; // 清除搖晃動畫
-    giftBox3d.classList.add('opening');
-    giftBox3d.style.animation = 'mysteryboxFloat 3s ease-in-out infinite';
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // 第三階段：隱藏盒子並顯示結果
-    giftBox3d.style.display = 'none';
-    create3DConfetti();
-    await showMysteryBoxResult(rewardType);
+            mysteryboxAnimation.style.display = 'none';
+            giftBox3d.style.animation = ''; // 完全清除動畫
+            giftBox3d.classList.remove('opening');
+            resultContainer.classList.remove('show');
+        }, 4000); // 延長顯示結果的時間
+
+    } catch (error) {
+        console.error("打開盲盒時發生錯誤:", error);
+        // 如果出錯，確保隱藏動畫界面
+        mysteryboxAnimation.style.display = 'none';
+        addMessage('打開盲盒時發生錯誤，請稍後再試。', 'error');
+    }
 }
 
 // 創建3D紙屑效果
@@ -3862,143 +3890,89 @@ function createRewardPreview(reward, rewardType, container) {
 
 
 
-function showMysteryBoxResult(rewardType) {
-    const resultContainer = document.getElementById('mysterybox-result-container');
-    const resultIcon = document.getElementById('mysterybox-result-icon');
-    const resultText = document.getElementById('mysterybox-result-text');
-    
-    let reward = null;
-    let rewardText = '';
-    
-    if (rewardType === 'nothing') {
-        rewardText = '什麼都沒抽到...';
-        resultIcon.textContent = '❌';
-    } else if (rewardType === 'hidden') {
-        const hiddenExpressions = expressions.filter(item => item.isHidden);
-        const hiddenHairstyles = hairstyles.filter(item => item.isHidden);
-        const hiddenPersonalities = personalities.filter(item => item.isHidden);
-        
-        const allHiddenItems = [...hiddenExpressions, ...hiddenHairstyles, ...hiddenPersonalities];
-        
-        const unownedHiddenItems = allHiddenItems.filter(item => {
-            if (item.type === 'expression') {
-                return !userData.purchasedExpressions.includes(item.id);
-            } else if (item.type === 'hairstyle') {
-                return !userData.purchasedHairstyles.includes(item.id);
-            } else if (item.type === 'personality') {
-                return !userData.purchasedPersonalities.includes(item.id);
-            }
-        });
-        
-        if (unownedHiddenItems.length > 0) {
-            reward = unownedHiddenItems[Math.floor(Math.random() * unownedHiddenItems.length)];
-            if (reward.type === 'expression') {
-                userData.purchasedExpressions.push(reward.id);
-                rewardText = `獲得隱藏表情：${reward.name}！`;
-            } else if (reward.type === 'hairstyle') {
-                userData.purchasedHairstyles.push(reward.id);
-                rewardText = `獲得隱藏髮型：${reward.name}！`;
-            } else if (reward.type === 'personality') {
-                userData.purchasedPersonalities.push(reward.id);
-                rewardText = `獲得隱藏性格：${reward.name}！`;
+async function showMysteryBoxResult(rewardType) {
+    return new Promise(resolve => {
+        const resultContainer = document.getElementById('mysterybox-result-container');
+        const resultIcon = document.getElementById('mysterybox-result-icon');
+        const resultText = document.getElementById('mysterybox-result-text');
+
+        let reward = null;
+        let rewardText = '';
+        let actualRewardType = rewardType;
+
+        if (rewardType === 'nothing') {
+            rewardText = '什麼都沒抽到...';
+            resultIcon.innerHTML = '❌';
+        } else if (rewardType === 'hidden') {
+            const hiddenItems = getAllHiddenItems();
+            const unownedHiddenItems = hiddenItems.filter(item => {
+                if (item.type === 'expression') return !userData.purchasedExpressions.includes(item.id);
+                if (item.type === 'hairstyle') return !userData.purchasedHairstyles.includes(item.id);
+                if (item.type === 'personality') return !userData.purchasedPersonalities.includes(item.id);
+                return false;
+            });
+
+            if (unownedHiddenItems.length > 0) {
+                reward = unownedHiddenItems[Math.floor(Math.random() * unownedHiddenItems.length)];
+            } else {
+                reward = getRandomItem(foods); // 如果已擁有所有隱藏物品，則給予食物作為補償
             }
         } else {
-            reward = getRandomItem(foods);
-            if (reward) {
-                userData.purchasedFoods.push(reward.id);
-                rewardText = `獲得食物：${reward.name}！`;
+            const itemPools = {
+                food: foods,
+                expression: expressions.filter(e => !e.isHidden),
+                hairstyle: hairstyles.filter(h => !h.isHidden),
+                personality: personalities.filter(p => !p.isHidden)
+            };
+            const ownedPools = {
+                expression: userData.purchasedExpressions,
+                hairstyle: userData.purchasedHairstyles,
+                personality: userData.purchasedPersonalities
+            };
+
+            reward = getRandomUnownedItem(itemPools[rewardType], ownedPools[rewardType] || []);
+
+            if (!reward) { // 如果該類型獎勵已全部擁有，則給予食物作為補償
+                reward = getRandomItem(foods);
             }
         }
-    } else {
-        switch (rewardType) {
-            case 'food':
-                reward = getRandomItem(foods);
-                if (reward) {
+
+        // 處理獎勵
+        if (reward) {
+            actualRewardType = reward.type; // 確定實際獎勵類型
+            switch (actualRewardType) {
+                case 'food':
                     userData.purchasedFoods.push(reward.id);
                     rewardText = `獲得食物：${reward.name}！`;
-                }
-                break;
-            case 'expression':
-                reward = getRandomUnownedItem(expressions.filter(e => !e.isHidden), userData.purchasedExpressions);
-                if (reward) {
+                    resultIcon.innerHTML = `<span style="font-size: 3rem;">${reward.emoji}</span>`;
+                    break;
+                case 'expression':
                     userData.purchasedExpressions.push(reward.id);
-                    rewardText = `獲得表情：${reward.name}！`;
-                } else {
-                    reward = getRandomItem(foods);
-                    if (reward) {
-                        userData.purchasedFoods.push(reward.id);
-                        rewardText = `獲得食物：${reward.name}！`;
-                    }
-                }
-                break;
-            case 'hairstyle':
-                reward = getRandomUnownedItem(hairstyles.filter(h => !h.isHidden), userData.purchasedHairstyles);
-                if (reward) {
+                    rewardText = `獲得${reward.isHidden ? '隱藏' : ''}表情：${reward.name}！`;
+                    createRewardPreview(reward, 'expression', resultIcon);
+                    break;
+                case 'hairstyle':
                     userData.purchasedHairstyles.push(reward.id);
-                    rewardText = `獲得髮型：${reward.name}！`;
-                } else {
-                    reward = getRandomItem(foods);
-                    if (reward) {
-                        userData.purchasedFoods.push(reward.id);
-                        rewardText = `獲得食物：${reward.name}！`;
-                    }
-                }
-                break;
-            case 'personality':
-                reward = getRandomUnownedItem(personalities.filter(p => !p.isHidden), userData.purchasedPersonalities);
-                if (reward) {
+                    rewardText = `獲得${reward.isHidden ? '隱藏' : ''}髮型：${reward.name}！`;
+                    createRewardPreview(reward, 'hairstyle', resultIcon);
+                    break;
+                case 'personality':
                     userData.purchasedPersonalities.push(reward.id);
-                    rewardText = `獲得性格：${reward.name}！`;
-                } else {
-                    reward = getRandomItem(foods);
-                    if (reward) {
-                        userData.purchasedFoods.push(reward.id);
-                        rewardText = `獲得食物：${reward.name}！`;
-                    }
-                }
-                break;
+                    rewardText = `獲得${reward.isHidden ? '隱藏' : ''}形象：${reward.name}！`;
+                    createRewardPreview(reward, 'personality', resultIcon);
+                    break;
+            }
         }
-    }
-    
-    // 如果有獎勵，根據實際獲得的reward更新rewardType
-    if (reward) {
-        rewardType = reward.type;
-    }
-    
-    // 設置獎勵顯示
-    if (reward && (rewardType === 'expression' || rewardType === 'hairstyle' || rewardType === 'personality')) {
-        createRewardPreview(reward, rewardType, resultIcon);
-    } else if (rewardType === 'food') {
-        resultIcon.textContent = reward.emoji;
-    } else {
-        resultIcon.textContent = '❌';
-    }
-    
-    resultText.innerHTML = `<div style="text-align: center; line-height: 1.6; font-weight: bold; color: #333; font-size: 1.2rem;">${rewardText}</div>`;
-    
-    // 顯示結果容器
-    setTimeout(() => {
-        resultContainer.classList.add('show');
-    }, 500);
-    
-    // 保存用戶數據
-    saveUserData();
-    
-    // 顯示獲得的獎勵通知
-    showNotification(rewardText);
-    
-    // 3秒後自動關閉動畫
-    setTimeout(() => {
-        mysteryboxAnimation.style.display = 'none';
-        resultContainer.classList.remove('show');
-        const giftBox3d = document.getElementById('gift-box-3d');
-        giftBox3d.classList.remove('opening');
-        giftBox3d.style.display = 'flex';
         
-        const confettiElements = mysteryboxAnimation.querySelectorAll('.confetti-3d');
-        confettiElements.forEach(el => el.remove());
-    }, 3000);
+        resultText.innerHTML = `<div style="text-align: center; line-height: 1.6; font-weight: bold; color: #333; font-size: 1.2rem;">${rewardText}</div>`;
+        
+        saveUserData(); // 保存用戶數據
+        showNotification(rewardText); // 顯示通知
+        
+        resolve(); // 解決Promise，讓 openMysteryBox 函數繼續執行
+    });
 }
+
 
 function createRewardPreview(reward, rewardType, container) {
     container.innerHTML = '';
