@@ -3264,16 +3264,11 @@ const friendsTabs = document.querySelectorAll('.friends-tabs .tab');
 
 
 
-        const API_KEYS = [
-   "pk_D77NeM4n6GnNCYbo",
-"pk_c17y17tQ3BY71cpd",
-"pk_Ax3rRTHkrdTQVIGD",
-"pk_dGVqEggn4T4dwQI3",
-"pk_YIFWnDFts0quviE0"
-        ];
-        let currentApiKeyIndex = 0;
-        const API_URL = "https://gen.pollinations.ai/v1/chat/completions";
-        const MODEL = "gemini";
+// === 後端配置 ===
+const CLOUDFLARE_WORKER_URL = "https://script.google.com/macros/s/AKfycbw3GLUM12ls3PhST5TkimLZvZwQx2H4RG8g2SbZiMJmuxg3HqsO_d13kPU4AnKpxi2P6A/exec"; // 請確認這是您正確的 GAS URL
+
+// 保持模型定義 (後端會接收此參數)
+const MODEL = "gemini";
 
         const chatOutput = document.getElementById('chat-output');
         const userInput = document.getElementById('user-input');
@@ -5453,37 +5448,85 @@ function updateAllAIMessageNames() {
     });
 }
 
+
+// ★★★ 新增：統一處理 Log 顏色的輔助函數 ★★★
+function logProviderInfo(dataOrResponse, apiName) {
+    let provider = null;
+    let debugTrace = null;
+
+    // 1. 判斷資料來源
+    if (dataOrResponse._provider_log) {
+        // [情況 A] 新版 GAS：從 JSON 本體讀取
+        provider = dataOrResponse._provider_log;
+        // 如果後端有回傳 trace 陣列，也可在此讀取
+        if (Array.isArray(dataOrResponse.trace)) {
+            debugTrace = dataOrResponse.trace;
+        }
+    } else if (dataOrResponse.headers && typeof dataOrResponse.headers.get === 'function') {
+        // [情況 B] 舊版/Worker：從 Header 讀取 (保留兼容性)
+        provider = dataOrResponse.headers.get('X-Provider-Log');
+        const traceStr = dataOrResponse.headers.get('X-Debug-Trace');
+        if (traceStr) {
+            try { debugTrace = JSON.parse(traceStr); } catch(e) {}
+        }
+    }
+
+    // 2. 顯示失敗的嘗試 (如果有 Trace)
+    if (debugTrace && Array.isArray(debugTrace)) {
+        debugTrace.forEach(trace => {
+            console.log(`%c[${apiName} Fail] ${trace}`, "color: #ffeb3b; background: #333; padding: 2px 5px;");
+        });
+    }
+
+    // 3. 顯示成功的調用 (顏色設定)
+    if (provider) {
+        if (provider.includes("OFFICIAL DEEPSEEK")) {
+            // 官方 DeepSeek：橙紅風格
+            console.log(`%c🚀 [${apiName}] SUCCESS via ${provider}`, "color: #fff; background: #e64a19; padding: 4px 8px; border-radius: 4px; font-weight: bold;");
+        } else {
+            // Pollinations 或其他：藍綠風格
+            console.log(`%c🌿 [${apiName}] SUCCESS via ${provider}`, "color: #fff; background: #009688; padding: 4px 8px; border-radius: 4px; font-weight: bold;");
+        }
+    }
+}
+
+
+
+		
+
         // 發送消息到API
-        async function sendMessage() {
-            let message = userInput.value.trim();
-            if (!message) return;
+    // 發送消息到 API (GAS 代理版)
+async function sendMessage() {
+    let message = userInput.value.trim();
+    if (!message) return;
 
-            message = message
-                .replace(/(呢|呀|啦|喎|咁|同埋)$/g, '$1。')
-                .replace(/(係|唔係|有|無|咪|係咪)$/g, '$1，')
-                .replace(/(因為|所以|如果|但係)$/g, '$1，')
-                .replace(/([。！？])([^\s])/g, '$1 $2')
-                .trim();
+    // 粵語助詞與標點符號處理
+    message = message
+        .replace(/(呢|呀|啦|喎|咁|同埋)$/g, '$1。')
+        .replace(/(係|唔係|有|無|咪|係咪)$/g, '$1，')
+        .replace(/(因為|所以|如果|但係)$/g, '$1，')
+        .replace(/([。！？])([^\s])/g, '$1 $2')
+        .trim();
 
-            addMessage(message, 'user');
-            userInput.value = '';
-            sendBtn.disabled = true;
-            voiceBtn.disabled = true;
-            typingIndicator.style.display = 'block';
+    addMessage(message, 'user');
+    userInput.value = '';
+    sendBtn.disabled = true;
+    voiceBtn.disabled = true;
+    typingIndicator.style.display = 'block';
 
-            conversationHistory.push({ role: 'user', content: message });
+    conversationHistory.push({ role: 'user', content: message });
 
-            try {
-                speechSynthesis.cancel();
-                stopTalking();
+    try {
+        speechSynthesis.cancel();
+        stopTalking();
 
-                const mode = modeSelect.value;
-                const currentPersonality = personalities.find(p => p.id === userData.currentPersonality);
-                let personalityPrompt = currentPersonality && currentPersonality.prompt ? currentPersonality.prompt : '';
-                
-                let systemPrompt = '';
-                if (mode === 'comfort') {
-                    systemPrompt = `你係一個中學DSE中文老師，非常風趣幽默、毒舌，喜歡在回應問題時揶揄學生（但不會傷學生自尊心），但又有正經嚴肅的一面。你的語文知識豐富。請用繁體中文同香港粵語回應，說話要貼近日常生活，但不要市井粗俗，要顯得有文化。${personalityPrompt} 
+        const mode = modeSelect.value;
+        const currentPersonality = personalities.find(p => p.id === userData.currentPersonality);
+        let personalityPrompt = currentPersonality && currentPersonality.prompt ? currentPersonality.prompt : '';
+        
+        let systemPrompt = '';
+        if (mode === 'comfort') {
+            systemPrompt = `你係一個中學DSE中文老師，非常風趣幽默、毒舌，喜歡在回應問題時揶揄學生（但不會傷學生自尊心），但又有正經嚴肅的一面。你的語文知識豐富。請用繁體中文同香港粵語回應，說話要貼近日常生活，但不要市井粗俗，要顯得有文化。${personalityPrompt} 
 
 重要規則：你的回應必須是純淨的文字格式，絕對不可以包含任何格式符號，包括但不限於：
 - 絕對不可以使用星號，如「**文字**」或「*文字*」
@@ -5499,8 +5542,8 @@ function updateAllAIMessageNames() {
 你要回答學生在閱讀卷上的疑難，例如十二篇指定範文、長問答題技巧等，或者要解答同學一些中文概念的問題。假如同學的問題問及一些具體的篇章，而你的數據庫中並沒有這篇文章的資料，請不要虛構文章內容回應，要請同學提供文本。不可以直接告訴用家答案，只能給予引導，適時運用日常化的比喻（有兩點要注意：一，不要只針對某一句去打比喻，要針對整體內容去做比喻；二，不可以每次回應都用，這樣會顯得很機械化）。內容長度要維持在一百二十字內。絕對不可以用粗言穢語或粗口諧音，嚴禁用「屌」、「撚」、「仆街」！
 
 以下是閱讀卷筆記需評估答題方向是否合理、文本依據是否充實具體、闡釋推論是否嚴謹、主題句是否清晰。文本依據應概括歸納而非直接引用原文，除非題目中有『摘錄』字眼。改寫範例應使答案更圓足，但若學生答題方向錯誤，則不跟從錯誤方向改寫。在「改寫範例」前，加入答題步驟及思路，描述各部分方向，步驟因題制宜，可能包括【鋪墊】、【回應】、【文本依據】、【闡釋】，靈活運用。`;
-                } else {
-                    systemPrompt = `你係一個中學DSE中文老師，非常風趣幽默、毒舌，喜歡在回應問題時揶揄學生（但不會傷學生自尊心），但又有正經嚴肅的一面。你的語文知識豐富。請用繁體中文同香港粵語回應，說話要貼近日常生活，但不要市井粗俗，要顯得有文化。${personalityPrompt} 
+        } else {
+            systemPrompt = `你係一個中學DSE中文老師，非常風趣幽默、毒舌，喜歡在回應問題時揶揄學生（但不會傷學生自尊心），但又有正經嚴肅的一面。你的語文知識豐富。請用繁體中文同香港粵語回應，說話要貼近日常生活，但不要市井粗俗，要顯得有文化。${personalityPrompt} 
 
 重要規則：你的回應必須是純淨的文字格式，絕對不可以包含任何格式符號，包括但不限於：
 - 絕對不可以使用星號，如「**文字**」或「*文字*」
@@ -5518,53 +5561,69 @@ function updateAllAIMessageNames() {
 議論文筆記如下：1. 論點清晰明確，一語中的，能直接呼應題目；2. 論據與論點密切相關，全文論據涵蓋古今中外（不需要每段都有古今中外的例子，不要捏造用家沒有輸入的例子作點評，假如缺少例子，直言其問題即可。要注意過猶不及，充塞例子則感覺生硬）；3. 論證嚴謹，能具體解釋論據與論點的關係；4. 注意文句密度（詞匯量、實詞及虛詞比例，但過猶不及，過量使用實詞則生硬，適時加入虛詞，才能使文句節奏錯落有致）及修辭運用（宜適時運用排比和比喻）。
 
 敘事抒情文筆記如下：請注意大綱的邏輯性、條理性以及是否包含了故事的起承轉合或三線結構（即所謂「散敘」，有以下三點要注意：其一，三線的分類範疇相同；其二，三線或有層遞關係，或能從三個角度呈現同一個主題；其三，三線的情節發展不能過於相似；其四，所分之角度能突顯與主題相關的立意。「三線」例子如下：題目為「勇氣」，則可用「年少時的勇氣」為一線、「年青時的勇氣」為二線、「年老時的勇氣」為三線；又如以「重遊舊地所見有感」，則可用在故鄉的不同「地」所見作三線分類，例如老屋、後山等。必須確保每條線的「結構段重點」清晰點明三線的分類範疇、想突顯題目的甚麼要點、與題目如何扣連等，以及「合」能統攝總結全文立意）。要逐部分分析每個結構段與題目的關係有多大，並在點評中明確指出。此外，在「改寫後的大綱」,其「結構段重點」必須交代該部份與題目之間的邏輯關係，即怎樣做到扣題。此外，由於是應試文章，因此改寫後的大綱避免過份具理論哲學性及文學性，以至於脫離了現實和日常生活，亦圍繞人在經歷的情感和體悟設定，必須減少概念模糊的術語，例如「情感載體」及「時空的共創」，請用日常化用語描述。此外，「改寫後的大綱」不宜只圍繞一件事敘寫，這樣會容易寫得太抽象，應適時加插人物與人物之間的回憶或其他經歷，令文章看起來更具體實在。此外，大綱不是全篇文章，最重要的是在點評時分析其結構段及情節大要的思路是否扣緊題目，方向是否合理、正確。`;
-                }
-
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${API_KEYS[currentApiKeyIndex]}`
-                    },
-                    body: JSON.stringify({
-                        model: MODEL,
-                        messages: [
-                            { role: 'system', content: systemPrompt },
-                            ...conversationHistory
-                        ],
-                        max_tokens: 64000
-                    })
-                });
-
-                if (!response.ok) {
-                    if (response.status === 429 && currentApiKeyIndex < API_KEYS.length - 1) {
-                        currentApiKeyIndex++;
-                        addMessage('API 限制，切換密鑰重試...', 'ai');
-                        sendMessage();
-                        return;
-                    }
-                    throw new Error(`HTTP 錯誤！狀態：${response.status}`);
-                }
-
-                const data = await response.json();
-                let aiResponse = data.choices[0].message.content;
-                
-                // 徹底清理AI回應
-                aiResponse = cleanText(aiResponse);
-                
-                addMessage(aiResponse, 'ai');
-                conversationHistory.push({ role: 'assistant', content: aiResponse });
-                
-                addPoints(1);
-                speak(aiResponse);
-            } catch (error) {
-                addMessage(`錯誤：${error.message}`, 'error');
-            }
-
-            typingIndicator.style.display = 'none';
-            sendBtn.disabled = false;
-            voiceBtn.disabled = false;
         }
+
+        // 準備發送給 GAS 的數據包
+        const payload = {
+            model: MODEL,
+            messages: [
+                { role: 'system', content: systemPrompt },
+                ...conversationHistory
+            ],
+            max_tokens: 64000,
+            temperature: 0.7
+        };
+
+        // 發送請求到 Google Apps Script
+        const response = await fetch(CLOUDFLARE_WORKER_URL, {
+            method: 'POST',
+            // GAS Web App 處理跨域時，通常用 text/plain 或 application/json
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`HTTP 錯誤！狀態：${response.status} - ${errorText}`);
+        }
+
+        const data = await response.json();
+
+        // ★★★ 調用美化 Log 函數 ★★★
+        // "YuDanAI" 是在 Console 顯示的標籤，您可以隨意改
+        logProviderInfo(data, "YuDanAI");
+
+        // 錯誤檢查
+        if (data.error) {
+            console.error('後端返回錯誤:', data.error);
+            // 可以在此處理後端明確返回的錯誤，例如顯示錯誤訊息
+            throw new Error(`AI生成失敗: ${data.error}`);
+        }
+
+        if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+            console.error('API返回數據格式錯誤:', data);
+            throw new Error('API返回數據格式不正確');
+        }
+
+        let aiResponse = data.choices[0].message.content;
+        
+        // 徹底清理AI回應
+        aiResponse = cleanText(aiResponse);
+        
+        addMessage(aiResponse, 'ai');
+        conversationHistory.push({ role: 'assistant', content: aiResponse });
+        
+        addPoints(1);
+        speak(aiResponse);
+
+    } catch (error) {
+        console.error("發送訊息錯誤:", error);
+        addMessage(`錯誤：${error.message || '發生未知錯誤，請稍後重試'}`, 'error');
+    }
+
+    typingIndicator.style.display = 'none';
+    sendBtn.disabled = false;
+    voiceBtn.disabled = false;
+}
 
         // 流暢拖拽實現
         let dragOffset = { x: 0, y: 0 };
