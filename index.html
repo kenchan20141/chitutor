@@ -3217,7 +3217,9 @@
 
 
 
-
+// 全局變量
+let recognition = null;
+let isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
 
 
@@ -5145,11 +5147,7 @@ document.addEventListener('click', (e) => {
         // 啟動隨機眨眼
         randomBlinking();
 
-        // 全局變量
-let recognition = null;
-let isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-// 檢查瀏覽器支持
+       // 檢查瀏覽器支持
 function isSpeechRecognitionSupported() {
     return 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
 }
@@ -5306,8 +5304,6 @@ function stopRecording() {
         }
     }
 }
-
-       
         // 檢查滑動取消
         function checkSwipe(e) {
             if (!isRecording) return;
