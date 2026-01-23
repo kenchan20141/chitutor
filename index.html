@@ -3217,9 +3217,7 @@
 
 
 
-// 全局變量
-let recognition = null;
-let isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
 
 
 
@@ -5147,163 +5145,157 @@ document.addEventListener('click', (e) => {
         // 啟動隨機眨眼
         randomBlinking();
 
-       // 檢查瀏覽器支持
-function isSpeechRecognitionSupported() {
-    return 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
-}
+        // 檢查瀏覽器是否支援語音識別 - 修復語音輸入問題
+        function isSpeechRecognitionSupported() {
+            return 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
+        }
 
-// 初始化語音識別 (針對手機優化版)
-function initSpeechRecognition() {
-    if (!isSpeechRecognitionSupported()) {
-        voiceBtn.disabled = true;
-        voiceBtn.title = '您的瀏覽器不支援語音輸入';
-        return null;
-    }
-
-    try {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        const recognizer = new SpeechRecognition();
-        
-        recognizer.lang = 'zh-HK'; // 設定為廣東話
-        
-        // ★★★ 關鍵修復：手機版強制關閉連續模式 ★★★
-        // 手機(特別是iOS)在 continuous=true 時極易卡死
-        recognizer.continuous = false; 
-        recognizer.interimResults = true; // 允許顯示中間結果(即時字幕)
-        recognizer.maxAlternatives = 1;
-
-        recognizer.onstart = function() {
-            isRecording = true;
-            voiceBtn.classList.add('recording');
-            recordingIndicator.style.display = 'flex';
-            swipeHint.style.display = 'block';
-            
-            // 手機版提示
-            if (isMobile) {
-                userInput.placeholder = "請說話...";
+        // 語音識別初始化 - 修復語音輸入問題
+        function initSpeechRecognition() {
+            if (!isSpeechRecognitionSupported()) {
+                voiceBtn.disabled = true;
+                voiceBtn.title = '您的瀏覽器不支援語音輸入';
+                return null;
             }
-        };
 
-        recognizer.onresult = function(event) {
-            let finalTranscript = '';
-            let interimTranscript = '';
+            try {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (!SpeechRecognition) {
+                    console.error('Speech recognition not supported');
+                    voiceBtn.disabled = true;
+                    voiceBtn.title = '您的瀏覽器不支援語音輸入';
+                    return null;
+                }
 
-            for (let i = event.resultIndex; i < event.results.length; ++i) {
-                if (event.results[i].isFinal) {
-                    finalTranscript += event.results[i][0].transcript;
+                const recognizer = new SpeechRecognition();
+                recognizer.lang = 'zh-HK';
+                recognizer.continuous = true;
+                recognizer.interimResults = true;
+
+                recognizer.onstart = function() {
+                    isRecording = true;
+                    voiceBtn.classList.add('recording');
+                    recordingIndicator.style.display = 'flex';
+                    swipeHint.style.display = 'block';
+                    voiceBtn.title = '正在語音輸入，滑動取消';
+                };
+
+                recognizer.onresult = function(event) {
+                    if (!event || !event.results) {
+                        console.error('語音識別結果無效');
+                        return;
+                    }
+
+                    clearTimeout(silenceTimeout);
+                    let interimTranscript = '';
+                    for (let i = event.resultIndex; i < event.results.length; ++i) {
+                        if (event.results[i] && event.results[i][0]) {
+                            if (event.results[i].isFinal) {
+                                transcript += event.results[i][0].transcript;
+                            } else {
+                                interimTranscript += event.results[i][0].transcript;
+                            }
+                        }
+                    }
+
+                    // 防止輸入框延遲，使用requestAnimationFrame進行優化
+                    requestAnimationFrame(() => {
+                        userInput.value = transcript + interimTranscript;
+                    });
+                    
+                    // 設置自動停止
+                    silenceTimeout = setTimeout(() => {
+                        try {
+                            recognizer.stop();
+                            sendMessage();
+                        } catch (error) {
+                            console.error('停止語音識別出錯:', error);
+                            stopRecording();
+                        }
+                    }, 2000);
+                };
+
+                recognizer.onerror = function(event) {
+                    console.error('語音識別錯誤:', event.error);
+                    addMessage(`語音輸入出錯: ${event.error}`, 'error');
+                    stopRecording();
+                };
+
+                recognizer.onend = function() {
+                    stopRecording();
+                };
+
+                return recognizer;
+            } catch (error) {
+                console.error('初始化語音識別失敗:', error);
+                voiceBtn.disabled = true;
+                voiceBtn.title = '語音輸入初始化失敗';
+                return null;
+            }
+        }
+
+        // 初始化語音識別
+        recognition = initSpeechRecognition();
+
+        // 開始錄音
+        function startRecording() {
+            if (!recognition) {
+                addMessage('語音識別功能未能初始化', 'error');
+                return;
+            }
+            
+            if (voiceBtn.disabled) return;
+            
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel();
+                stopTalking();
+            }
+            
+            try {
+                transcript = '';
+                recognition.start();
+            } catch (error) {
+                console.error('啟動語音識別失敗:', error);
+                
+                // 嘗試重新初始化語音識別
+                recognition = initSpeechRecognition();
+                if (recognition) {
+                    setTimeout(() => {
+                        try {
+                            transcript = '';
+                            recognition.start();
+                        } catch (retryError) {
+                            console.error('重試啟動語音識別失敗:', retryError);
+                            addMessage('啟動麥克風失敗，請確保已授予權限', 'error');
+                            stopRecording();
+                        }
+                    }, 500);
                 } else {
-                    interimTranscript += event.results[i][0].transcript;
+                    addMessage('啟動麥克風失敗，請確保已授予權限', 'error');
+                    stopRecording();
                 }
             }
-
-            // 更新輸入框
-            const currentText = finalTranscript || interimTranscript;
-            if (currentText) {
-                userInput.value = currentText;
-            }
-        };
-
-        recognizer.onerror = function(event) {
-            console.error('語音識別錯誤:', event.error);
-            
-            let errorMsg = '';
-            switch(event.error) {
-                case 'not-allowed':
-                    errorMsg = '麥克風權限被拒絕，請到手機設定中允許瀏覽器使用麥克風。';
-                    break;
-                case 'no-speech':
-                    // 手機上經常發生，忽略即可，不要彈窗打擾
-                    console.log('未偵測到聲音');
-                    return; 
-                case 'audio-capture':
-                    errorMsg = '找不到麥克風。';
-                    break;
-                case 'network':
-                    errorMsg = '網絡連線不穩定，語音識別需要網絡。';
-                    break;
-                default:
-                    errorMsg = '語音識別錯誤: ' + event.error;
-            }
-            
-            if (errorMsg) {
-                addMessage(errorMsg, 'error');
-                alert(errorMsg); // 手機上彈窗提示更明顯
-            }
-            stopRecording();
-        };
-
-        recognizer.onend = function() {
-            // 自動停止錄音狀態
-            stopRecording();
-            
-            // 如果輸入框有內容，且是手機版，可以考慮自動發送（這裡先保持手動發送）
-            if (userInput.value.trim().length > 0) {
-                // 可選：自動發送
-                // sendMessage(); 
-            }
-        };
-
-        return recognizer;
-    } catch (error) {
-        console.error('初始化失敗:', error);
-        return null;
-    }
-}
-
-// 重新初始化
-recognition = initSpeechRecognition();
-
-// 開始錄音 (手機版點擊事件處理)
-function startRecording() {
-    // 1. 如果正在說話(TTS)，先停止
-    if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-    }
-    stopTalking();
-
-    // 2. 重新初始化 (iOS 有時需要重新建立實例才能再次啟動)
-    if (!recognition) {
-        recognition = initSpeechRecognition();
-    }
-
-    if (!recognition) {
-        alert("無法啟動語音功能");
-        return;
-    }
-
-    try {
-        transcript = ''; // 清空之前的文字
-        userInput.value = ''; // 清空輸入框
-        userInput.placeholder = "聆聽中...";
-        recognition.start();
-    } catch (error) {
-        console.error('啟動錄音失敗:', error);
-        // 如果是因為已經開始了導致的報錯，先停再開
-        try {
-            recognition.stop();
-            setTimeout(() => recognition.start(), 200);
-        } catch(e) {
-            alert('無法啟動麥克風，請刷新頁面重試');
         }
-    }
-}
 
-// 停止錄音
-function stopRecording() {
-    isRecording = false;
-    voiceBtn.classList.remove('recording');
-    recordingIndicator.style.display = 'none';
-    swipeHint.style.display = 'none';
-    userInput.placeholder = "輸入你的訊息...";
-    
-    if (recognition) {
-        try {
-            recognition.stop();
-        } catch (e) {
-            // 忽略停止時的錯誤
+        // 停止錄音
+        function stopRecording() {
+            isRecording = false;
+            voiceBtn.classList.remove('recording');
+            recordingIndicator.style.display = 'none';
+            swipeHint.style.display = 'none';
+            voiceBtn.title = '點擊語音輸入';
+            voiceBtn.disabled = false;
+            clearTimeout(silenceTimeout);
+            
+            if (recognition) {
+                try {
+                    recognition.stop();
+                } catch (error) {
+                    console.error('停止語音識別時出錯:', error);
+                }
+            }
         }
-    }
-}
+
         // 檢查滑動取消
         function checkSwipe(e) {
             if (!isRecording) return;
