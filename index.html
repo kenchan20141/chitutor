@@ -3203,25 +3203,8 @@
         <p>Copyright © 2025 陳冠健、黃子謙. All rights reserved.</p>
     </footer>
 
-
-
-
-
-
-
-
-
-
-    
     <script>
 
-
-
-
-
-
-
-        
 
 // Firebase 配置
 const firebaseConfig = {
@@ -3264,11 +3247,16 @@ const friendsTabs = document.querySelectorAll('.friends-tabs .tab');
 
 
 
-// === 後端配置 ===
-const CLOUDFLARE_WORKER_URL = "https://script.google.com/macros/s/AKfycbw3GLUM12ls3PhST5TkimLZvZwQx2H4RG8g2SbZiMJmuxg3HqsO_d13kPU4AnKpxi2P6A/exec"; // 請確認這是您正確的 GAS URL
-
-// 保持模型定義 (後端會接收此參數)
-const MODEL = "gemini";
+        const API_KEYS = [
+   "pk_D77NeM4n6GnNCYbo",
+"pk_c17y17tQ3BY71cpd",
+"pk_Ax3rRTHkrdTQVIGD",
+"pk_dGVqEggn4T4dwQI3",
+"pk_YIFWnDFts0quviE0"
+        ];
+        let currentApiKeyIndex = 0;
+        const API_URL = "https://gen.pollinations.ai/v1/chat/completions";
+        const MODEL = "gemini";
 
         const chatOutput = document.getElementById('chat-output');
         const userInput = document.getElementById('user-input');
@@ -3660,24 +3648,24 @@ async function openMysteryBox(boxData) {
     const resultContainer = document.getElementById('mysterybox-result-container');
     const boxTop = document.getElementById('box-top');
 
-    // 1. 顯示容器
+    // 1. 準備動畫環境
+    // 確保之前的動畫和狀態被清除
     mysteryboxAnimation.style.display = 'flex';
     resultContainer.classList.remove('show');
     resultContainer.style.opacity = '0';
-    
-    // 2. 強制重置動畫狀態
     giftBox3d.style.display = 'block';
-    giftBox3d.style.animation = 'none';
     giftBox3d.classList.remove('opening');
+    giftBox3d.style.animation = ''; // 清除所有之前的動畫
     
-    // 重置盒蓋位置 (暫時移除 transition 以便瞬間歸位)
-    boxTop.style.transition = 'none';
+    // 重置盒蓋位置，確保動畫能從初始狀態開始
+    boxTop.style.transition = 'none'; // 暫時移除過渡效果以便立即重置
+    await new Promise(resolve => setTimeout(resolve, 0)); // 等待UI更新
     boxTop.style.transform = 'rotateX(90deg) translateZ(100px)';
 
-    // 清除舊的紙屑
+    // 清除上次的紙屑
     document.querySelectorAll('.confetti-3d').forEach(el => el.remove());
 
-    // 設置顏色樣式
+    // 設置盲盒類型
     giftBox3d.className = `gift-box-3d mysterybox-${boxData.id}`;
     
     // 抽獎邏輯
@@ -3692,50 +3680,45 @@ async function openMysteryBox(boxData) {
         }
     }
 
-    // 3. 關鍵修復：給瀏覽器一點時間應用"重置"的狀態，然後再開始動畫
-    await new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 50)));
-
     try {
-        // 播放搖晃動畫
+        // 2. 播放搖晃動畫
         giftBox3d.style.animation = 'mysteryboxShake 1.5s ease-in-out';
-        await new Promise(resolve => setTimeout(resolve, 1500)); 
+        await new Promise(resolve => setTimeout(resolve, 1500)); // 等待搖晃動畫結束
 
-        // 播放懸浮動畫
-        giftBox3d.style.animation = 'none'; 
-        void giftBox3d.offsetWidth; // 強制瀏覽器重繪 (Reflow)
+        // 3. 播放打開動畫
+        giftBox3d.style.animation = 'none'; // 清除搖晃動畫
+        void giftBox3d.offsetWidth; // 強制瀏覽器重繪
         giftBox3d.style.animation = 'mysteryboxFloat 3s ease-in-out infinite';
         
-        // 恢復 transition 並打開盒蓋
+        // 觸發盒蓋打開動畫
         boxTop.style.transition = 'all 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
-        // 使用 requestAnimationFrame 確保樣式應用
-        requestAnimationFrame(() => {
-            boxTop.style.transform = 'rotateX(90deg) translateZ(100px) rotateX(-120deg) translateY(-80px)';
-            giftBox3d.classList.add('opening');
-        });
+        giftBox3d.classList.add('opening');
         
-        await new Promise(resolve => setTimeout(resolve, 800)); // 等待盒蓋打開
+        await new Promise(resolve => setTimeout(resolve, 1000)); // 等待盒蓋打開一部分
 
-        // 產生紙屑並顯示結果
+        // 4. 產生紙屑並顯示結果
         create3DConfetti();
+        
+        // 處理獎勵邏輯，並更新UI
         await showMysteryBoxResult(rewardType);
         
-        // 顯示結果卡片
+        // 5. 盒子消失，結果完全顯示
         resultContainer.classList.add('show');
-        
-        // 盒子消失動畫
         giftBox3d.style.animation = 'mysteryboxDisappear 1s forwards';
         
-        // 4秒後自動關閉
+        await new Promise(resolve => setTimeout(resolve, 1000)); // 等待盒子消失動畫
+        
+        // 6. 清理並關閉動畫
         setTimeout(() => {
             mysteryboxAnimation.style.display = 'none';
-            // 重置狀態以備下次使用
-            giftBox3d.style.animation = '';
+            giftBox3d.style.animation = ''; // 完全清除動畫
             giftBox3d.classList.remove('opening');
             resultContainer.classList.remove('show');
-        }, 4000);
+        }, 4000); // 延長顯示結果的時間
 
     } catch (error) {
         console.error("打開盲盒時發生錯誤:", error);
+        // 如果出錯，確保隱藏動畫界面
         mysteryboxAnimation.style.display = 'none';
         addMessage('打開盲盒時發生錯誤，請稍後再試。', 'error');
     }
@@ -5453,85 +5436,37 @@ function updateAllAIMessageNames() {
     });
 }
 
-
-// ★★★ 新增：統一處理 Log 顏色的輔助函數 ★★★
-function logProviderInfo(dataOrResponse, apiName) {
-    let provider = null;
-    let debugTrace = null;
-
-    // 1. 判斷資料來源
-    if (dataOrResponse._provider_log) {
-        // [情況 A] 新版 GAS：從 JSON 本體讀取
-        provider = dataOrResponse._provider_log;
-        // 如果後端有回傳 trace 陣列，也可在此讀取
-        if (Array.isArray(dataOrResponse.trace)) {
-            debugTrace = dataOrResponse.trace;
-        }
-    } else if (dataOrResponse.headers && typeof dataOrResponse.headers.get === 'function') {
-        // [情況 B] 舊版/Worker：從 Header 讀取 (保留兼容性)
-        provider = dataOrResponse.headers.get('X-Provider-Log');
-        const traceStr = dataOrResponse.headers.get('X-Debug-Trace');
-        if (traceStr) {
-            try { debugTrace = JSON.parse(traceStr); } catch(e) {}
-        }
-    }
-
-    // 2. 顯示失敗的嘗試 (如果有 Trace)
-    if (debugTrace && Array.isArray(debugTrace)) {
-        debugTrace.forEach(trace => {
-            console.log(`%c[${apiName} Fail] ${trace}`, "color: #ffeb3b; background: #333; padding: 2px 5px;");
-        });
-    }
-
-    // 3. 顯示成功的調用 (顏色設定)
-    if (provider) {
-        if (provider.includes("OFFICIAL DEEPSEEK")) {
-            // 官方 DeepSeek：橙紅風格
-            console.log(`%c🚀 [${apiName}] SUCCESS via ${provider}`, "color: #fff; background: #e64a19; padding: 4px 8px; border-radius: 4px; font-weight: bold;");
-        } else {
-            // Pollinations 或其他：藍綠風格
-            console.log(`%c🌿 [${apiName}] SUCCESS via ${provider}`, "color: #fff; background: #009688; padding: 4px 8px; border-radius: 4px; font-weight: bold;");
-        }
-    }
-}
-
-
-
-		
-
         // 發送消息到API
-    // 發送消息到 API (GAS 代理版)
-async function sendMessage() {
-    let message = userInput.value.trim();
-    if (!message) return;
+        async function sendMessage() {
+            let message = userInput.value.trim();
+            if (!message) return;
 
-    // 粵語助詞與標點符號處理
-    message = message
-        .replace(/(呢|呀|啦|喎|咁|同埋)$/g, '$1。')
-        .replace(/(係|唔係|有|無|咪|係咪)$/g, '$1，')
-        .replace(/(因為|所以|如果|但係)$/g, '$1，')
-        .replace(/([。！？])([^\s])/g, '$1 $2')
-        .trim();
+            message = message
+                .replace(/(呢|呀|啦|喎|咁|同埋)$/g, '$1。')
+                .replace(/(係|唔係|有|無|咪|係咪)$/g, '$1，')
+                .replace(/(因為|所以|如果|但係)$/g, '$1，')
+                .replace(/([。！？])([^\s])/g, '$1 $2')
+                .trim();
 
-    addMessage(message, 'user');
-    userInput.value = '';
-    sendBtn.disabled = true;
-    voiceBtn.disabled = true;
-    typingIndicator.style.display = 'block';
+            addMessage(message, 'user');
+            userInput.value = '';
+            sendBtn.disabled = true;
+            voiceBtn.disabled = true;
+            typingIndicator.style.display = 'block';
 
-    conversationHistory.push({ role: 'user', content: message });
+            conversationHistory.push({ role: 'user', content: message });
 
-    try {
-        speechSynthesis.cancel();
-        stopTalking();
+            try {
+                speechSynthesis.cancel();
+                stopTalking();
 
-        const mode = modeSelect.value;
-        const currentPersonality = personalities.find(p => p.id === userData.currentPersonality);
-        let personalityPrompt = currentPersonality && currentPersonality.prompt ? currentPersonality.prompt : '';
-        
-        let systemPrompt = '';
-        if (mode === 'comfort') {
-            systemPrompt = `你係一個中學DSE中文老師，非常風趣幽默、毒舌，喜歡在回應問題時揶揄學生（但不會傷學生自尊心），但又有正經嚴肅的一面。你的語文知識豐富。請用繁體中文同香港粵語回應，說話要貼近日常生活，但不要市井粗俗，要顯得有文化。${personalityPrompt} 
+                const mode = modeSelect.value;
+                const currentPersonality = personalities.find(p => p.id === userData.currentPersonality);
+                let personalityPrompt = currentPersonality && currentPersonality.prompt ? currentPersonality.prompt : '';
+                
+                let systemPrompt = '';
+                if (mode === 'comfort') {
+                    systemPrompt = `你係一個中學DSE中文老師，非常風趣幽默、毒舌，喜歡在回應問題時揶揄學生（但不會傷學生自尊心），但又有正經嚴肅的一面。你的語文知識豐富。請用繁體中文同香港粵語回應，說話要貼近日常生活，但不要市井粗俗，要顯得有文化。${personalityPrompt} 
 
 重要規則：你的回應必須是純淨的文字格式，絕對不可以包含任何格式符號，包括但不限於：
 - 絕對不可以使用星號，如「**文字**」或「*文字*」
@@ -5547,8 +5482,8 @@ async function sendMessage() {
 你要回答學生在閱讀卷上的疑難，例如十二篇指定範文、長問答題技巧等，或者要解答同學一些中文概念的問題。假如同學的問題問及一些具體的篇章，而你的數據庫中並沒有這篇文章的資料，請不要虛構文章內容回應，要請同學提供文本。不可以直接告訴用家答案，只能給予引導，適時運用日常化的比喻（有兩點要注意：一，不要只針對某一句去打比喻，要針對整體內容去做比喻；二，不可以每次回應都用，這樣會顯得很機械化）。內容長度要維持在一百二十字內。絕對不可以用粗言穢語或粗口諧音，嚴禁用「屌」、「撚」、「仆街」！
 
 以下是閱讀卷筆記需評估答題方向是否合理、文本依據是否充實具體、闡釋推論是否嚴謹、主題句是否清晰。文本依據應概括歸納而非直接引用原文，除非題目中有『摘錄』字眼。改寫範例應使答案更圓足，但若學生答題方向錯誤，則不跟從錯誤方向改寫。在「改寫範例」前，加入答題步驟及思路，描述各部分方向，步驟因題制宜，可能包括【鋪墊】、【回應】、【文本依據】、【闡釋】，靈活運用。`;
-        } else {
-            systemPrompt = `你係一個中學DSE中文老師，非常風趣幽默、毒舌，喜歡在回應問題時揶揄學生（但不會傷學生自尊心），但又有正經嚴肅的一面。你的語文知識豐富。請用繁體中文同香港粵語回應，說話要貼近日常生活，但不要市井粗俗，要顯得有文化。${personalityPrompt} 
+                } else {
+                    systemPrompt = `你係一個中學DSE中文老師，非常風趣幽默、毒舌，喜歡在回應問題時揶揄學生（但不會傷學生自尊心），但又有正經嚴肅的一面。你的語文知識豐富。請用繁體中文同香港粵語回應，說話要貼近日常生活，但不要市井粗俗，要顯得有文化。${personalityPrompt} 
 
 重要規則：你的回應必須是純淨的文字格式，絕對不可以包含任何格式符號，包括但不限於：
 - 絕對不可以使用星號，如「**文字**」或「*文字*」
@@ -5566,69 +5501,53 @@ async function sendMessage() {
 議論文筆記如下：1. 論點清晰明確，一語中的，能直接呼應題目；2. 論據與論點密切相關，全文論據涵蓋古今中外（不需要每段都有古今中外的例子，不要捏造用家沒有輸入的例子作點評，假如缺少例子，直言其問題即可。要注意過猶不及，充塞例子則感覺生硬）；3. 論證嚴謹，能具體解釋論據與論點的關係；4. 注意文句密度（詞匯量、實詞及虛詞比例，但過猶不及，過量使用實詞則生硬，適時加入虛詞，才能使文句節奏錯落有致）及修辭運用（宜適時運用排比和比喻）。
 
 敘事抒情文筆記如下：請注意大綱的邏輯性、條理性以及是否包含了故事的起承轉合或三線結構（即所謂「散敘」，有以下三點要注意：其一，三線的分類範疇相同；其二，三線或有層遞關係，或能從三個角度呈現同一個主題；其三，三線的情節發展不能過於相似；其四，所分之角度能突顯與主題相關的立意。「三線」例子如下：題目為「勇氣」，則可用「年少時的勇氣」為一線、「年青時的勇氣」為二線、「年老時的勇氣」為三線；又如以「重遊舊地所見有感」，則可用在故鄉的不同「地」所見作三線分類，例如老屋、後山等。必須確保每條線的「結構段重點」清晰點明三線的分類範疇、想突顯題目的甚麼要點、與題目如何扣連等，以及「合」能統攝總結全文立意）。要逐部分分析每個結構段與題目的關係有多大，並在點評中明確指出。此外，在「改寫後的大綱」,其「結構段重點」必須交代該部份與題目之間的邏輯關係，即怎樣做到扣題。此外，由於是應試文章，因此改寫後的大綱避免過份具理論哲學性及文學性，以至於脫離了現實和日常生活，亦圍繞人在經歷的情感和體悟設定，必須減少概念模糊的術語，例如「情感載體」及「時空的共創」，請用日常化用語描述。此外，「改寫後的大綱」不宜只圍繞一件事敘寫，這樣會容易寫得太抽象，應適時加插人物與人物之間的回憶或其他經歷，令文章看起來更具體實在。此外，大綱不是全篇文章，最重要的是在點評時分析其結構段及情節大要的思路是否扣緊題目，方向是否合理、正確。`;
+                }
+
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_KEYS[currentApiKeyIndex]}`
+                    },
+                    body: JSON.stringify({
+                        model: MODEL,
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            ...conversationHistory
+                        ],
+                        max_tokens: 64000
+                    })
+                });
+
+                if (!response.ok) {
+                    if (response.status === 429 && currentApiKeyIndex < API_KEYS.length - 1) {
+                        currentApiKeyIndex++;
+                        addMessage('API 限制，切換密鑰重試...', 'ai');
+                        sendMessage();
+                        return;
+                    }
+                    throw new Error(`HTTP 錯誤！狀態：${response.status}`);
+                }
+
+                const data = await response.json();
+                let aiResponse = data.choices[0].message.content;
+                
+                // 徹底清理AI回應
+                aiResponse = cleanText(aiResponse);
+                
+                addMessage(aiResponse, 'ai');
+                conversationHistory.push({ role: 'assistant', content: aiResponse });
+                
+                addPoints(1);
+                speak(aiResponse);
+            } catch (error) {
+                addMessage(`錯誤：${error.message}`, 'error');
+            }
+
+            typingIndicator.style.display = 'none';
+            sendBtn.disabled = false;
+            voiceBtn.disabled = false;
         }
-
-        // 準備發送給 GAS 的數據包
-        const payload = {
-            model: MODEL,
-            messages: [
-                { role: 'system', content: systemPrompt },
-                ...conversationHistory
-            ],
-            max_tokens: 64000,
-            temperature: 0.7
-        };
-
-        // 發送請求到 Google Apps Script
-        const response = await fetch(CLOUDFLARE_WORKER_URL, {
-            method: 'POST',
-            // GAS Web App 處理跨域時，通常用 text/plain 或 application/json
-            body: JSON.stringify(payload)
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`HTTP 錯誤！狀態：${response.status} - ${errorText}`);
-        }
-
-        const data = await response.json();
-
-        // ★★★ 調用美化 Log 函數 ★★★
-        // "YuDanAI" 是在 Console 顯示的標籤，您可以隨意改
-        logProviderInfo(data, "YuDanAI");
-
-        // 錯誤檢查
-        if (data.error) {
-            console.error('後端返回錯誤:', data.error);
-            // 可以在此處理後端明確返回的錯誤，例如顯示錯誤訊息
-            throw new Error(`AI生成失敗: ${data.error}`);
-        }
-
-        if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-            console.error('API返回數據格式錯誤:', data);
-            throw new Error('API返回數據格式不正確');
-        }
-
-        let aiResponse = data.choices[0].message.content;
-        
-        // 徹底清理AI回應
-        aiResponse = cleanText(aiResponse);
-        
-        addMessage(aiResponse, 'ai');
-        conversationHistory.push({ role: 'assistant', content: aiResponse });
-        
-        addPoints(1);
-        speak(aiResponse);
-
-    } catch (error) {
-        console.error("發送訊息錯誤:", error);
-        addMessage(`錯誤：${error.message || '發生未知錯誤，請稍後重試'}`, 'error');
-    }
-
-    typingIndicator.style.display = 'none';
-    sendBtn.disabled = false;
-    voiceBtn.disabled = false;
-}
 
         // 流暢拖拽實現
         let dragOffset = { x: 0, y: 0 };
@@ -5964,19 +5883,9 @@ if (userProfile.vtuberAppearance) {
 }
 
 function checkNewGifts() {
-    // 添加這行檢查，防止未登入時報錯
-    if (!currentUser || !currentUser.uid) return;
-
     database.ref('users/' + currentUser.uid + '/gifts').on('child_added', (snapshot) => {
-        // 確保元素存在才操作
         const notification = document.getElementById('gift-notification');
-        if (notification) {
-            notification.style.display = 'block';
-            // 5秒後自動隱藏
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 5000);
-        }
+        notification.style.display = 'block';
     });
 }
 
@@ -6264,6 +6173,52 @@ function rejectFriendRequest(requestId) {
 }
 
 
+function loadChatList() {
+    const container = document.getElementById('friends-chat-list');
+    container.innerHTML = '';
+    
+    database.ref('friends/' + currentUser.uid).once('value')
+        .then((snapshot) => {
+            if (snapshot.exists()) {
+                const friends = snapshot.val();
+                Object.keys(friends).forEach(friendId => {
+                    loadChatFriendInfo(friendId, container);
+                });
+            } else {
+                container.innerHTML = '<p>還沒有好友可以聊天</p>';
+            }
+        });
+}
+
+function loadChatFriendInfo(friendId, container) {
+    database.ref('users/' + friendId).once('value')
+        .then((snapshot) => {
+            const friendData = snapshot.val();
+            if (friendData) {
+                getUserVtuberAppearance(friendId, (appearance) => {
+                    const friendItem = document.createElement('div');
+                    friendItem.className = 'friend-item';
+                    friendItem.style.cursor = 'pointer';
+                    friendItem.onclick = () => openChat(friendId, friendData.characterName || friendData.username);
+                    
+                    const avatarElement = createVtuberAvatar(appearance, 50);
+                    avatarElement.className = 'friend-avatar';
+                    avatarElement.style.marginRight = '15px';
+                    
+                    const infoDiv = document.createElement('div');
+                    infoDiv.className = 'friend-info';
+                    infoDiv.innerHTML = `
+                        <div><strong>${friendData.characterName || friendData.username || '未命名'}</strong></div>
+                        <div>點擊開始聊天</div>
+                    `;
+                    
+                    friendItem.appendChild(avatarElement);
+                    friendItem.appendChild(infoDiv);
+                    container.appendChild(friendItem);
+                });
+            }
+        });
+}
 
 // 獲取用戶的VTUBER外觀信息
 function getUserVtuberAppearance(userId, callback) {
@@ -6397,7 +6352,88 @@ function createVtuberAvatar(appearance, size = 50) {
 }
 
 
+function openChat(friendId, friendName) {
+    currentChatFriend = friendId;
+    document.getElementById('friends-chat-list').style.display = 'none';
+    document.getElementById('chat-window').style.display = 'block';
+    document.getElementById('current-friend-name').textContent = friendName;
+    
+    loadChatMessages();
+    
+    document.getElementById('back-to-chat-list').onclick = () => {
+        document.getElementById('chat-window').style.display = 'none';
+        document.getElementById('friends-chat-list').style.display = 'block';
+        currentChatFriend = null;
+    };
+}
 
+function loadChatMessages() {
+    const chatId = [currentUser.uid, currentChatFriend].sort().join('_');
+    const container = document.getElementById('chat-messages');
+    container.innerHTML = '';
+    
+    // 先設置參與者
+    const updates = {};
+    updates[`chats/${chatId}/participants/${currentUser.uid}`] = true;
+    updates[`chats/${chatId}/participants/${currentChatFriend}`] = true;
+    
+    database.ref().update(updates).then(() => {
+        // 然後監聽消息
+        database.ref('chats/' + chatId + '/messages').orderByChild('timestamp').on('value', (snapshot) => {
+            container.innerHTML = '';
+            if (snapshot.exists()) {
+                const messages = snapshot.val();
+                Object.values(messages).forEach(message => {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = `chat-message ${message.from === currentUser.uid ? 'sent' : 'received'}`;
+                    messageDiv.innerHTML = `
+                        <div>${message.text}</div>
+                        <small>${new Date(message.timestamp).toLocaleString()}</small>
+                    `;
+                    container.appendChild(messageDiv);
+                });
+                container.scrollTop = container.scrollHeight;
+            }
+        });
+    }).catch((error) => {
+        console.error('設置聊天室參與者失敗:', error);
+    });
+}
+
+function sendChatMessage() {
+    const input = document.getElementById('chat-message-input');
+    const message = input.value.trim();
+    if (!message || !currentChatFriend) return;
+    
+    const chatId = [currentUser.uid, currentChatFriend].sort().join('_');
+    const messageData = {
+        from: currentUser.uid,
+        text: message,
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+    };
+    
+    // 同時設置參與者信息以符合安全規則
+    const updates = {};
+    updates[`chats/${chatId}/messages`] = firebase.database().ref(`chats/${chatId}/messages`).push().key;
+    updates[`chats/${chatId}/messages/${updates[`chats/${chatId}/messages`]}`] = messageData;
+    updates[`chats/${chatId}/participants/${currentUser.uid}`] = true;
+    updates[`chats/${chatId}/participants/${currentChatFriend}`] = true;
+    
+    database.ref().update(updates)
+        .then(() => {
+            input.value = '';
+        })
+        .catch((error) => {
+            console.error('發送消息失敗:', error);
+        });
+}
+
+// 添加Enter鍵發送消息
+document.getElementById('chat-message-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        sendChatMessage();
+    }
+});
 
 
 
@@ -7214,12 +7250,14 @@ window.addEventListener('click', (e) => {
 </div>
 
 
+<!-- === 1. Firebase SDK 引入 === -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
 <!-- === 2. Firebase 初始化與配置 (這裡修復了您漏掉的啟動碼) === -->
-<!-- === [修改版] 雙 Firebase 共存設定 === -->
 <script>
-  // 1. 這裡改名為 statsConfig，避免跟上面的 firebaseConfig 衝突
-  const statsConfig = {
+  const firebaseConfig = {
     apiKey: "AIzaSyBgwrgn2m343mRJb0WjzUhteiospegXhvI",
     authDomain: "sansidata.firebaseapp.com",
     projectId: "sansidata",
@@ -7229,33 +7267,27 @@ window.addEventListener('click', (e) => {
     databaseURL: "https://sansidata-default-rtdb.firebaseio.com" 
   };
 
-  // 2. 初始化第二個 Firebase App，取名為 "StatsApp"
-  let statsApp;
-  try {
-      // 嘗試獲取已存在的 App，避免重複初始化
-      statsApp = firebase.app("StatsApp");
-  } catch (e) {
-      // 如果不存在，則初始化它
-      statsApp = firebase.initializeApp(statsConfig, "StatsApp");
+  // ★★★ 修正重點：補上初始化指令 ★★★
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
   }
   
-  // 3. 獲取統計專用的資料庫參照
-  // 注意：我們用 statsDatabase 而不是 database
-  const statsDatabase = statsApp.database();
-  
-  // (選用) 統計端匿名登入
-  statsApp.auth().signInAnonymously().catch((error) => {
-      console.error("Stats Auth Error:", error);
+  // ★★★ 修正重點：定義 database 變數，下面的程式才抓得到 ★★★
+  var database = firebase.database();
+
+  // (選用) 啟用匿名驗證，確保連線權限更穩定
+  firebase.auth().signInAnonymously().catch((error) => {
+      console.error("Auth Error:", error);
   });
 </script>
 
-
-<!-- === [修改版] 神思大數據收集模組 (使用 statsDatabase) === -->
+<!-- === 3. [還原版] 神思大數據收集模組 (30秒=1分鐘邏輯) === -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     let totalSeconds = 0;
     let timerInterval = null;
 
+    // 1. 獲取日期路徑
     function getDateParts() {
         const now = new Date();
         const y = String(now.getFullYear());
@@ -7264,6 +7296,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return { y, m, d };
     }
 
+    // 2. 獲取身份
     function getIdentity() {
         const rawProfile = localStorage.getItem('studentProfile');
         let s = null;
@@ -7282,10 +7315,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // === 記錄訪問 (使用 statsDatabase) ===
+   // 3. 記錄訪問 (Log Visit)
     async function logVisitOnce() {
-        // 修改這裡：檢查 statsDatabase
-        if (typeof firebase === 'undefined' || !statsDatabase) return;
+        // 這裡會檢查 database 是否存在，現在上面有初始化了，所以會通過
+        if (typeof firebase === 'undefined' || !database) return;
         
         const { y, m, d } = getDateParts();
         const identity = getIdentity();
@@ -7294,8 +7327,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const sessionKey = `sansi_visit_logged_${y}${m}${d}_${uid}`;
         if (sessionStorage.getItem(sessionKey)) return; 
 
-        // 修改這裡：使用 statsDatabase
-        const trackingRef = statsDatabase.ref(`stats_tracking/${y}/${m}/${d}/unique_users/${uid}`);
+        const trackingRef = database.ref(`stats_tracking/${y}/${m}/${d}/unique_users/${uid}`);
         
         try {
             const snap = await trackingRef.once('value');
@@ -7304,25 +7336,19 @@ document.addEventListener('DOMContentLoaded', function() {
             const updates = {};
             const increment1 = firebase.database.ServerValue.increment(1);
             
-            const globalPath = `stats_global/${y}/${m}/${d}`;
+            const globalPath = `stats_view/${y}/${m}/${d}/global`;
             updates[`${globalPath}/visits`] = increment1;
 
-            const schoolPath = `stats_school/${y}/${m}/${d}`;
-
             if (identity.type === 'student') {
-                const classKey = `${identity.grade}${identity.class}`;
-                const studentKey = identity.id.split('_').pop();
-
-                updates[`${schoolPath}/visits`] = increment1;
-                const classPath = `stats_classes/${classKey}/${y}/${m}/${d}`;
+                const classPath = `stats_view/${y}/${m}/${d}/classes/${identity.grade}${identity.class}`;
                 updates[`${classPath}/visits`] = increment1;
-                const studentPath = `stats_students/${classKey}/${studentKey}/${y}/${m}/${d}`;
+
+                const studentPath = `stats_view/${y}/${m}/${d}/students/${identity.grade}/${identity.class}/${identity.id.split('_').pop()}`; 
                 updates[`${studentPath}/visits`] = increment1;
 
                 if (isFirstTimeToday) {
                     updates[`stats_tracking/${y}/${m}/${d}/unique_users/${uid}`] = true;
                     updates[`${globalPath}/unique`] = increment1;
-                    updates[`${schoolPath}/unique`] = increment1;
                     updates[`${classPath}/unique`] = increment1;
                 }
             } else {
@@ -7332,51 +7358,48 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
 
-            // 修改這裡：使用 statsDatabase
-            await statsDatabase.ref().update(updates).catch(err => {
-                console.warn("Stats update warning:", err.message);
-            });
+            await database.ref().update(updates);
             sessionStorage.setItem(sessionKey, 'true');
-            console.log("📍 [Stats] 訪問計數已上傳 (Stats App)");
+            console.log("📍 [Stats] 訪問次數已上傳");
 
         } catch (e) {
-            console.warn("Stats Error:", e);
+            console.error("Stats Error:", e);
         }
     }
 
-    // === 上傳時長 (使用 statsDatabase) ===
+    // 4. 上傳 1 分鐘
     function uploadOneMinute() {
-        // 修改這裡：檢查 statsDatabase
-        if (typeof firebase === 'undefined' || !statsDatabase) return;
+        if (typeof firebase === 'undefined' || !database) return;
         
-        logVisitOnce(); 
+        logVisitOnce();
 
         const { y, m, d } = getDateParts();
         const identity = getIdentity();
-        const studentKey = identity.id.includes('_') ? identity.id.split('_').pop() : identity.name; 
         
         const updates = {};
         const increment60 = firebase.database.ServerValue.increment(60);
 
-        updates[`stats_global/${y}/${m}/${d}/duration`] = increment60;
+        updates[`stats_view/${y}/${m}/${d}/global/duration`] = increment60;
 
         if (identity.type === 'student') {
-            const classKey = `${identity.grade}${identity.class}`;
-            updates[`stats_school/${y}/${m}/${d}/duration`] = increment60;
-            updates[`stats_classes/${classKey}/${y}/${m}/${d}/duration`] = increment60;
-            updates[`stats_students/${classKey}/${studentKey}/${y}/${m}/${d}/duration`] = increment60;
+            updates[`stats_view/${y}/${m}/${d}/classes/${identity.grade}${identity.class}/duration`] = increment60;
+            
+            const studentPath = `stats_view/${y}/${m}/${d}/students/${identity.grade}/${identity.class}/${identity.id.split('_').pop()}`;
+            updates[`${studentPath}/duration`] = increment60;
         }
 
-        // 修改這裡：使用 statsDatabase
-        statsDatabase.ref().update(updates)
-            .then(() => console.log("✅ [Stats] 時長上傳成功"))
-            .catch(e => console.error("❌ [Stats] 上傳失敗:", e));
+        database.ref().update(updates).catch(e => console.error(e));
     }
 
+    // 5. 計時器啟動
     function startTimer() {
         if (timerInterval) return;
+        console.log("▶️ [Stats] 計時器啟動");
+        
         timerInterval = setInterval(() => {
             totalSeconds++;
+            // 30秒 -> 傳送 (算1分鐘)
+            // 90秒 (1分30秒) -> 傳送 (算2分鐘)
             if (totalSeconds === 30 || (totalSeconds > 30 && (totalSeconds - 30) % 60 === 0)) {
                 uploadOneMinute();
             }
@@ -7387,6 +7410,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (timerInterval) {
             clearInterval(timerInterval);
             timerInterval = null;
+            console.log("⏸️ [Stats] 暫停計時");
         }
     }
 
@@ -7399,65 +7423,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (document.visibilityState === 'hidden') pauseTimer();
         else startTimer();
     });
+    
+    window.forceLogVisit = logVisitOnce;
 });
-</script>
-
-<!-- === [修改版] 在線狀態自動報到系統 (使用 statsDatabase) === -->
-<script>
-    function initPresenceSystem() {
-        setTimeout(() => {
-            // 修改這裡：檢查 statsDatabase
-            if (typeof statsDatabase === 'undefined') return;
-
-            // 修改這裡：使用 statsDatabase 監聽連線
-            const connectedRef = statsDatabase.ref('.info/connected');
-
-            connectedRef.on('value', (snap) => {
-                if (snap.val() === true) {
-                    const s = JSON.parse(localStorage.getItem('studentProfile'));
-                    let myUid = "";
-                    let userData = {};
-
-                    if (s && s.name) {
-                        // 這裡要注意：如果你的用戶登入是在 Main App，這裡是獲取不到 auth 的
-                        // 但既然是統計，通常依賴 localStorage 的 studentProfile
-                        myUid = `stu_${s.grade}${s.class}_${s.name}`;
-                        userData = {
-                            name: s.name,
-                            grade: s.grade,
-                            class: s.class,
-                            timestamp: firebase.database.ServerValue.TIMESTAMP,
-                            device: /Mobile|Android/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop'
-                        };
-                    } else {
-                        let guestId = localStorage.getItem('sansi_guest_uuid');
-                        if (!guestId) {
-                            guestId = 'guest_' + Math.random().toString(36).substr(2, 9);
-                            localStorage.setItem('sansi_guest_uuid', guestId);
-                        }
-                        myUid = guestId;
-                        userData = {
-                            name: "訪客",
-                            grade: "Guest",
-                            class: "Visitor",
-                            timestamp: firebase.database.ServerValue.TIMESTAMP
-                        };
-                    }
-
-                    // 修改這裡：使用 statsDatabase
-                    const myPresenceRef = statsDatabase.ref(`online_users/${myUid}`);
-
-                    myPresenceRef.onDisconnect().remove().then(() => {
-                        myPresenceRef.set(userData);
-                    });
-                }
-            });
-        }, 2000);
-    }
-    document.addEventListener('DOMContentLoaded', initPresenceSystem);
-</script>
-
-	
 </script>
 
 
